@@ -1,0 +1,21 @@
+{
+  "name": "one-dark-modern",
+  "displayName": "One Dark Modern",
+  "description": "A color theme inspired by Atom One Dark and Dark Modern",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Themes"
+  ],
+  "contributes": {
+    "themes": [
+      {
+        "label": "One Dark Modern",
+        "uiTheme": "vs-dark",
+        "path": "./themes/one-dark-modern.json"
+      }
+    ]
+  }
+}
