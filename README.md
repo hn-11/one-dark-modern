@@ -42,7 +42,7 @@ Requires Node.js >= 23.6 (scripts run as native TypeScript).
 
 ## Upstream sync (automated)
 
-A [weekly workflow](.github/workflows/check-upstream.yml) re-fetches both
+A [monthly workflow](.github/workflows/check-upstream.yml) re-fetches both
 upstream files, rebuilds the theme, and opens an auto-merge PR. CI guards the
 result (typecheck, reproducible build, packaging). Upstream changes flow in
 automatically unless they collide with an override — in that case the override

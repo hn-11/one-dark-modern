@@ -2,7 +2,7 @@ name: Sync upstream themes
 
 on:
   schedule:
-    - cron: "0 6 * * 1" # Mondays 06:00 UTC
+    - cron: "0 6 1 * *" # 1st of every month, 06:00 UTC (upstreams change a few times a year)
   workflow_dispatch:
 
 permissions:
