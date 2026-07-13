@@ -37,4 +37,5 @@ jobs:
           files: |
             *.vsix
             dist/*.jar
+            dist/ghostty/one-dark-modern
           generate_release_notes: true

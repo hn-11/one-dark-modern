@@ -2,7 +2,7 @@
   "name": "one-dark-modern",
   "displayName": "One Dark Modern",
   "description": "A color theme inspired by Atom One Dark and Dark Modern",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "publisher": "hn-11",
   "type": "module",
   "repository": {
@@ -10,7 +10,7 @@
     "url": "https://github.com/hn-11/one-dark-modern.git"
   },
   "scripts": {
-    "build": "node scripts/build.ts && node scripts/build-jetbrains.ts",
+    "build": "node scripts/build.ts && node scripts/build-jetbrains.ts && node scripts/build-ghostty.ts",
     "typecheck": "tsc --noEmit",
     "package": "vsce package",
     "package:jetbrains": "cd dist/jetbrains && zip -qr ../one-dark-modern-jetbrains-$npm_package_version.jar META-INF theme",
