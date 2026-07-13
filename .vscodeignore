@@ -1,3 +1,5 @@
 .vscode/**
-.vscode-test/**
-.gitignore
+parts/**
+theme-builder.js
+.theme-state.json
+*.md
