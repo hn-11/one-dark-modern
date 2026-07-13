@@ -1,0 +1,24 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Merge parts
+        run: cd "$GITHUB_WORKSPACE/.." && node one-dark-modern/theme-builder.js merge one-dark-modern
+
+      - name: Check generated theme is committed
+        run: git diff --exit-code themes/
+
+      - name: Package
+        run: npx --yes @vscode/vsce package

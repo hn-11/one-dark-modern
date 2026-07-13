@@ -1,0 +1,37 @@
+name: Check upstream themes
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch upstream theme files
+        run: |
+          curl -sSfL -o upstream/dark_modern.json \
+            https://raw.githubusercontent.com/microsoft/vscode/main/extensions/theme-defaults/themes/dark_modern.json
+          curl -sSfL -o upstream/OneDark-Pro.json \
+            https://raw.githubusercontent.com/Binaryify/OneDark-Pro/master/themes/OneDark-Pro.json
+
+      - name: Open PR if upstream changed
+        uses: peter-evans/create-pull-request@v6
+        with:
+          branch: chore/upstream-sync
+          commit-message: "chore: update upstream theme snapshots"
+          title: "Upstream themes changed (Dark Modern / One Dark Pro)"
+          body: |
+            Weekly upstream check detected changes in the source themes.
+
+            Review the diff of `upstream/` to see what changed, apply the
+            relevant pieces to `parts/` manually, then merge this PR
+            together with those edits (run `npm run merge` and commit the
+            regenerated theme).

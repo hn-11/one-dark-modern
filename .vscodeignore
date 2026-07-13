@@ -3,3 +3,6 @@ parts/**
 theme-builder.js
 .theme-state.json
 *.md
+.github/**
+upstream/**
+.gitignore
