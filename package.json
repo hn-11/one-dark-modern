@@ -2,16 +2,23 @@
   "name": "one-dark-modern",
   "displayName": "One Dark Modern",
   "description": "A color theme inspired by Atom One Dark and Dark Modern",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "publisher": "hn-11",
+  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/hn-11/one-dark-modern.git"
   },
   "scripts": {
-    "merge": "cd .. && node one-dark-modern/theme-builder.js merge one-dark-modern",
-    "bump": "cd .. && node one-dark-modern/theme-builder.js bump one-dark-modern",
-    "package": "npx --yes @vscode/vsce package"
+    "build": "node scripts/build.ts",
+    "typecheck": "tsc --noEmit",
+    "package": "vsce package",
+    "vscode:prepublish": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@vscode/vsce": "^3.0.0",
+    "typescript": "^5.8.0"
   },
   "engines": {
     "vscode": "^1.90.0"

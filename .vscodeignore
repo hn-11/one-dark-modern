@@ -1,8 +1,10 @@
 .vscode/**
-parts/**
-theme-builder.js
-.theme-state.json
-*.md
 .github/**
+scripts/**
+overrides/**
 upstream/**
+node_modules/**
+tsconfig.json
+package-lock.json
+*.md
 .gitignore

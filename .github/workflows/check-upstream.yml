@@ -1,4 +1,4 @@
-name: Check upstream themes
+name: Sync upstream themes
 
 on:
   schedule:
@@ -10,10 +10,15 @@ permissions:
   pull-requests: write
 
 jobs:
-  check:
+  sync:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
 
       - name: Fetch upstream theme files
         run: |
@@ -22,16 +27,26 @@ jobs:
           curl -sSfL -o upstream/OneDark-Pro.json \
             https://raw.githubusercontent.com/Binaryify/OneDark-Pro/master/themes/OneDark-Pro.json
 
-      - name: Open PR if upstream changed
+      - name: Rebuild theme from new snapshots
+        run: npm run build
+
+      - name: Open PR if anything changed
+        id: pr
         uses: peter-evans/create-pull-request@v6
         with:
           branch: chore/upstream-sync
-          commit-message: "chore: update upstream theme snapshots"
-          title: "Upstream themes changed (Dark Modern / One Dark Pro)"
+          commit-message: "chore: sync upstream themes (Dark Modern / One Dark Pro)"
+          title: "Sync upstream themes (Dark Modern / One Dark Pro)"
           body: |
-            Weekly upstream check detected changes in the source themes.
+            Automated upstream sync. The diff of `upstream/` shows what changed
+            in the sources; `themes/` is the rebuilt result with our
+            `overrides/` applied on top.
 
-            Review the diff of `upstream/` to see what changed, apply the
-            relevant pieces to `parts/` manually, then merge this PR
-            together with those edits (run `npm run merge` and commit the
-            regenerated theme).
+            CI validates the build. If a change looks wrong, add or adjust an
+            entry in `overrides/` on this branch before merging.
+
+      - name: Enable auto-merge
+        if: steps.pr.outputs.pull-request-operation == 'created'
+        run: gh pr merge --auto --squash "${{ steps.pr.outputs.pull-request-number }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

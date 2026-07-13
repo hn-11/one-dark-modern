@@ -14,7 +14,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 24
+          cache: npm
+      - run: npm ci
 
       - name: Check tag matches package.json version
         run: |
@@ -25,11 +27,8 @@ jobs:
             exit 1
           fi
 
-      - name: Merge parts
-        run: cd "$GITHUB_WORKSPACE/.." && node one-dark-modern/theme-builder.js merge one-dark-modern
-
-      - name: Package
-        run: npx --yes @vscode/vsce package
+      - run: npm run build
+      - run: npm run package
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

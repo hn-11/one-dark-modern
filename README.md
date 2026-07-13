@@ -2,7 +2,7 @@
 
 A VS Code color theme that combines [One Dark Pro](https://github.com/Binaryify/OneDark-Pro) syntax highlighting (originally from [Atom One Dark](https://github.com/atom/one-dark-syntax)) with the [Dark Modern](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/dark_modern.json) workbench UI.
 
-- **Syntax**: One Dark Pro token colors, cleaned up (dead/duplicate rules removed, `invalid.*` rendered as errors) plus `semanticTokenColors` aligned with the TextMate rules — colors stay consistent whether or not a language server is running.
+- **Syntax**: One Dark Pro token & semantic colors, with a few fixes (`invalid.*` rendered as errors, dead duplicate rules dropped).
 - **UI**: Dark Modern's `#181818`/`#1f1f1f` workbench with the `#0078d4` accent.
 - **Terminal / brackets**: One Dark ANSI palette and bracket-pair colors.
 
@@ -16,43 +16,45 @@ code --install-extension one-dark-modern-<version>.vsix
 
 Then select **One Dark Modern** via `Cmd+K Cmd+T`.
 
-## Development
+## How it works
 
-The theme file is generated — do not edit `themes/one-dark-modern-color-theme.json` directly. Edit the files in `parts/` instead:
+The theme is **generated** from upstream snapshots plus this repo's overrides:
 
-| File | Contents |
-|---|---|
-| `parts/base.json` | name, type, `semanticHighlighting` |
-| `parts/colors-editor.json` | editor & peek view colors |
-| `parts/colors-ui.json` | workbench UI colors |
-| `parts/colors-terminal.json` | terminal / ANSI colors |
-| `parts/tokens.json` | TextMate token colors |
-| `parts/semantic.json` | semantic token colors |
+```
+upstream/dark_modern.json   (auto-synced)  ─┐
+upstream/OneDark-Pro.json   (auto-synced)  ─┤→ scripts/build.ts → themes/one-dark-modern-color-theme.json
+overrides/{colors,tokens,semantic}.json    ─┘
+```
 
-Then rebuild (the builder is from [jugyo/vscode-theme-skill](https://github.com/jugyo/vscode-theme-skill) and expects to run from the parent directory):
+`overrides/` is the only thing meant to be edited by hand — it holds everything
+this theme intentionally does differently from its upstreams (~56 colors,
+9 token rules, 23 semantic entries). An override with the same key/scope as an
+upstream entry replaces it; everything else flows through from upstream.
 
 ```sh
-npm run merge     # regenerate themes/one-dark-modern-color-theme.json
-npm run package   # build the .vsix
+npm ci
+npm run build      # regenerate themes/
+npm run typecheck
+npm run package    # build the .vsix
 ```
+
+Requires Node.js >= 23.6 (scripts run as native TypeScript).
+
+## Upstream sync (automated)
+
+A [weekly workflow](.github/workflows/check-upstream.yml) re-fetches both
+upstream files, rebuilds the theme, and opens an auto-merge PR. CI guards the
+result (typecheck, reproducible build, packaging). Upstream changes flow in
+automatically unless they collide with an override — in that case the override
+wins by construction, so nothing we've customized can be silently reverted.
 
 ## Releasing
 
-1. Bump the version: `npm run bump` (patch) — or edit `package.json`.
-2. Commit, tag, and push:
+```sh
+npm version patch            # bumps package.json + creates the git tag
+npm run build && git add themes && git commit --amend --no-edit
+git push origin main --tags
+```
 
-   ```sh
-   git tag v$(node -p "require('./package.json').version")
-   git push origin main --tags
-   ```
-
-3. The [release workflow](.github/workflows/release.yml) builds the `.vsix` and attaches it to a GitHub Release.
-
-## Tracking upstream
-
-`upstream/` holds snapshots of the two sources this theme derives from:
-
-- `upstream/dark_modern.json` — from `microsoft/vscode` (UI colors)
-- `upstream/OneDark-Pro.json` — from `Binaryify/OneDark-Pro` (token colors)
-
-A [weekly workflow](.github/workflows/check-upstream.yml) re-fetches both and opens a PR when they change. The PR diff shows exactly what upstream changed; apply the relevant parts to `parts/` by hand (our files are modified derivatives, so blind syncing is not safe) and merge the snapshot update together with those edits.
+The [release workflow](.github/workflows/release.yml) checks the tag against
+`package.json`, builds the `.vsix`, and attaches it to a GitHub Release.
