@@ -29,9 +29,12 @@ jobs:
 
       - run: npm run build
       - run: npm run package
+      - run: npm run package:jetbrains
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: "*.vsix"
+          files: |
+            *.vsix
+            dist/*.jar
           generate_release_notes: true

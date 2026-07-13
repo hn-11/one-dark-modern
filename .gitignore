@@ -1,3 +1,4 @@
 node_modules
 *.vsix
 one-dark-modern-*.vsix
+dist/

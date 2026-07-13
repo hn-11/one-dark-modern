@@ -16,6 +16,14 @@ code --install-extension one-dark-modern-<version>.vsix
 
 Then select **One Dark Modern** via `Cmd+K Cmd+T`.
 
+### JetBrains IDEs (IDEA / GoLand / WebStorm / PyCharm)
+
+Download `one-dark-modern-jetbrains-<version>.jar` from Releases, then
+**Settings → Plugins → ⚙ → Install Plugin from Disk…** and restart. The plugin
+is generated from the same VS Code theme file, so the palette is identical by
+construction (`scripts/build-jetbrains.ts` maps it to IntelliJ attribute keys,
+with dedicated mappings for Java, Go, JS/TS, and Python).
+
 ## How it works
 
 The theme is **generated** from upstream snapshots plus this repo's overrides:

@@ -20,3 +20,4 @@ jobs:
       - name: Check generated theme is committed
         run: git diff --exit-code themes/
       - run: npm run package
+      - run: npm run package:jetbrains
