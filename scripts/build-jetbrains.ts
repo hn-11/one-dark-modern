@@ -355,6 +355,11 @@ const attributes: Array<[string, Attr]> = [
   ["PY.ANNOTATION", { fg: cls }],
   ["PY.STRING.B", { fg: str }],
 
+  // Shell script (Shell plugin)
+  ["BASH.EXTERNAL_COMMAND", { fg: token("entity.name.command.shell", "#98c379") }],
+  ["BASH.SUBSHELL_COMMAND", { fg: token("entity.name.command.shell", "#98c379") }],
+  ["BASH.FUNCTION_DEF_NAME", { fg: func }],
+
   // console (terminal palette)
   ["CONSOLE_NORMAL_OUTPUT", { fg: ui("terminal.foreground", "#abb2bf") }],
   ["CONSOLE_ERROR_OUTPUT", { fg: ansi("Red") }],

@@ -2251,6 +2251,21 @@
       "settings": {
         "foreground": "#F44747"
       }
+    },
+    {
+      "scope": [
+        "entity.name.command.shell",
+        "support.function.builtin.shell"
+      ],
+      "settings": {
+        "foreground": "#98C379"
+      }
+    },
+    {
+      "scope": "constant.other.option.shell",
+      "settings": {
+        "foreground": "#56B6C2"
+      }
     }
   ],
   "semanticTokenColors": {
