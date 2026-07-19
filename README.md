@@ -56,8 +56,16 @@ typescript-language-server) for semantic tokens, then reports every token
 whose color would visibly change when semantic highlighting lands. The rule:
 semantic may *correct* tokens TextMate left at the plain foreground, but must
 not repaint a color TextMate set deliberately — intentional exceptions live in
-`audit/allow.json` with reasons. Python/Shell are TM-only (Pylance is
-closed-source; shell has no semantic server).
+`audit/allow.json` with reasons (optionally scoped to an exact TM color via
+`tmColor`). Python/Shell are TM-only (Pylance is closed-source; shell has no
+semantic server).
+
+Coverage is tracked two ways: observed semantic `type.modifier` combos are
+snapshotted in `audit/coverage-semantic.json` (new combos fail the audit until
+reviewed and accepted with `npm run audit -- --update`), and theme rules that
+no fixture exercises are listed in `audit/coverage-tm.json`. Fixtures under
+`audit/fixtures/` include files borrowed from microsoft/vscode's
+colorize-tests suite (MIT), plus hand-written samples.
 
 ## Upstream sync (automated)
 

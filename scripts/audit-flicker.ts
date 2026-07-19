@@ -5,17 +5,23 @@
 // only fill in what TM could not decide." A violation is therefore:
 //   TM gave a token a deliberate color (not the plain foreground) AND the
 //   semantic layer resolves a DIFFERENT color for the same token.
-// Semantic coloring of plain-foreground tokens is a legitimate correction
-// and is reported only as a count.
+// Intentional corrections are documented in audit/allow.json.
+//
+// Also reports coverage:
+//   - semantic: observed type.modifiers combos per language, snapshotted in
+//     audit/coverage-semantic.json (run with --update to accept new combos;
+//     unseen combos fail the audit so server drift is surfaced)
+//   - TextMate: which theme tokenColors rules matched at least one fixture
+//     token (unexercised rules -> audit/coverage-tm.json, informational)
 //
 // Coverage: Go (gopls) and TypeScript (typescript-language-server).
 // Python/Shell have no open-source semantic token servers (Pylance is
 // closed; bash-ls emits none), so they are TM-only here.
 //
-// Usage: npm run audit   (requires gopls on PATH)
+// Usage: npm run audit [-- --update]   (requires gopls on PATH)
 import { spawn, type ChildProcess } from "node:child_process";
 import { createRequire } from "node:module";
-import { readFileSync } from "node:fs";
+import { readFileSync, writeFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { pathToFileURL, fileURLToPath } from "node:url";
 import type * as tmTypes from "vscode-textmate";
@@ -25,6 +31,7 @@ const require = createRequire(import.meta.url);
 const tm: typeof tmTypes = require("vscode-textmate");
 const oniguruma = require("vscode-oniguruma");
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+const UPDATE = process.argv.includes("--update");
 
 interface TokenRule {
   scope: string | string[];
@@ -44,6 +51,7 @@ interface AllowEntry {
   lang: string;
   type: string;
   modifiers?: string[];
+  tmColor?: string; // if set, only allowed when TM resolved exactly this color
   reason: string;
 }
 const allow: AllowEntry[] = JSON.parse(readFileSync(join(root, "audit/allow.json"), "utf8"));
@@ -78,27 +86,77 @@ registry.setTheme({
   ],
 });
 
-// per line: array of {start, end, colorIndex}
-async function tmColors(lang: string, text: string): Promise<Array<Array<{ s: number; e: number; c: number }>>> {
+interface TmLine {
+  colors: Array<{ s: number; e: number; c: number }>;
+  scopes: Array<{ s: number; e: number; stack: string[] }>;
+}
+
+async function tmTokenize(lang: string, text: string): Promise<TmLine[]> {
   const grammar = await registry.loadGrammar(GRAMMARS[lang].scope);
   if (!grammar) throw new Error(`grammar not found for ${lang}`);
   const lines = text.split("\n");
-  const out: Array<Array<{ s: number; e: number; c: number }>> = [];
-  let stack: tmTypes.StateStack | null = null;
+  const out: TmLine[] = [];
+  let stack2: tmTypes.StateStack | null = null;
+  let stack1: tmTypes.StateStack | null = null;
   for (const line of lines) {
-    const r = grammar.tokenizeLine2(line, stack);
-    const toks: Array<{ s: number; e: number; c: number }> = [];
-    const d = r.tokens; // pairs of (startIndex, metadata)
+    const r2 = grammar.tokenizeLine2(line, stack2);
+    const colors: TmLine["colors"] = [];
+    const d = r2.tokens;
     for (let i = 0; i < d.length; i += 2) {
-      const start = d[i];
-      const end = i + 2 < d.length ? d[i + 2] : line.length;
-      const color = (d[i + 1] & 0b00000000111111111000000000000000) >>> 15;
-      toks.push({ s: start, e: end, c: color });
+      colors.push({
+        s: d[i],
+        e: i + 2 < d.length ? d[i + 2] : line.length,
+        c: (d[i + 1] & 0b00000000111111111000000000000000) >>> 15,
+      });
     }
-    out.push(toks);
-    stack = r.ruleStack;
+    const r1 = grammar.tokenizeLine(line, stack1);
+    const scopes: TmLine["scopes"] = r1.tokens.map((t) => ({
+      s: t.startIndex,
+      e: t.endIndex,
+      stack: t.scopes,
+    }));
+    out.push({ colors, scopes });
+    stack2 = r2.ruleStack;
+    stack1 = r1.ruleStack;
   }
   return out;
+}
+
+// ---------- TM rule coverage ----------
+// selector part matches a scope if equal or a dot-prefix of it
+const partMatches = (part: string, scope: string): boolean =>
+  scope === part || scope.startsWith(part + ".");
+// descendant selector: every part must match successive scopes in the stack
+function selectorMatches(selector: string, stack: string[]): boolean {
+  const parts = selector.trim().split(/\s+/).filter((p) => p !== ">");
+  let idx = 0;
+  for (const part of parts) {
+    let found = -1;
+    for (let j = idx; j < stack.length; j++) {
+      if (partMatches(part, stack[j])) {
+        found = j;
+        break;
+      }
+    }
+    if (found < 0) return false;
+    idx = found + 1;
+  }
+  return true;
+}
+const ruleSelectors: string[][] = theme.tokenColors.map((r) => {
+  const raw = Array.isArray(r.scope) ? r.scope : [r.scope];
+  return raw.flatMap((s) => s.split(","));
+});
+const ruleFired = new Array<boolean>(theme.tokenColors.length).fill(false);
+function recordRuleCoverage(lines: TmLine[]): void {
+  for (const line of lines) {
+    for (const tok of line.scopes) {
+      for (let r = 0; r < ruleSelectors.length; r++) {
+        if (ruleFired[r]) continue;
+        if (ruleSelectors[r].some((sel) => selectorMatches(sel, tok.stack))) ruleFired[r] = true;
+      }
+    }
+  }
 }
 
 // ---------- semantic resolution (mirrors VS Code precedence) ----------
@@ -151,7 +209,6 @@ class Lsp {
   }
   private dispatch(msg: { id?: number; method?: string; params?: unknown; result?: unknown }): void {
     if (msg.method && msg.id !== undefined) {
-      // server -> client request: answer enough to keep servers happy
       let result: unknown = null;
       if (msg.method === "workspace/configuration") {
         const items = (msg.params as { items: unknown[] }).items;
@@ -187,68 +244,74 @@ interface SemToken {
   type: string;
   modifiers: string[];
 }
+interface Legend {
+  tokenTypes: string[];
+  tokenModifiers: string[];
+}
 
-async function semanticTokens(
-  cmd: string,
-  args: string[],
-  cwd: string,
-  fileUri: string,
-  languageId: string,
-  text: string,
-  initOptions: unknown,
-  configResponse: unknown
-): Promise<SemToken[]> {
-  const lsp = new Lsp(cmd, args, cwd, configResponse);
-  const init = await lsp.request<{
-    capabilities: { semanticTokensProvider?: { legend: { tokenTypes: string[]; tokenModifiers: string[] } } };
-  }>("initialize", {
-    processId: process.pid,
-    rootUri: pathToFileURL(cwd).toString(),
-    workspaceFolders: [{ uri: pathToFileURL(cwd).toString(), name: "fixture" }],
-    initializationOptions: initOptions,
-    capabilities: {
-      workspace: { configuration: true },
-      textDocument: {
-        semanticTokens: {
-          requests: { full: true },
-          tokenTypes: [],
-          tokenModifiers: [],
-          formats: ["relative"],
+class SemanticSession {
+  private lsp: Lsp;
+  private legend: Legend | undefined;
+  private ready: Promise<void>;
+  constructor(cmd: string, args: string[], cwd: string, initOptions: unknown, configResponse: unknown) {
+    this.lsp = new Lsp(cmd, args, cwd, configResponse);
+    this.ready = this.lsp
+      .request<{ capabilities: { semanticTokensProvider?: { legend: Legend } } }>("initialize", {
+        processId: process.pid,
+        rootUri: pathToFileURL(cwd).toString(),
+        workspaceFolders: [{ uri: pathToFileURL(cwd).toString(), name: "fixture" }],
+        initializationOptions: initOptions,
+        capabilities: {
+          workspace: { configuration: true },
+          textDocument: {
+            semanticTokens: {
+              requests: { full: true },
+              tokenTypes: [],
+              tokenModifiers: [],
+              formats: ["relative"],
+            },
+          },
         },
-      },
-    },
-  });
-  const legend = init.capabilities.semanticTokensProvider?.legend;
-  lsp.notify("initialized", {});
-  lsp.notify("textDocument/didOpen", {
-    textDocument: { uri: fileUri, languageId, version: 1, text },
-  });
-  // poll until the server has analyzed the file
-  let data: number[] | null = null;
-  for (let i = 0; i < 30; i++) {
-    const r = await lsp.request<{ data: number[] } | null>("textDocument/semanticTokens/full", {
-      textDocument: { uri: fileUri },
+      })
+      .then((init) => {
+        this.legend = init.capabilities.semanticTokensProvider?.legend;
+        this.lsp.notify("initialized", {});
+      });
+  }
+  async tokens(path: string, languageId: string, text: string): Promise<SemToken[]> {
+    await this.ready;
+    const uri = pathToFileURL(path).toString();
+    this.lsp.notify("textDocument/didOpen", {
+      textDocument: { uri, languageId, version: 1, text },
     });
-    if (r && r.data && r.data.length > 0) {
-      data = r.data;
-      break;
+    let data: number[] | null = null;
+    for (let i = 0; i < 30; i++) {
+      const r = await this.lsp.request<{ data: number[] } | null>("textDocument/semanticTokens/full", {
+        textDocument: { uri },
+      });
+      if (r && r.data && r.data.length > 0) {
+        data = r.data;
+        break;
+      }
+      await new Promise((res) => setTimeout(res, 500));
     }
-    await new Promise((res) => setTimeout(res, 500));
+    if (!data || !this.legend) return [];
+    const toks: SemToken[] = [];
+    let line = 0;
+    let start = 0;
+    for (let i = 0; i < data.length; i += 5) {
+      line += data[i];
+      start = data[i] === 0 ? start + data[i + 1] : data[i + 1];
+      const mods: string[] = [];
+      for (let b = 0; b < this.legend.tokenModifiers.length; b++)
+        if (data[i + 4] & (1 << b)) mods.push(this.legend.tokenModifiers[b]);
+      toks.push({ line, start, len: data[i + 2], type: this.legend.tokenTypes[data[i + 3]], modifiers: mods });
+    }
+    return toks;
   }
-  lsp.kill();
-  if (!data || !legend) return [];
-  const toks: SemToken[] = [];
-  let line = 0;
-  let start = 0;
-  for (let i = 0; i < data.length; i += 5) {
-    line += data[i];
-    start = data[i] === 0 ? start + data[i + 1] : data[i + 1];
-    const mods: string[] = [];
-    for (let b = 0; b < legend.tokenModifiers.length; b++)
-      if (data[i + 4] & (1 << b)) mods.push(legend.tokenModifiers[b]);
-    toks.push({ line, start, len: data[i + 2], type: legend.tokenTypes[data[i + 3]], modifiers: mods });
+  kill(): void {
+    this.lsp.kill();
   }
-  return toks;
 }
 
 // ---------- comparison ----------
@@ -263,103 +326,159 @@ interface Finding {
   semanticColor: string;
 }
 
-async function auditLang(
-  lang: "go" | "ts",
-  file: string,
+const observedCombos = new Set<string>();
+
+function compare(
   languageId: string,
-  server: [string, string[]],
-  initOptions: unknown,
-  configResponse: unknown
-): Promise<{ findings: Finding[]; corrections: number; total: number }> {
-  const cwd = join(root, "audit/fixtures", lang);
-  const path = join(cwd, file);
-  const text = readFileSync(path, "utf8");
+  fileLabel: string,
+  text: string,
+  tmLines: TmLine[],
+  sem: SemToken[]
+): { findings: Finding[]; corrections: number } {
   const lines = text.split("\n");
-  const tmByLine = await tmColors(lang, text);
   const colorMap = registry.getColorMap().map((c) => (c ?? "").toLowerCase());
-  const sem = await semanticTokens(
-    server[0],
-    server[1],
-    cwd,
-    pathToFileURL(path).toString(),
-    languageId,
-    text,
-    initOptions,
-    configResponse
-  );
   const findings: Finding[] = [];
   let corrections = 0;
   for (const t of sem) {
+    observedCombos.add(`${languageId}|${[t.type, ...t.modifiers.slice().sort()].join(".")}`);
     const semFg = semColor(t.type, t.modifiers, languageId);
     if (!semFg) continue; // unmapped -> falls back to TM: never a flicker
-    const tmTok = (tmByLine[t.line] ?? []).find((k) => k.s <= t.start && t.start < k.e);
+    const tmTok = (tmLines[t.line]?.colors ?? []).find((k) => k.s <= t.start && t.start < k.e);
     if (!tmTok) continue;
-    const tmFg = colorMap[tmTok.c] ?? editorFg;
+    const tmFg = colorMap[tmTok.c] || editorFg;
     if (tmFg === semFg) continue;
     if (tmFg === editorFg) {
-      corrections++; // TM had no opinion: legitimate correction
+      corrections++;
       continue;
     }
-    const word = lines[t.line].slice(t.start, t.start + t.len);
-    const allowed = allow.some(
-      (a) =>
-        a.lang === languageId &&
-        a.type === t.type &&
-        (a.modifiers ?? []).every((m) => t.modifiers.includes(m))
-    );
-    if (allowed) continue;
+    if (
+      allow.some(
+        (a) =>
+          a.lang === languageId &&
+          a.type === t.type &&
+          (a.modifiers ?? []).every((m) => t.modifiers.includes(m)) &&
+          (!a.tmColor || a.tmColor === tmFg)
+      )
+    )
+      continue;
     findings.push({
       lang: languageId,
-      file: `audit/fixtures/${lang}/${file}`,
+      file: fileLabel,
       line: t.line + 1,
-      text: word,
+      text: lines[t.line].slice(t.start, t.start + t.len),
       type: t.type,
       modifiers: t.modifiers,
       tmColor: tmFg,
       semanticColor: semFg,
     });
   }
-  return { findings, corrections, total: sem.length };
+  return { findings, corrections };
 }
 
-// TM-only sanity pass: report fixture coverage for languages without a server
-async function tmOnly(lang: "py" | "sh", file: string): Promise<number> {
-  const text = readFileSync(join(root, "audit/fixtures", lang, file), "utf8");
-  const toks = await tmColors(lang, text);
-  return toks.flat().length;
+const listFiles = (dir: string, ext: string): string[] =>
+  readdirSync(dir)
+    .filter((f) => f.endsWith(ext))
+    .map((f) => join(dir, f));
+
+// ---------- run ----------
+const findings: Finding[] = [];
+let corrections = 0;
+let semTotal = 0;
+
+// Go: one gopls session per module dir
+const goRoot = join(root, "audit/fixtures/go");
+for (const sub of readdirSync(goRoot)) {
+  const dir = join(goRoot, sub);
+  if (!statSync(dir).isDirectory()) continue;
+  const session = new SemanticSession("gopls", [], dir, { semanticTokens: true }, { semanticTokens: true });
+  for (const file of listFiles(dir, ".go")) {
+    const text = readFileSync(file, "utf8");
+    const tmLines = await tmTokenize("go", text);
+    recordRuleCoverage(tmLines);
+    const sem = await session.tokens(file, "go", text);
+    semTotal += sem.length;
+    const r = compare("go", file.replace(root + "/", ""), text, tmLines, sem);
+    findings.push(...r.findings);
+    corrections += r.corrections;
+  }
+  session.kill();
 }
 
-const results = [
-  await auditLang("go", "main.go", "go", ["gopls", []], { semanticTokens: true }, { semanticTokens: true }),
-  await auditLang(
-    "ts",
-    "sample.ts",
-    "typescript",
-    [join(root, "node_modules/.bin/typescript-language-server"), ["--stdio"]],
-    {},
-    {}
-  ),
-];
-const pyTokens = await tmOnly("py", "sample.py");
-const shTokens = await tmOnly("sh", "sample.sh");
+// TS: one server for the whole dir
+const tsDir = join(root, "audit/fixtures/ts");
+const tsSession = new SemanticSession(
+  join(root, "node_modules/.bin/typescript-language-server"),
+  ["--stdio"],
+  tsDir,
+  {},
+  {}
+);
+for (const file of listFiles(tsDir, ".ts")) {
+  const text = readFileSync(file, "utf8");
+  const tmLines = await tmTokenize("ts", text);
+  recordRuleCoverage(tmLines);
+  const sem = await tsSession.tokens(file, "typescript", text);
+  semTotal += sem.length;
+  const r = compare("typescript", file.replace(root + "/", ""), text, tmLines, sem);
+  findings.push(...r.findings);
+  corrections += r.corrections;
+}
+tsSession.kill();
 
-let violations = 0;
-for (const r of results) {
-  violations += r.findings.length;
-  for (const f of r.findings) {
-    console.log(
-      `VIOLATION [${f.lang}] ${f.file}:${f.line} "${f.text}" ` +
-        `${f.type}${f.modifiers.length ? "." + f.modifiers.join(".") : ""} ` +
-        `TM ${f.tmColor} -> semantic ${f.semanticColor}`
-    );
+// Python / Shell: TM-only (rule coverage still counts)
+let tmOnlyTokens = 0;
+for (const [lang, ext] of [
+  ["py", ".py"],
+  ["sh", ".sh"],
+] as const) {
+  for (const file of listFiles(join(root, "audit/fixtures", lang), ext)) {
+    const tmLines = await tmTokenize(lang, readFileSync(file, "utf8"));
+    recordRuleCoverage(tmLines);
+    tmOnlyTokens += tmLines.reduce((n, l) => n + l.scopes.length, 0);
   }
 }
-console.log(
-  `\ngo: ${results[0].total} semantic tokens, ${results[0].corrections} corrections, ${results[0].findings.length} violations`
+
+// ---------- report ----------
+for (const f of findings) {
+  console.log(
+    `VIOLATION [${f.lang}] ${f.file}:${f.line} "${f.text}" ` +
+      `${f.type}${f.modifiers.length ? "." + f.modifiers.join(".") : ""} ` +
+      `TM ${f.tmColor} -> semantic ${f.semanticColor}`
+  );
+}
+
+// semantic combo coverage vs snapshot
+const comboPath = join(root, "audit/coverage-semantic.json");
+const combos = [...observedCombos].sort();
+let newCombos: string[] = [];
+try {
+  const known: string[] = JSON.parse(readFileSync(comboPath, "utf8"));
+  newCombos = combos.filter((c) => !known.includes(c));
+} catch {
+  newCombos = combos;
+}
+if (UPDATE || newCombos.length === 0) {
+  if (UPDATE) writeFileSync(comboPath, JSON.stringify(combos, null, 2) + "\n");
+} else {
+  console.log(`\nNEW semantic type/modifier combos (unaudited color paths — review, then run with --update):`);
+  for (const c of newCombos) console.log(`  ${c}`);
+}
+
+// TM rule coverage
+const unexercised = theme.tokenColors
+  .map((r, i) => ({ i, scope: r.scope }))
+  .filter(({ i }) => !ruleFired[i]);
+writeFileSync(
+  join(root, "audit/coverage-tm.json"),
+  JSON.stringify(unexercised.map((u) => u.scope), null, 2) + "\n"
 );
+
+console.log(`\nsemantic tokens: ${semTotal} (corrections of plain tokens: ${corrections})`);
+console.log(`semantic combos observed: ${combos.length} (${newCombos.length} new vs snapshot)`);
 console.log(
-  `ts: ${results[1].total} semantic tokens, ${results[1].corrections} corrections, ${results[1].findings.length} violations`
+  `TM rules exercised: ${ruleFired.filter(Boolean).length}/${theme.tokenColors.length} ` +
+    `(unexercised list -> audit/coverage-tm.json)`
 );
-console.log(`py: TM-only (${pyTokens} tokens; Pylance semantic tokens are closed-source)`);
-console.log(`sh: TM-only (${shTokens} tokens; no semantic token server exists)`);
-process.exit(violations > 0 ? 1 : 0);
+console.log(`py/sh TM-only tokens: ${tmOnlyTokens}`);
+console.log(`violations: ${findings.length}`);
+process.exit(findings.length > 0 || (newCombos.length > 0 && !UPDATE) ? 1 : 0);

@@ -7,18 +7,39 @@
   {
     "lang": "go",
     "type": "variable",
-    "modifiers": ["readonly"],
+    "modifiers": [
+      "readonly"
+    ],
     "reason": "consts are yellow by design (matches TS variable.readonly / ODP variable.other.constant); the Go TM grammar cannot see constness"
   },
   {
     "lang": "typescript",
     "type": "variable",
-    "modifiers": ["readonly"],
+    "modifiers": [
+      "readonly"
+    ],
     "reason": "const locals are yellow by design; TM only marks some declaration sites"
   },
   {
     "lang": "typescript",
     "type": "enumMember",
     "reason": "One Dark Pro upstream itself defines semantic enumMember cyan; TM has no enum-member awareness"
+  },
+  {
+    "lang": "typescript",
+    "type": "class",
+    "reason": "constructor calls: TM guesses function-call blue; semantic class yellow keeps the type family consistent (approved look since Record<> screenshot)"
+  },
+  {
+    "lang": "typescript",
+    "type": "variable",
+    "tmColor": "#e5c07b",
+    "reason": "ODP paints object receivers (variable.other.object) yellow; semantic cannot opt out per-language, and uniform red has been the shipped look since v0.0.2"
+  },
+  {
+    "lang": "typescript",
+    "type": "parameter",
+    "tmColor": "#e5c07b",
+    "reason": "same as variable: parameters used as object receivers get TM receiver-yellow"
   }
 ]
