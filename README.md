@@ -19,7 +19,7 @@ Then select **One Dark Modern** via `Cmd+K Cmd+T`.
 The extension also ships **One Dark 2026** — the same One Dark syntax on
 VS Code's experimental [2026 Dark](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/2026-dark.json)
 workbench (darker `#121314` background), with the accent recolored to One Dark's `#528BFF` (Atom's accent, same as the cursor) via `overrides/accent-2026.json` - alpha-preserving, so upstream accent keys are remapped automatically. It tracks upstream
-through the same monthly sync; variant-specific tweaks go in
+through the same automated sync; variant-specific tweaks go in
 `overrides/colors-2026.json`. The JetBrains/terminal/Vim artifacts remain
 based on One Dark Modern.
 
@@ -47,8 +47,8 @@ overrides/{colors,tokens,semantic}.json    ─┘
 ```
 
 `overrides/` is the only thing meant to be edited by hand — it holds everything
-this theme intentionally does differently from its upstreams (~56 colors,
-9 token rules, 23 semantic entries). An override with the same key/scope as an
+this theme intentionally does differently from its upstreams (41 colors,
+7 token rules, 27 semantic entries, plus the 2026 accent map). An override with the same key/scope as an
 upstream entry replaces it; everything else flows through from upstream.
 
 ```sh
@@ -100,8 +100,8 @@ colorize-tests suite (MIT), plus hand-written samples.
 
 ## Upstream sync (automated)
 
-A [monthly workflow](.github/workflows/check-upstream.yml) re-fetches both
-upstream files, rebuilds the theme, and opens an auto-merge PR. CI guards the
+A [scheduled workflow](.github/workflows/check-upstream.yml) (weekly while
+2026 Dark churns; monthly otherwise) re-fetches the upstream files, rebuilds the theme, and opens an auto-merge PR. CI guards the
 result (typecheck, reproducible build, packaging). Upstream changes flow in
 automatically unless they collide with an override — in that case the override
 wins by construction, so nothing we've customized can be silently reverted.
@@ -109,9 +109,7 @@ wins by construction, so nothing we've customized can be silently reverted.
 ## Releasing
 
 ```sh
-npm version patch            # bumps package.json + creates the git tag
-npm run build && git add themes && git commit --amend --no-edit
-git push origin main --tags
+npm version patch   # builds, stages themes/, commits, tags, and pushes
 ```
 
 The [release workflow](.github/workflows/release.yml) checks the tag against
