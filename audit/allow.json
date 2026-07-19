@@ -33,7 +33,7 @@
       "javascriptreact"
     ],
     "type": "enumMember",
-    "reason": "One Dark Pro upstream itself defines semantic enumMember cyan; TM has no enum-member awareness"
+    "reason": "enum members are compile-time constants - yellow like variable.readonly (self-consistency purge 2026-07); TM has no enum-member awareness"
   },
   {
     "lang": [

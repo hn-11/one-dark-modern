@@ -159,7 +159,7 @@ const lines: string[] = [
   // Treesitter / semantic (Neovim only - '@' is invalid in Vim group names)
   "if has('nvim')",
   hi("@variable", { fg: variable }),
-  hi("@variable.builtin", { fg: cls }),
+  hi("@variable.builtin", { fg: token("variable.language", "#e06c75") }),
   hi("@variable.parameter", { fg: semantic("parameter", "#e06c75"), style: "italic" }),
   hi("@variable.member", { fg: variable }),
   hi("@property", { fg: variable }),

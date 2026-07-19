@@ -14,13 +14,17 @@ mapping (borrowing a color for another family) are forbidden by default.
 |---|---|---|
 | Purple | `#C678DD` | Keywords, control flow, storage (`func` `if` `const` `import`) |
 | Blue | `#61AFEF` | Callables (functions, methods, decorators, macros) |
-| Yellow | `#E5C07B` | The type family (class/interface/enum/namespace) + const values + `this`/`self` |
-| Red | `#E06C75` | The variable family (variables, fields, parameters) + tags + headings |
-| Cyan | `#56B6C2` | Builtins (`support.*`), escapes, enum members, regexps, shell flags |
+| Yellow | `#E5C07B` | The type family (class/interface/enum/namespace) + const values + enum members |
+| Red | `#E06C75` | The variable family (variables, fields, parameters, `this`/`self`) + tags + headings |
+| Cyan | `#56B6C2` | Platform-provided magic: builtins (`support.*`), escapes, regexps, shell flags |
 | Green | `#98C379` | Strings, inserted diffs, shell command names |
-| Orange | `#D19A66` | Literals (numbers), attribute names, Python parameters, bold markup |
+| Orange | `#D19A66` | Literals (numbers, booleans), attribute names, bold markup |
 | Gray | `#7F848E` | Comments (italic) |
 | Foreground | `#ABB2BF` | Operators, punctuation — and the deliberate choice *not* to highlight |
+
+One canonized exception survives by design: shell command names are green
+(string color) to mirror zsh-syntax-highlighting in terminals - family-impure,
+kept deliberately.
 
 The UI is Dark Modern (`#181818` / `#1F1F1F`, accent `#0078D4`); the terminal
 palette is Atom one-dark-ui's ANSI 16. This three-way blend *is* the theme's
@@ -78,6 +82,18 @@ decade of tuning against each grammar's quirks.
   Separately, `string.regexp` was restored to cyan: ODP's red turned out to
   be a duplicate-rule accident canonized, and it contradicted our own
   semantic `regexp` and the color vocabulary (section 0).
+
+Case law (2026-07, the self-consistency purge): auditing the theme against
+this very document found five self-violations, four fixed: Go primitive
+types were purple while TS's were yellow (a flicker-fix had canonized the
+split - both now yellow); `this`/`self` wore type-yellow while being values
+(now variable-red, which is also Atom's original); Python parameters and
+JSON booleans had per-language exception colors (now uniform red / orange -
+the JSON fix also restores Atom+Zed two-generation agreement); enum members
+were cyan while consts were yellow (both compile-time constants - now both
+yellow). The shell-green exception was reviewed and kept. Lesson: layer
+consistency (what the flicker audit checks) is not family consistency -
+the former can be satisfied while canonizing the latter's violation.
 
 ## 4. One source of truth, generated everywhere
 

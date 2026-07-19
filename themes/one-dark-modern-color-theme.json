@@ -727,13 +727,6 @@
       }
     },
     {
-      "name": "Language variables",
-      "scope": "variable.language",
-      "settings": {
-        "foreground": "#e5c07b"
-      }
-    },
-    {
       "name": "Java Variables",
       "scope": "token.variable.parameter.java",
       "settings": {
@@ -1221,13 +1214,6 @@
       "scope": "source.json meta.structure.dictionary.json > value.json > string.quoted.json,source.json meta.structure.array.json > value.json > string.quoted.json,source.json meta.structure.dictionary.json > value.json > string.quoted.json > punctuation,source.json meta.structure.array.json > value.json > string.quoted.json > punctuation",
       "settings": {
         "foreground": "#98c379"
-      }
-    },
-    {
-      "name": "Source Json Meta Structure Dictionary Json > Constant Language Json,source Json Meta Structure Array Json > Constant Language Json",
-      "scope": "source.json meta.structure.dictionary.json > constant.language.json,source.json meta.structure.array.json > constant.language.json",
-      "settings": {
-        "foreground": "#56b6c2"
       }
     },
     {
@@ -2298,13 +2284,57 @@
       "settings": {
         "foreground": "#56B6C2"
       }
+    },
+    {
+      "scope": [
+        "storage.type.boolean.go",
+        "storage.type.byte.go",
+        "storage.type.error.go",
+        "storage.type.numeric.go",
+        "storage.type.rune.go",
+        "storage.type.string.go",
+        "storage.type.uintptr.go"
+      ],
+      "settings": {
+        "foreground": "#E5C07B"
+      }
+    },
+    {
+      "scope": "variable.language",
+      "settings": {
+        "foreground": "#E06C75"
+      }
+    },
+    {
+      "scope": [
+        "variable.parameter.function.language.special.self.python",
+        "variable.parameter.function.language.special.cls.python"
+      ],
+      "settings": {
+        "foreground": "#E06C75"
+      }
+    },
+    {
+      "scope": [
+        "variable.parameter.function.language.python",
+        "variable.parameter.function.python"
+      ],
+      "settings": {
+        "foreground": "#E06C75"
+      }
+    },
+    {
+      "scope": "source.json meta.structure.dictionary.json > constant.language.json,source.json meta.structure.array.json > constant.language.json",
+      "settings": {
+        "foreground": "#D19A66"
+      }
     }
   ],
   "semanticTokenColors": {
     "annotation:dart": {
       "foreground": "#d19a66"
     },
-    "enumMember": "#56B6C2",
+    "enumMember": "#E5C07B",
     "macro": "#61AFEF",
     "memberOperatorOverload": {
       "foreground": "#c678dd"
@@ -2353,13 +2383,9 @@
       "foreground": "#7F848E",
       "italic": true
     },
-    "parameter:python": {
-      "foreground": "#D19A66",
-      "italic": false
-    },
     "string.format": "#D19A66",
-    "type.defaultLibrary.string:go": "#C678DD",
-    "type.defaultLibrary.number:go": "#C678DD",
-    "type.defaultLibrary.bool:go": "#C678DD"
+    "type.defaultLibrary.string:go": "#E5C07B",
+    "type.defaultLibrary.number:go": "#E5C07B",
+    "type.defaultLibrary.bool:go": "#E5C07B"
   }
 }

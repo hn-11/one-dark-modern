@@ -17,7 +17,7 @@
     "italic": true
   },
   "property": "#E06C75",
-  "enumMember": "#56B6C2",
+  "enumMember": "#E5C07B",
   "event": "#E06C75",
   "keyword": "#C678DD",
   "string": "#98C379",
@@ -27,12 +27,8 @@
     "foreground": "#7F848E",
     "italic": true
   },
-  "parameter:python": {
-    "foreground": "#D19A66",
-    "italic": false
-  },
   "string.format": "#D19A66",
-  "type.defaultLibrary.string:go": "#C678DD",
-  "type.defaultLibrary.number:go": "#C678DD",
-  "type.defaultLibrary.bool:go": "#C678DD"
+  "type.defaultLibrary.string:go": "#E5C07B",
+  "type.defaultLibrary.number:go": "#E5C07B",
+  "type.defaultLibrary.bool:go": "#E5C07B"
 }
