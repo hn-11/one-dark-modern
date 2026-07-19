@@ -2328,14 +2328,6 @@
     },
     {
       "scope": [
-        "string.regexp"
-      ],
-      "settings": {
-        "foreground": "#e06c75"
-      }
-    },
-    {
-      "scope": [
         "log.info"
       ],
       "settings": {
@@ -2463,6 +2455,28 @@
       ],
       "settings": {
         "foreground": "#BE5046"
+      }
+    },
+    {
+      "scope": "variable.interpolation",
+      "settings": {
+        "foreground": "#BE5046"
+      }
+    },
+    {
+      "scope": [
+        "markup.underline.link",
+        "markup.underline.link.markdown",
+        "markup.underline.link.image.markdown"
+      ],
+      "settings": {
+        "foreground": "#56B6C2"
+      }
+    },
+    {
+      "scope": "string.regexp",
+      "settings": {
+        "foreground": "#56B6C2"
       }
     }
   ],

@@ -360,5 +360,11 @@
   "markup.italic.markdown",
   "invalid.broken",
   "invalid.deprecated",
-  "invalid.unimplemented"
+  "invalid.unimplemented",
+  "variable.interpolation",
+  [
+    "markup.underline.link",
+    "markup.underline.link.markdown",
+    "markup.underline.link.image.markdown"
+  ]
 ]

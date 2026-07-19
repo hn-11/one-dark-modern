@@ -66,10 +66,18 @@ decade of tuning against each grammar's quirks.
   calibrated on ODP".
 - When this collides with principle 2 (identity), principle 2 wins
   (see the receiver-yellow ruling).
-- The origin can win back individual tokens on taste: template-expression
-  punctuation (`${` `}`) was restored from ODP's purple to Atom's dark red
-  `#BE5046` (hue-5-2) after the Zed comparison showed Zed had preserved it
-  (2026-07, hn's call).
+- The origin can win back individual tokens on taste (2026-07, hn's call).
+  Criterion used: when Atom AND Zed - two generations of the family - agree
+  and only ODP deviates, the deviation is suspect. A mechanical
+  reconciliation of all 78 base.less assignments found exactly four such
+  tokens; three were restored:
+  - template-expression / embedded punctuation -> `#BE5046` (hue-5-2)
+  - `variable.interpolation` -> `#BE5046`
+  - markdown link URLs -> `#56B6C2` (cyan)
+  The fourth (comment brightness) stays ODP per the readability ruling.
+  Separately, `string.regexp` was restored to cyan: ODP's red turned out to
+  be a duplicate-rule accident canonized, and it contradicted our own
+  semantic `regexp` and the color vocabulary (section 0).
 
 ## 4. One source of truth, generated everywhere
 
