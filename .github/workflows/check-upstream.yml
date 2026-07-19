@@ -31,6 +31,10 @@ jobs:
             https://raw.githubusercontent.com/Binaryify/OneDark-Pro/master/themes/OneDark-Pro.json
           curl -sSfL -o upstream/zed-one.json \
             https://raw.githubusercontent.com/zed-industries/zed/main/assets/themes/one/one.json
+          curl -sSfL -o audit/zed-queries/go-highlights.scm \
+            https://raw.githubusercontent.com/zed-industries/zed/main/crates/grammars/src/go/highlights.scm
+          curl -sSfL -o audit/zed-queries/typescript-highlights.scm \
+            https://raw.githubusercontent.com/zed-industries/zed/main/crates/grammars/src/typescript/highlights.scm
 
       - name: Rebuild theme from new snapshots
         run: npm run build

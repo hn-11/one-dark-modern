@@ -64,3 +64,4 @@ jobs:
         run: go install golang.org/x/tools/gopls@latest
       - run: echo "$HOME/go/bin" >> "$GITHUB_PATH"
       - run: npm run audit
+      - run: npm run audit:zed

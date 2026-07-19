@@ -210,12 +210,24 @@
       }
     },
     {
-      "scope": [
-        "constant.numeric",
-        "constant.language"
-      ],
+      "scope": "constant.numeric",
       "settings": {
         "foreground": "#bf956a"
+      }
+    },
+    {
+      "scope": "constant.language.boolean",
+      "settings": {
+        "foreground": "#bf956a"
+      }
+    },
+    {
+      "scope": [
+        "constant.language.null",
+        "constant.language.undefined"
+      ],
+      "settings": {
+        "foreground": "#dfc184"
       }
     },
     {
@@ -238,17 +250,40 @@
       }
     },
     {
+      "scope": "storage.type.function.arrow",
+      "settings": {
+        "foreground": "#6eb4bf"
+      }
+    },
+    {
+      "scope": [
+        "keyword.operator.type",
+        "keyword.operator.optional"
+      ],
+      "settings": {
+        "foreground": "#b1574b"
+      }
+    },
+    {
       "scope": [
         "entity.name.type",
         "entity.name.class",
-        "support.type",
-        "support.class",
         "entity.other.inherited-class",
         "support.type.primitive",
         "support.type.builtin"
       ],
       "settings": {
         "foreground": "#6eb4bf"
+      }
+    },
+    {
+      "scope": [
+        "entity.name.namespace",
+        "entity.name.package",
+        "entity.name.type.package"
+      ],
+      "settings": {
+        "foreground": "#dce0e5"
       }
     },
     {
@@ -266,6 +301,54 @@
       "scope": "variable.parameter",
       "settings": {
         "foreground": "#d07277"
+      }
+    },
+    {
+      "scope": "variable.language",
+      "settings": {
+        "foreground": "#bf956a"
+      }
+    },
+    {
+      "scope": "variable.other.enummember",
+      "settings": {
+        "foreground": "#d07277"
+      }
+    },
+    {
+      "scope": "meta.template.expression",
+      "settings": {
+        "foreground": "#acb2be"
+      }
+    },
+    {
+      "scope": [
+        "punctuation.separator",
+        "punctuation.accessor",
+        "punctuation.terminator",
+        "punctuation.other"
+      ],
+      "settings": {
+        "foreground": "#b2b9c6"
+      }
+    },
+    {
+      "scope": [
+        "meta.brace",
+        "punctuation.definition.block",
+        "punctuation.definition.parameters",
+        "punctuation.definition.typeparameters",
+        "punctuation.definition.arguments",
+        "punctuation.definition.array",
+        "punctuation.section",
+        "punctuation.definition.begin",
+        "punctuation.definition.end",
+        "punctuation.definition.bracket",
+        "punctuation.definition.binding-pattern",
+        "punctuation.definition.imports"
+      ],
+      "settings": {
+        "foreground": "#b2b9c6"
       }
     },
     {
@@ -393,9 +476,6 @@
     "enum": "#6eb4bf",
     "type": "#6eb4bf",
     "typeParameter": "#6eb4bf",
-    "property": "#d07277",
-    "parameter": "#d07277",
-    "enumMember": "#dfc184",
-    "variable.readonly": "#dfc184"
+    "property": "#d07277"
   }
 }

@@ -27,7 +27,12 @@ based on One Dark Modern.
 interpretation](https://github.com/zed-industries/zed/blob/main/assets/themes/one/one.json)
 (desaturated palette, unpainted variables, cyan types, `#74ADE8` accent)
 onto the same two workbenches - generated fresh from `upstream/zed-one.json`
-by `scripts/build-zed.ts`, no ODP inheritance.
+by `scripts/build-zed.ts`, no ODP inheritance. Fidelity is verified by
+`npm run audit:zed` (CI): fixtures are parsed with tree-sitter using Zed's
+own vendored highlight queries, each capture resolved against Zed's syntax
+slots, and compared token-by-token with our VS Code rendering - 5,200+
+captures, zero mismatches, with 8 documented engine-difference exceptions
+in `audit/zed-allow.json`.
 
 Across all four themes the policy is: **backgrounds belong to the UI
 generation** (Dark Modern `#1F1F1F` / 2026 Dark `#121314`); the

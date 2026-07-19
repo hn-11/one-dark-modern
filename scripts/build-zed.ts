@@ -125,15 +125,28 @@ const tokenColors = [
   rule("string", s("string")),
   rule("constant.character.escape", s("string.escape")),
   rule("string.regexp", s("string.regex")),
-  rule(["constant.numeric", "constant.language"], s("number")),
+  rule("constant.numeric", s("number")),
+  rule("constant.language.boolean", s("boolean")),
+  rule(["constant.language.null", "constant.language.undefined"], s("constant")),
   rule(["variable.other.constant", "constant.other"], s("constant")),
   rule(["entity.name.function", "support.function", "meta.function-call.generic"], s("function")),
+  rule("storage.type.function.arrow", s("operator")),
+  rule(["keyword.operator.type", "keyword.operator.optional"], s("punctuation.special")),
   rule(
-    ["entity.name.type", "entity.name.class", "support.type", "support.class", "entity.other.inherited-class", "support.type.primitive", "support.type.builtin"],
+    ["entity.name.type", "entity.name.class", "entity.other.inherited-class", "support.type.primitive", "support.type.builtin"],
     s("type")
   ),
+  rule(["entity.name.namespace", "entity.name.package", "entity.name.type.package"], s("namespace")),
   rule(["variable.other.property", "variable.other.object.property", "support.variable.property", "support.type.property-name"], s("property")),
   rule("variable.parameter", s("variable.parameter")),
+  rule("variable.language", s("variable.special")),
+  rule("variable.other.enummember", s("property")),
+  rule("meta.template.expression", s("primary")),
+  rule(["punctuation.separator", "punctuation.accessor", "punctuation.terminator", "punctuation.other"], s("punctuation.delimiter")),
+  rule(
+    ["meta.brace", "punctuation.definition.block", "punctuation.definition.parameters", "punctuation.definition.typeparameters", "punctuation.definition.arguments", "punctuation.definition.array", "punctuation.section", "punctuation.definition.begin", "punctuation.definition.end", "punctuation.definition.bracket", "punctuation.definition.binding-pattern", "punctuation.definition.imports"],
+    s("punctuation.bracket")
+  ),
   rule("entity.name.tag", s("tag")),
   rule("entity.other.attribute-name", s("attribute")),
   rule("entity.name.label", s("label")),
@@ -169,9 +182,6 @@ const semanticTokenColors: Record<string, unknown> = {
   type: s("type"),
   typeParameter: s("type"),
   property: s("property"),
-  parameter: s("variable.parameter"),
-  enumMember: s("constant"),
-  "variable.readonly": s("constant"),
 };
 
 const buildVariant = (name: string, file: string, chrome: Record<string, string>): void => {

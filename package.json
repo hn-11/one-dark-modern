@@ -16,15 +16,19 @@
     "vscode:prepublish": "npm run build",
     "audit": "node scripts/audit-flicker.ts",
     "version": "npm run build && git add themes",
-    "postversion": "git push origin main --tags"
+    "postversion": "git push origin main --tags",
+    "audit:zed": "node scripts/audit-zed.ts"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
     "@vscode/vsce": "^3.0.0",
+    "tree-sitter-go": "^0.25.0",
+    "tree-sitter-typescript": "^0.23.2",
     "typescript": "^5.8.0",
     "typescript-language-server": "^5.3.0",
     "vscode-oniguruma": "^2.0.1",
-    "vscode-textmate": "^9.3.2"
+    "vscode-textmate": "^9.3.2",
+    "web-tree-sitter": "^0.26.11"
   },
   "engines": {
     "vscode": "^1.90.0",
