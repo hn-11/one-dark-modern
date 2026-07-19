@@ -34,6 +34,8 @@ jobs:
           sudo apt-get install -y --no-install-recommends libxml2-utils >/dev/null
           xmllint --noout dist/jetbrains/OneDarkModern.icls
           node scripts/audit-jetbrains.ts
+      - name: Accent-family guard (One Dark 2026)
+        run: node scripts/audit-accent.ts
 
   # Real-grammar + real-LSP flicker audit (scripts/audit-flicker.ts):
   # flags tokens whose color changes when semantic highlighting lands.

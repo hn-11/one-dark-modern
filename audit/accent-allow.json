@@ -1,0 +1,12 @@
+[
+  { "color": "#56b6c2", "reason": "One Dark syntax cyan (builtins/escapes) - identity color" },
+  { "color": "#42b3c2", "reason": "One Dark terminal ansiCyan" },
+  { "color": "#4cd1e0", "reason": "One Dark terminal ansiBrightCyan" },
+  { "color": "#4aa5f0", "reason": "One Dark terminal ansiBlue" },
+  { "color": "#4dc4ff", "reason": "One Dark terminal ansiBrightBlue" },
+  { "color": "#4daafc", "reason": "link blue (Dark Modern textLink, kept in both variants)" },
+  { "color": "#57a3f8", "reason": "2026 charts.blue - data-viz palette, not accent" },
+  { "color": "#59a4f9", "reason": "2026 gauge foreground - data-viz palette, not accent" },
+  { "color": "#58a4f9", "reason": "2026 gauge background (alpha variant of gauge blue)" },
+  { "color": "#6caddf", "reason": "Dark Modern tab.selectedBorderTop - inherited niche feature color" }
+]
