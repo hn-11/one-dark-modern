@@ -29,6 +29,8 @@ jobs:
             https://raw.githubusercontent.com/microsoft/vscode/main/extensions/theme-defaults/themes/2026-dark.json
           curl -sSfL -o upstream/OneDark-Pro.json \
             https://raw.githubusercontent.com/Binaryify/OneDark-Pro/master/themes/OneDark-Pro.json
+          curl -sSfL -o upstream/zed-one.json \
+            https://raw.githubusercontent.com/zed-industries/zed/main/assets/themes/one/one.json
 
       - name: Rebuild theme from new snapshots
         run: npm run build

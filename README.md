@@ -23,6 +23,12 @@ through the same automated sync; variant-specific tweaks go in
 `overrides/colors-2026.json`. The JetBrains/terminal/Vim artifacts remain
 based on One Dark Modern.
 
+A third theme, **Zed One Dark Modern**, translates [Zed's One Dark
+interpretation](https://github.com/zed-industries/zed/blob/main/assets/themes/one/one.json)
+(desaturated palette, unpainted variables, cyan types) onto the Dark Modern
+workbench - generated fresh from `upstream/zed-one.json` by
+`scripts/build-zed.ts`, no ODP inheritance.
+
 ### JetBrains IDEs (IDEA / GoLand / WebStorm / PyCharm)
 
 Download `OneDarkModern.icls` from Releases, then
