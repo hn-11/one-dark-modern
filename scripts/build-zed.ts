@@ -33,6 +33,9 @@ interface ZedSemRule {
 }
 const zedDefaultRules = readJson<ZedSemRule[]>("upstream/zed-semantic-default.json");
 const zedGoRules = readJson<ZedSemRule[]>("upstream/zed-semantic-go.json");
+const zedExtraRules = readJson<Array<ZedSemRule & { languages?: string[] }>>(
+  "overrides/zed-semantic-extra.json"
+);
 
 // zed colors are #rrggbbaa; drop the alpha when it is opaque
 const trim = (v: string): string => (v.toLowerCase().endsWith("ff") ? v.slice(0, 7) : v);
@@ -132,6 +135,7 @@ const tokenColors = [
   rule("comment.block.documentation", s("comment.doc")),
   rule(["keyword", "storage", "meta.preprocessor keyword", "keyword.operator.word", "keyword.operator.expression", "keyword.operator.new"], s("keyword")),
   rule("keyword.operator", s("operator")),
+  rule("meta.interface entity.name.function", s("property")),
   rule("string", s("string")),
   rule("constant.character.escape", s("string.escape")),
   rule("string.regexp", s("string.regex")),
@@ -200,6 +204,8 @@ const addRules = (rules: ZedSemRule[], langSuffix: string): void => {
   }
 };
 addRules(zedGoRules, ":go");
+for (const rule of zedExtraRules)
+  for (const lang of rule.languages ?? []) addRules([rule], ":" + lang);
 addRules(zedDefaultRules, "");
 
 const buildVariant = (name: string, file: string, chrome: Record<string, string>): void => {

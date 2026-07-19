@@ -44,12 +44,22 @@ interface ZedSemRule {
   style?: string[];
   foreground_color?: string;
 }
+// ground truth = Zed combined + our documented gap-fills (zed-semantic-extra)
+const extra = readJson<Array<ZedSemRule & { languages?: string[] }>>(
+  "overrides/zed-semantic-extra.json"
+);
+const extraFor = (vscodeLang: string): ZedSemRule[] =>
+  extra.filter((r) => (r.languages ?? []).includes(vscodeLang));
 const zedRules: Record<string, ZedSemRule[]> = {
   go: [
     ...readJson<ZedSemRule[]>("upstream/zed-semantic-go.json"),
+    ...extraFor("go"),
     ...readJson<ZedSemRule[]>("upstream/zed-semantic-default.json"),
   ],
-  ts: readJson<ZedSemRule[]>("upstream/zed-semantic-default.json"),
+  ts: [
+    ...extraFor("typescript"),
+    ...readJson<ZedSemRule[]>("upstream/zed-semantic-default.json"),
+  ],
 };
 // Zed combined mode: first matching rule whose style resolves wins
 const zedSemanticColor = (lang: string, type: string, modifiers: string[]): string | null => {

@@ -1,0 +1,9 @@
+[
+  {
+    "token_type": "variable",
+    "token_modifiers": ["readonly"],
+    "style": ["constant"],
+    "languages": ["typescript", "typescriptreact", "javascript", "javascriptreact"],
+    "_reason": "Zed ships no TS semantic rules; its variable.constant rule only matches rust-analyzer's dialect. This is the Go rule (readonly -> constant) applied to the TS family - a gap-fill, expected to become upstream someday."
+  }
+]

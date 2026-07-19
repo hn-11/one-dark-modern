@@ -192,6 +192,12 @@
       }
     },
     {
+      "scope": "meta.interface entity.name.function",
+      "settings": {
+        "foreground": "#d07277"
+      }
+    },
+    {
       "scope": "string",
       "settings": {
         "foreground": "#a1c181"
@@ -464,6 +470,10 @@
   "semanticTokenColors": {
     "variable.readonly:go": "#dfc184",
     "string.format:go": "#bf956a",
+    "variable.readonly:typescript": "#dfc184",
+    "variable.readonly:typescriptreact": "#dfc184",
+    "variable.readonly:javascript": "#dfc184",
+    "variable.readonly:javascriptreact": "#dfc184",
     "namespace": "#dce0e5",
     "class": "#6eb4bf",
     "enum": "#6eb4bf",
