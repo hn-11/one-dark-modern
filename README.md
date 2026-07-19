@@ -73,7 +73,7 @@ JetBrains-related changes:
 
 ```sh
 cd jetbrains-audit
-gradle test -PideType=GO -PideVersion=2026.1   # requires JDK 21 (mise.toml provided)
+gradle test -PideType=GO -PideVersion=2026.1 -Pgoroot=$(go env GOROOT)   # JDK 21 via mise.toml; GOROOT enables builtin classification
 cd .. && node scripts/compare-jetbrains-dump.ts GO
 ```
 
