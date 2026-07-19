@@ -47,6 +47,9 @@ intellijPlatform {
 
 tasks.test {
     useJUnit()
+    // GOROOT (e.g. the CI toolcache) lies outside the test VFS guard's allowed
+    // roots; this is the platform's documented escape hatch for that guard
+    systemProperty("NO_FS_ROOTS_ACCESS_CHECK", "true")
     systemProperty("audit.ideType", ideType)
     // absolute paths so the test can find fixtures and write dumps
     systemProperty("audit.fixtures", rootDir.parentFile.resolve("audit/fixtures").absolutePath)
