@@ -74,6 +74,19 @@ const recolor = (colors: Record<string, string>): Record<string, string> =>
 // ---- Zed identity: text, terminal, selection - no backgrounds ----
 const ansi = (name: string): string => z(`terminal.ansi.${name}`);
 const zedIdentity: Record<string, string> = {
+  // selection/focus surfaces: Dark Modern leaves these to VS Code's legacy
+  // defaults (#04395E-family blues) which clash with Zed's accent - use
+  // Zed's real element colors (muted grays + focused border) instead
+  "list.activeSelectionBackground": z("element.selected"),
+  "list.inactiveSelectionBackground": z("ghost_element.hover"),
+  "list.hoverBackground": z("ghost_element.hover"),
+  "quickInputList.focusBackground": z("element.selected"),
+  "editorSuggestWidget.selectedBackground": z("element.selected"),
+  "menu.selectionBackground": z("element.selected"),
+  "menu.selectionForeground": z("terminal.bright_foreground"),
+  "list.focusOutline": z("border.focused"),
+  "inputOption.activeBorder": z("border.focused"),
+  "inputOption.activeBackground": trim(players[0].selection),
   "editor.foreground": s("primary"),
   "editor.selectionBackground": trim(players[0].selection),
   "editorCursor.foreground": trim(players[0].cursor),
