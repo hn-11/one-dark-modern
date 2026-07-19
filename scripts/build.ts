@@ -6,6 +6,10 @@
 //   upstream/OneDark-Pro.json   One Dark Pro (Binaryify)        -> token colors base (shared)
 //   overrides/colors.json       our color overrides, shared by both variants
 //   overrides/colors-2026.json  extra overrides applied only to One Dark 2026
+//   overrides/accent-2026.json  accent recolor map for One Dark 2026: any
+//                               upstream value with a listed RGB is replaced
+//                               (alpha preserved), so new accent keys added
+//                               upstream are remapped automatically
 //   overrides/tokens.json       our token rules (same scope replaces the upstream rule)
 //   overrides/semantic.json     our semantic token overrides
 //
@@ -19,6 +23,24 @@ const dark2026 = read<Theme>("upstream/2026-dark.json");
 const oneDarkPro = read<Theme>("upstream/OneDark-Pro.json");
 const ovColors = read<Record<string, string>>("overrides/colors.json");
 const ovColors2026 = read<Record<string, string>>("overrides/colors-2026.json");
+const accent2026 = read<Record<string, string>>("overrides/accent-2026.json");
+
+// value-level recolor: replace the RGB part, keep any alpha suffix
+const recolor = (colors: Record<string, string>, map: Record<string, string>): Record<string, string> => {
+  const rules = Object.entries(map).map(([from, to]) => ({
+    from: from.toLowerCase(),
+    to: to.toLowerCase(),
+  }));
+  return Object.fromEntries(
+    Object.entries(colors).map(([k, v]) => {
+      const lower = v.toLowerCase();
+      for (const { from, to } of rules) {
+        if (lower.startsWith(from)) return [k, to + lower.slice(from.length)];
+      }
+      return [k, v];
+    })
+  );
+};
 const ovTokens = read<TokenRule[]>("overrides/tokens.json");
 const ovSemantic = read<Record<string, unknown>>("overrides/semantic.json");
 
@@ -73,10 +95,11 @@ buildVariant("One Dark Modern", "one-dark-modern-color-theme.json", [
   ovColors,
 ]);
 // One Dark 2026: 2026 Dark includes dark_modern upstream, so resolve the
-// include chain the same way VS Code does, then apply our overrides.
+// include chain the same way VS Code does, recolor the upstream accent to
+// One Dark's (#528BFF, Atom's accent - already our cursor color), then
+// apply our overrides.
 buildVariant("One Dark 2026", "one-dark-2026-color-theme.json", [
-  darkModern.colors,
-  dark2026.colors,
+  recolor({ ...darkModern.colors, ...dark2026.colors }, accent2026),
   ovColors,
   ovColors2026,
 ]);

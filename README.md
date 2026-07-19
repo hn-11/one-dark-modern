@@ -18,7 +18,7 @@ Then select **One Dark Modern** via `Cmd+K Cmd+T`.
 
 The extension also ships **One Dark 2026** — the same One Dark syntax on
 VS Code's experimental [2026 Dark](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/2026-dark.json)
-workbench (darker `#121314` background, teal accent). It tracks upstream
+workbench (darker `#121314` background), with the accent recolored to One Dark's `#528BFF` (Atom's accent, same as the cursor) via `overrides/accent-2026.json` - alpha-preserving, so upstream accent keys are remapped automatically. It tracks upstream
 through the same monthly sync; variant-specific tweaks go in
 `overrides/colors-2026.json`. The JetBrains/terminal/Vim artifacts remain
 based on One Dark Modern.
