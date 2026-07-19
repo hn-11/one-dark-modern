@@ -48,20 +48,32 @@ const theme: Theme = JSON.parse(
 const editorFg = (theme.colors["editor.foreground"] ?? "#abb2bf").toLowerCase();
 
 interface AllowEntry {
-  lang: string;
+  lang: string | string[];
   type: string;
   modifiers?: string[];
   tmColor?: string; // if set, only allowed when TM resolved exactly this color
   reason: string;
 }
+const langMatches = (a: AllowEntry, lang: string): boolean =>
+  Array.isArray(a.lang) ? a.lang.includes(lang) : a.lang === lang;
 const allow: AllowEntry[] = JSON.parse(readFileSync(join(root, "audit/allow.json"), "utf8"));
 
 // ---------- TextMate side ----------
 const GRAMMARS: Record<string, { scope: string; file: string }> = {
   go: { scope: "source.go", file: "go.tmLanguage.json" },
   ts: { scope: "source.ts", file: "TypeScript.tmLanguage.json" },
+  tsx: { scope: "source.tsx", file: "TypeScriptReact.tmLanguage.json" },
+  js: { scope: "source.js", file: "JavaScript.tmLanguage.json" },
+  jsx: { scope: "source.js.jsx", file: "JavaScriptReact.tmLanguage.json" },
   py: { scope: "source.python", file: "MagicPython.tmLanguage.json" },
   sh: { scope: "source.shell", file: "shell-unix-bash.tmLanguage.json" },
+};
+// file extension -> (grammar key, LSP languageId)
+const EXT_LANG: Record<string, { grammar: string; languageId: string }> = {
+  ".ts": { grammar: "ts", languageId: "typescript" },
+  ".tsx": { grammar: "tsx", languageId: "typescriptreact" },
+  ".js": { grammar: "js", languageId: "javascript" },
+  ".jsx": { grammar: "jsx", languageId: "javascriptreact" },
 };
 
 const wasm = readFileSync(require.resolve("vscode-oniguruma/release/onig.wasm"));
@@ -354,7 +366,7 @@ function compare(
     if (
       allow.some(
         (a) =>
-          a.lang === languageId &&
+          langMatches(a, languageId) &&
           a.type === t.type &&
           (a.modifiers ?? []).every((m) => t.modifiers.includes(m)) &&
           (!a.tmColor || a.tmColor === tmFg)
@@ -404,26 +416,32 @@ for (const sub of readdirSync(goRoot)) {
   session.kill();
 }
 
-// TS: one server for the whole dir
-const tsDir = join(root, "audit/fixtures/ts");
-const tsSession = new SemanticSession(
-  join(root, "node_modules/.bin/typescript-language-server"),
-  ["--stdio"],
-  tsDir,
-  {},
-  {}
-);
-for (const file of listFiles(tsDir, ".ts")) {
-  const text = readFileSync(file, "utf8");
-  const tmLines = await tmTokenize("ts", text);
-  recordRuleCoverage(tmLines);
-  const sem = await tsSession.tokens(file, "typescript", text);
-  semTotal += sem.length;
-  const r = compare("typescript", file.replace(root + "/", ""), text, tmLines, sem);
-  findings.push(...r.findings);
-  corrections += r.corrections;
+// TS/TSX/JS/JSX: one server per fixture dir, languageId by extension
+for (const sub of ["ts", "js"]) {
+  const dir = join(root, "audit/fixtures", sub);
+  const session = new SemanticSession(
+    join(root, "node_modules/.bin/typescript-language-server"),
+    ["--stdio"],
+    dir,
+    {},
+    {}
+  );
+  const files = readdirSync(dir)
+    .map((f) => join(dir, f))
+    .filter((f) => EXT_LANG[f.slice(f.lastIndexOf("."))]);
+  for (const file of files) {
+    const { grammar, languageId } = EXT_LANG[file.slice(file.lastIndexOf("."))];
+    const text = readFileSync(file, "utf8");
+    const tmLines = await tmTokenize(grammar, text);
+    recordRuleCoverage(tmLines);
+    const sem = await session.tokens(file, languageId, text);
+    semTotal += sem.length;
+    const r = compare(languageId, file.replace(root + "/", ""), text, tmLines, sem);
+    findings.push(...r.findings);
+    corrections += r.corrections;
+  }
+  session.kill();
 }
-tsSession.kill();
 
 // Python / Shell: TM-only (rule coverage still counts)
 let tmOnlyTokens = 0;

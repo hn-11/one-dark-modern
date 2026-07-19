@@ -13,7 +13,12 @@
     "reason": "consts are yellow by design (matches TS variable.readonly / ODP variable.other.constant); the Go TM grammar cannot see constness"
   },
   {
-    "lang": "typescript",
+    "lang": [
+      "typescript",
+      "typescriptreact",
+      "javascript",
+      "javascriptreact"
+    ],
     "type": "variable",
     "modifiers": [
       "readonly"
@@ -21,25 +26,56 @@
     "reason": "const locals are yellow by design; TM only marks some declaration sites"
   },
   {
-    "lang": "typescript",
+    "lang": [
+      "typescript",
+      "typescriptreact",
+      "javascript",
+      "javascriptreact"
+    ],
     "type": "enumMember",
     "reason": "One Dark Pro upstream itself defines semantic enumMember cyan; TM has no enum-member awareness"
   },
   {
-    "lang": "typescript",
+    "lang": [
+      "typescript",
+      "typescriptreact",
+      "javascript",
+      "javascriptreact"
+    ],
     "type": "class",
     "reason": "constructor calls: TM guesses function-call blue; semantic class yellow keeps the type family consistent (approved look since Record<> screenshot)"
   },
   {
-    "lang": "typescript",
+    "lang": [
+      "typescript",
+      "typescriptreact",
+      "javascript",
+      "javascriptreact"
+    ],
     "type": "variable",
     "tmColor": "#e5c07b",
     "reason": "ODP paints object receivers (variable.other.object) yellow; semantic cannot opt out per-language, and uniform red has been the shipped look since v0.0.2"
   },
   {
-    "lang": "typescript",
+    "lang": [
+      "typescript",
+      "typescriptreact",
+      "javascript",
+      "javascriptreact"
+    ],
     "type": "parameter",
     "tmColor": "#e5c07b",
     "reason": "same as variable: parameters used as object receivers get TM receiver-yellow"
+  },
+  {
+    "lang": [
+      "typescript",
+      "typescriptreact",
+      "javascript",
+      "javascriptreact"
+    ],
+    "type": "property",
+    "tmColor": "#e5c07b",
+    "reason": "mid-chain properties (a.b.c) get ODP receiver-yellow via variable.other.object.property; same decision as variable receivers: identity-consistent red wins"
   }
 ]
