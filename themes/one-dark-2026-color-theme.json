@@ -1049,13 +1049,6 @@
       }
     },
     {
-      "name": "Support type",
-      "scope": "support.type.property-name",
-      "settings": {
-        "foreground": "#abb2bf"
-      }
-    },
-    {
       "name": "[VSCODE-CUSTOM] toml support",
       "scope": "support.type.property-name.toml, support.type.property-name.table.toml, support.type.property-name.array.toml",
       "settings": {
@@ -2512,6 +2505,12 @@
       "scope": "keyword.other.unit",
       "settings": {
         "foreground": "#D19A66"
+      }
+    },
+    {
+      "scope": "support.type.property-name",
+      "settings": {
+        "foreground": "#E06C75"
       }
     }
   ],

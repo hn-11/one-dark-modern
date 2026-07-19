@@ -15,7 +15,7 @@ mapping (borrowing a color for another family) are forbidden by default.
 | Purple | `#C678DD` | Keywords, control flow, storage (`func` `if` `const` `import`) |
 | Blue | `#61AFEF` | Callables (functions, methods, decorators, macros) |
 | Yellow | `#E5C07B` | The type family (class/interface/enum/namespace) + const values + enum members |
-| Red | `#E06C75` | The variable family (variables, fields, parameters, `this`/`self`) + tags + headings |
+| Red | `#E06C75` | The variable family (variables, fields, parameters, `this`/`self`) + key-like names (JSON/YAML keys, CSS property names) + tags + headings |
 | Cyan | `#56B6C2` | Platform-provided magic: builtins (`support.*`), escapes, regexps, shell flags |
 | Green | `#98C379` | Strings, inserted diffs, shell command names |
 | Orange | `#D19A66` | Literals (numbers, booleans), attribute names, bold markup |
@@ -125,6 +125,12 @@ units red -> orange (ODP's red traced to an external 2018 bulk PR baked
 in by a generator rewrite - not even the author's design). Principle
 distilled: an inherited color's authority is its provenance; "it was in
 ODP" alone is not a reason once the history is known.
+
+Case law (2026-07-20): CSS property names plain -> red. The cross-format
+key family (JSON and YAML keys are red) had a hole at CSS; Zed's red
+property names supplied the witness and the vocabulary supplied the reason.
+Vendored property names (-webkit-*) stay cyan: vendor prefixes are platform
+magic. (hn approved.)
 
 Doctrine (2026-07-20, adopted by hn): **the five witnesses**. Provenance
 scoring recognizes five strata: TextMate-era Atom, tree-sitter-era Atom,

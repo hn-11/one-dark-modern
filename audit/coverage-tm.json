@@ -72,7 +72,6 @@
   "keyword.other.special-method",
   "token.storage",
   "token.storage.type.java",
-  "support.type.property-name",
   "support.type.property-name.toml, support.type.property-name.table.toml, support.type.property-name.array.toml",
   "support.constant.property-value",
   "support.constant.font-name",
@@ -364,5 +363,6 @@
   ],
   "source.json meta.structure.dictionary.json > constant.language.json,source.json meta.structure.array.json > constant.language.json",
   "constant.character.entity",
-  "keyword.other.unit"
+  "keyword.other.unit",
+  "support.type.property-name"
 ]
