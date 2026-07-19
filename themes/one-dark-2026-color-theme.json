@@ -2452,6 +2452,18 @@
       "settings": {
         "foreground": "#ABB2BF"
       }
+    },
+    {
+      "scope": [
+        "punctuation.definition.template-expression.begin",
+        "punctuation.definition.template-expression.end",
+        "punctuation.section.embedded.begin",
+        "punctuation.section.embedded.end",
+        "punctuation.section.embedded"
+      ],
+      "settings": {
+        "foreground": "#BE5046"
+      }
     }
   ],
   "semanticTokenColors": {

@@ -66,6 +66,10 @@ decade of tuning against each grammar's quirks.
   calibrated on ODP".
 - When this collides with principle 2 (identity), principle 2 wins
   (see the receiver-yellow ruling).
+- The origin can win back individual tokens on taste: template-expression
+  punctuation (`${` `}`) was restored from ODP's purple to Atom's dark red
+  `#BE5046` (hue-5-2) after the Zed comparison showed Zed had preserved it
+  (2026-07, hn's call).
 
 ## 4. One source of truth, generated everywhere
 
