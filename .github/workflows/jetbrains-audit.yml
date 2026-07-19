@@ -1,17 +1,28 @@
+# Headless verification against the real JetBrains IDEs: a Gradle test
+# opens audit/fixtures in GoLand/WebStorm and dumps every token's
+# TextAttributesKey fallback chain; compare-jetbrains-dump.ts resolves the
+# chains against our .icls and asserts audit/jetbrains-expected.json.
+# Heavy (~1GB IDE download, cached) - so not a required merge check; runs
+# monthly and when JetBrains-related sources change.
 name: JetBrains highlight audit
 
 on:
   workflow_dispatch:
   schedule:
-    - cron: "0 7 1 * *" # monthly, after the upstream sync
+    - cron: "0 7 1 * *" # monthly, an hour after the upstream sync
   push:
     branches: [main]
     paths:
       - "scripts/build-jetbrains.ts"
       - "scripts/compare-jetbrains-dump.ts"
       - "audit/jetbrains-expected.json"
+      - "audit/fixtures/**"
       - "jetbrains-audit/**"
       - "overrides/**"
+      - ".github/workflows/jetbrains-audit.yml"
+
+permissions:
+  contents: read
 
 concurrency:
   group: jb-audit-${{ github.ref }}
@@ -28,12 +39,10 @@ jobs:
           - ide: WS
             version: "2026.1"
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
+      - uses: ./.github/actions/setup-node-project
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -42,10 +51,11 @@ jobs:
         if: matrix.ide == 'GO'
         with:
           go-version: stable
+          cache: false
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.14.5"
-      - run: npm ci
+
       - run: npm run build
 
       - name: Dump highlighting from ${{ matrix.ide }}

@@ -1,3 +1,5 @@
+# Tag v* -> build all five artifacts and attach them to a GitHub Release.
+# Normal flow: `npm version patch` (builds, commits, tags, pushes).
 name: Release
 
 on:
@@ -10,13 +12,10 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-      - run: npm ci
+      - uses: ./.github/actions/setup-node-project
 
       - name: Check tag matches package.json version
         run: |

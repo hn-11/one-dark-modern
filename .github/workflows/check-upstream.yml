@@ -1,3 +1,7 @@
+# Monthly upstream sync: re-fetch Dark Modern (microsoft/vscode) and
+# One Dark Pro (Binaryify), rebuild with our overrides/ applied, and open
+# an auto-merge PR. CI (build + flicker-audit) is the merge gate; overrides
+# win over upstream by construction, so nothing customized can revert.
 name: Sync upstream themes
 
 on:
@@ -12,13 +16,10 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-      - run: npm ci
+      - uses: ./.github/actions/setup-node-project
 
       - name: Fetch upstream theme files
         run: |

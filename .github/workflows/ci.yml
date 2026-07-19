@@ -1,3 +1,7 @@
+# Gate for every push/PR. Two required checks (see the "main protection"
+# ruleset): `build` is the fast correctness gate, `flicker-audit` is the
+# slower TM-vs-semantic verification. Auto-merged upstream-sync PRs wait
+# for both.
 name: CI
 
 on:
@@ -5,24 +9,40 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  # Typecheck, reproducible build, packaging, and static .icls validation.
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-      - run: npm ci
+      - uses: ./.github/actions/setup-node-project
       - run: npm run typecheck
       - run: npm run build
       - name: Check generated theme is committed
         run: git diff --exit-code themes/
+      - run: npm run package
+      - name: Validate JetBrains scheme (XML + attribute keys)
+        run: |
+          sudo apt-get install -y --no-install-recommends libxml2-utils >/dev/null
+          xmllint --noout dist/jetbrains/OneDarkModern.icls
+          node scripts/audit-jetbrains.ts
+
+  # Real-grammar + real-LSP flicker audit (scripts/audit-flicker.ts):
+  # flags tokens whose color changes when semantic highlighting lands.
+  flicker-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-node-project
       - uses: actions/setup-go@v5
         with:
           go-version: stable
@@ -41,12 +61,4 @@ jobs:
         if: steps.gopls-cache.outputs.cache-hit != 'true'
         run: go install golang.org/x/tools/gopls@latest
       - run: echo "$HOME/go/bin" >> "$GITHUB_PATH"
-      - name: Flicker audit (TM vs semantic)
-        run: npm run audit
-      - run: npm run package
-      - name: Validate JetBrains scheme XML
-        run: |
-          sudo apt-get install -y --no-install-recommends libxml2-utils >/dev/null
-          xmllint --noout dist/jetbrains/OneDarkModern.icls
-      - name: Validate JetBrains attribute keys
-        run: node scripts/audit-jetbrains.ts
+      - run: npm run audit
