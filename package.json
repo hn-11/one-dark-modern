@@ -2,7 +2,7 @@
   "name": "one-dark-modern",
   "displayName": "One Dark Modern",
   "description": "A color theme inspired by Atom One Dark and Dark Modern",
-  "version": "0.0.21",
+  "version": "0.0.22",
   "publisher": "hn-11",
   "type": "module",
   "repository": {
@@ -14,12 +14,16 @@
     "typecheck": "tsc --noEmit",
     "package": "vsce package",
     "package:jetbrains": "cd dist/jetbrains && zip -qr ../one-dark-modern-jetbrains-$npm_package_version.jar META-INF theme",
-    "vscode:prepublish": "npm run build"
+    "vscode:prepublish": "npm run build",
+    "audit": "node scripts/audit-flicker.ts"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
     "@vscode/vsce": "^3.0.0",
-    "typescript": "^5.8.0"
+    "typescript": "^5.8.0",
+    "typescript-language-server": "^5.3.0",
+    "vscode-oniguruma": "^2.0.1",
+    "vscode-textmate": "^9.3.2"
   },
   "engines": {
     "vscode": "^1.90.0"

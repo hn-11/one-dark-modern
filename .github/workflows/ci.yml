@@ -19,5 +19,12 @@ jobs:
       - run: npm run build
       - name: Check generated theme is committed
         run: git diff --exit-code themes/
+      - uses: actions/setup-go@v5
+        with:
+          go-version: stable
+      - name: Install gopls
+        run: go install golang.org/x/tools/gopls@latest
+      - name: Flicker audit (TM vs semantic)
+        run: npm run audit
       - run: npm run package
       - run: npm run package:jetbrains

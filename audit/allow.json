@@ -1,0 +1,24 @@
+[
+  {
+    "lang": "go",
+    "type": "namespace",
+    "reason": "TM misreads package references as variables (red) / import paths as strings (green); namespace yellow is the correct meaning and matches ODP's namespace color"
+  },
+  {
+    "lang": "go",
+    "type": "variable",
+    "modifiers": ["readonly"],
+    "reason": "consts are yellow by design (matches TS variable.readonly / ODP variable.other.constant); the Go TM grammar cannot see constness"
+  },
+  {
+    "lang": "typescript",
+    "type": "variable",
+    "modifiers": ["readonly"],
+    "reason": "const locals are yellow by design; TM only marks some declaration sites"
+  },
+  {
+    "lang": "typescript",
+    "type": "enumMember",
+    "reason": "One Dark Pro upstream itself defines semantic enumMember cyan; TM has no enum-member awareness"
+  }
+]

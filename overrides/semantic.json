@@ -31,6 +31,8 @@
     "foreground": "#D19A66",
     "italic": false
   },
-  "function.defaultLibrary": "#56B6C2",
-  "function.defaultLibrary:python": "#61AFEF"
+  "string.format": "#D19A66",
+  "type.defaultLibrary.string:go": "#C678DD",
+  "type.defaultLibrary.number:go": "#C678DD",
+  "type.defaultLibrary.bool:go": "#C678DD"
 }
