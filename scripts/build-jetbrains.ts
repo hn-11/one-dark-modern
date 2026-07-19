@@ -135,7 +135,6 @@ const attributes: Array<[string, Attr]> = [
   ["CSS.CLASS_NAME", { fg: attribute }],
   ["CSS.HASH", { fg: func }],
   ["CSS.FUNCTION", { fg: builtin }],
-  ["CSS.UNIT", { fg: num }],
 
   // JS / TS (WebStorm)
   ["JS.LOCAL_VARIABLE", { fg: variable }],
@@ -143,15 +142,11 @@ const attributes: Array<[string, Attr]> = [
   ["JS.PARAMETER", { fg: parameter, font: 2 }],
   ["JS.INSTANCE_MEMBER_FUNCTION", { fg: func }],
   ["JS.GLOBAL_FUNCTION", { fg: func }],
-  ["JS.LOCAL_FUNCTION", { fg: func }],
   ["JS.MODULE_NAME", { fg: namespace }],
-  ["JS.CLASS", { fg: cls }],
+  ["JS.FUNCTION", { fg: func }],
   ["JS.REGEXP", { fg: regexp }],
-  ["JS.PRIMITIVE.TYPE", { fg: cls }],
-  ["JS.TYPE_ALIAS", { fg: cls }],
   ["TS.TYPE_PARAMETER", { fg: cls }],
   ["TS.MODULE_NAME", { fg: namespace }],
-  ["JavaScript:INJECTED_LANGUAGE_FRAGMENT", { fg: editorFg }],
 
   // Java (IDEA)
   ["ANNOTATION_NAME_ATTRIBUTES", { fg: cls }],
@@ -164,7 +159,6 @@ const attributes: Array<[string, Attr]> = [
   ["STATIC_FINAL_FIELD_ATTRIBUTES", { fg: constant }],
   ["INSTANCE_FIELD_ATTRIBUTES", { fg: property }],
   ["STATIC_FIELD_ATTRIBUTES", { fg: property }],
-  ["LOCAL_VARIABLE_ATTRIBUTES", { fg: variable }],
   ["PARAMETER_ATTRIBUTES", { fg: parameter, font: 2 }],
   ["METHOD_DECLARATION_ATTRIBUTES", { fg: func }],
   ["METHOD_CALL_ATTRIBUTES", { fg: func }],
@@ -174,10 +168,20 @@ const attributes: Array<[string, Attr]> = [
 
   // Go (GoLand)
   ["GO_PACKAGE", { fg: namespace }],
-  ["GO_PACKAGE_EXPORTED", { fg: namespace }],
-  ["GO_PACKAGE_LOCAL", { fg: namespace }],
   ["GO_BUILTIN_TYPE_REFERENCE", { fg: cls }],
   ["GO_TYPE_REFERENCE", { fg: cls }],
+  ["GO_TYPE_SPECIFICATION", { fg: cls }],
+  ["GO_EXPORTED_STRUCT_REFERENCE", { fg: cls }],
+  ["GO_LOCAL_STRUCT_REFERENCE", { fg: cls }],
+  ["GO_EXPORTED_INTERFACE_REFERENCE", { fg: cls }],
+  ["GO_LOCAL_INTERFACE_REFERENCE", { fg: cls }],
+  ["GO_PACKAGE_EXPORTED_STRUCT", { fg: cls }],
+  ["GO_PACKAGE_LOCAL_STRUCT", { fg: cls }],
+  ["GO_PACKAGE_EXPORTED_INTERFACE", { fg: cls }],
+  ["GO_PACKAGE_LOCAL_INTERFACE", { fg: cls }],
+  ["GO_PACKAGE_EXPORTED_VARIABLE", { fg: variable }],
+  ["GO_PACKAGE_EXPORTED_VARIABLE_CALL", { fg: variable }],
+  ["GO_PACKAGE_LOCAL_VARIABLE_CALL", { fg: variable }],
   ["GO_BUILTIN_FUNCTION_CALL", { fg: func }],
   ["GO_EXPORTED_FUNCTION", { fg: func }],
   ["GO_EXPORTED_FUNCTION_CALL", { fg: func }],
@@ -186,9 +190,7 @@ const attributes: Array<[string, Attr]> = [
   ["GO_METHOD_RECEIVER", { fg: parameter, font: 2 }],
   ["GO_BUILTIN_CONSTANT", { fg: num }],
   ["GO_BUILTIN_VARIABLE", { fg: cls }],
-  ["GO_BUILTIN_TYPE", { fg: cls }],
   ["GO_FUNCTION_PARAMETER", { fg: parameter, font: 2 }],
-  ["GO_LOCAL_VARIABLE", { fg: variable }],
   ["GO_SHADOWING_VARIABLE", { fg: variable }],
   ["GO_STRUCT_EXPORTED_MEMBER", { fg: property }],
   ["GO_STRUCT_LOCAL_MEMBER", { fg: property }],
@@ -200,11 +202,11 @@ const attributes: Array<[string, Attr]> = [
   // Python (PyCharm / Python plugin)
   ["PY.DECORATOR", { fg: decorator }],
   ["PY.CLASS_DEFINITION", { fg: cls }],
-  ["PY.FUNC_DEFINITION", { fg: func }],
-  ["PY.NESTED_FUNC_DEFINITION", { fg: func }],
   ["PY.PREDEFINED_DEFINITION", { fg: func }],
   ["PY.PREDEFINED_USAGE", { fg: func }],
   ["PY.BUILTIN_NAME", { fg: func }],
+  ["PY.FUNCTION_CALL", { fg: func }],
+  ["PY.METHOD_CALL", { fg: func }],
   ["PY.SELF_PARAMETER", { fg: token("variable.parameter.function.language.special.self.python", "#e5c07b") }],
   ["PY.KEYWORD_ARGUMENT", { fg: token("variable.parameter.function.python", "#d19a66") }],
   ["PY.ANNOTATION", { fg: cls }],
@@ -212,8 +214,9 @@ const attributes: Array<[string, Attr]> = [
 
   // Shell script (Shell plugin)
   ["BASH.EXTERNAL_COMMAND", { fg: token("entity.name.command.shell", "#98c379") }],
-  ["BASH.SUBSHELL_COMMAND", { fg: token("entity.name.command.shell", "#98c379") }],
   ["BASH.FUNCTION_DEF_NAME", { fg: func }],
+  ["BASH.INTERNAL_COMMAND", { fg: token("support.function.builtin.shell", "#98c379") }],
+  ["BASH.FUNCTION_CALL", { fg: token("entity.name.command.shell", "#98c379") }],
 
   // console (terminal palette)
   ["CONSOLE_NORMAL_OUTPUT", { fg: ui("terminal.foreground", "#abb2bf") }],
