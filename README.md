@@ -16,6 +16,13 @@ code --install-extension one-dark-modern-<version>.vsix
 
 Then select **One Dark Modern** via `Cmd+K Cmd+T`.
 
+The extension also ships **One Dark 2026** — the same One Dark syntax on
+VS Code's experimental [2026 Dark](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/2026-dark.json)
+workbench (darker `#121314` background, teal accent). It tracks upstream
+through the same monthly sync; variant-specific tweaks go in
+`overrides/colors-2026.json`. The JetBrains/terminal/Vim artifacts remain
+based on One Dark Modern.
+
 ### JetBrains IDEs (IDEA / GoLand / WebStorm / PyCharm)
 
 Download `OneDarkModern.icls` from Releases, then

@@ -25,6 +25,8 @@ jobs:
         run: |
           curl -sSfL -o upstream/dark_modern.json \
             https://raw.githubusercontent.com/microsoft/vscode/main/extensions/theme-defaults/themes/dark_modern.json
+          curl -sSfL -o upstream/2026-dark.json \
+            https://raw.githubusercontent.com/microsoft/vscode/main/extensions/theme-defaults/themes/2026-dark.json
           curl -sSfL -o upstream/OneDark-Pro.json \
             https://raw.githubusercontent.com/Binaryify/OneDark-Pro/master/themes/OneDark-Pro.json
 

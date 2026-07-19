@@ -39,6 +39,11 @@
         "label": "One Dark Modern",
         "uiTheme": "vs-dark",
         "path": "./themes/one-dark-modern-color-theme.json"
+      },
+      {
+        "label": "One Dark 2026",
+        "uiTheme": "vs-dark",
+        "path": "./themes/one-dark-2026-color-theme.json"
       }
     ]
   }
