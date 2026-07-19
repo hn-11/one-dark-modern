@@ -126,6 +126,21 @@ in by a generator rewrite - not even the author's design). Principle
 distilled: an inherited color's authority is its provenance; "it was in
 ODP" alone is not a reason once the history is known.
 
+Doctrine (2026-07-20, adopted by hn): **the five witnesses**. Provenance
+scoring recognizes five strata: TextMate-era Atom, tree-sitter-era Atom,
+base16 (Kempson's slot roles), Zed, and the official tree-sitter grammar
+queries (snapshotted in audit/provenance/official-treesitter/). The fifth
+is weighty on which distinctions exist, silent on colors, and NOT inerrant
+(its vocabulary is uneven across grammars - @type.builtin exists for TS but
+not Go - and it canonizes the SCREAMING-case @constructor heuristic).
+Re-scoring under five witnesses: ${} punctuation.special stands 4-0; Go
+primitives-as-plain-type supports our yellow; string.regexp cyan narrows to
+3-2 (old strata cyan vs official-TS+Zed "special string" orange) - held,
+flagged for future re-scoring; this/self: the modern ontology distinguishes
+@variable.builtin, an objection recorded against our red merge - held on
+identity-family grounds. Corrected: Zed's regex orange is not an orphan;
+it sides with the modern ontology.
+
 ## 4. One source of truth, generated everywhere
 
 **The built VS Code theme (`themes/*.json`) is the single source of truth for
