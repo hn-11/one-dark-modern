@@ -25,6 +25,7 @@ public class HighlightDumpTest extends BasePlatformTestCase {
 
         List<Path> files = new ArrayList<>();
         if (ideType.equals("GO")) {
+            configureGoSdk(out);
             try (var s = Files.walk(fixtures.resolve("go"))) {
                 s.filter(p -> p.toString().endsWith(".go")).forEach(files::add);
             }
@@ -72,6 +73,30 @@ public class HighlightDumpTest extends BasePlatformTestCase {
             String name = file.getFileName().toString().replaceAll("\\W", "_") + ".json";
             Files.writeString(out.resolve(name), json.toString(), StandardCharsets.UTF_8);
         }
+    }
+
+    /**
+     * Configures the Go SDK from -Daudit.goroot (reflection: com.goide.* only
+     * exists when running against GoLand, and this class must also compile
+     * for the WebStorm run).
+     */
+    private void configureGoSdk(Path out) throws Exception {
+        String goroot = System.getProperty("audit.goroot", "");
+        Files.writeString(out.resolve("_sdk.log"), "goroot=" + goroot + "\n");
+        if (goroot.isEmpty()) return;
+        Class<?> sdkClass = Class.forName("com.goide.sdk.GoSdk");
+        Object sdk = sdkClass.getMethod("fromHomePath", String.class).invoke(null, goroot);
+        Files.writeString(out.resolve("_sdk.log"),
+                "goroot=" + goroot + "\nsdk=" + sdk + " valid=" + sdk.getClass().getMethod("isValid").invoke(sdk)
+                        + " version=" + sdk.getClass().getMethod("getVersion").invoke(sdk) + "\n");
+        Class<?> svcClass = Class.forName("com.goide.sdk.GoSdkService");
+        Object service = svcClass
+                .getMethod("getInstance", com.intellij.openapi.project.Project.class)
+                .invoke(null, getProject());
+        com.intellij.openapi.application.WriteAction.runAndWait(() ->
+                svcClass.getMethod("setSdk", sdkClass, boolean.class).invoke(service, sdk, false));
+        com.intellij.testFramework.IndexingTestUtil.waitUntilIndexesAreReady(getProject());
+        Files.writeString(out.resolve("_sdk.log"), "applied\n", java.nio.file.StandardOpenOption.APPEND);
     }
 
     private static boolean appendToken(StringBuilder json, boolean first, String layer,

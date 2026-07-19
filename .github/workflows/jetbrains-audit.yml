@@ -38,6 +38,10 @@ jobs:
         with:
           distribution: temurin
           java-version: 21
+      - uses: actions/setup-go@v5
+        if: matrix.ide == 'GO'
+        with:
+          go-version: stable
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: "8.14.5"
@@ -46,7 +50,9 @@ jobs:
 
       - name: Dump highlighting from ${{ matrix.ide }}
         working-directory: jetbrains-audit
-        run: gradle test -PideType=${{ matrix.ide }} -PideVersion=${{ matrix.version }} --no-daemon
+        run: |
+          if [ "${{ matrix.ide }}" = "GO" ]; then export GOROOT=$(go env GOROOT); fi
+          gradle test -PideType=${{ matrix.ide }} -PideVersion=${{ matrix.version }} --no-daemon
 
       - name: Compare against .icls expectations
         run: node scripts/compare-jetbrains-dump.ts ${{ matrix.ide }}

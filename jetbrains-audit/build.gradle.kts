@@ -51,4 +51,10 @@ tasks.test {
     // absolute paths so the test can find fixtures and write dumps
     systemProperty("audit.fixtures", rootDir.parentFile.resolve("audit/fixtures").absolutePath)
     systemProperty("audit.out", layout.buildDirectory.dir("dumps/$ideType").get().asFile.absolutePath)
+    // Go SDK so builtin classification (len/make -> GO_BUILTIN_FUNCTION_CALL) works;
+    // pass -Pgoroot=... or export GOROOT
+    systemProperty(
+        "audit.goroot",
+        providers.gradleProperty("goroot").orElse(providers.environmentVariable("GOROOT")).getOrElse("")
+    )
 }

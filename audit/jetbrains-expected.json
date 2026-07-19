@@ -96,5 +96,19 @@
     "text": "Name",
     "color": "#e06c75",
     "note": "struct member red"
+  },
+  {
+    "ide": "GO",
+    "file": "main.go",
+    "text": "len",
+    "color": "#61afef",
+    "note": "builtin call blue (requires GOROOT in the test env)"
+  },
+  {
+    "ide": "GO",
+    "file": "main.go",
+    "text": "make",
+    "color": "#61afef",
+    "note": "builtin blue via GO_BUILTIN_FUNCTION -> DEFAULT_FUNCTION_DECLARATION"
   }
 ]
