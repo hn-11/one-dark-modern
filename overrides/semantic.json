@@ -26,5 +26,11 @@
   "comment": {
     "foreground": "#7F848E",
     "italic": true
-  }
+  },
+  "parameter:python": {
+    "foreground": "#D19A66",
+    "italic": false
+  },
+  "function.defaultLibrary": "#56B6C2",
+  "function.defaultLibrary:python": "#61AFEF"
 }
