@@ -126,6 +126,9 @@ A [scheduled workflow](.github/workflows/check-upstream.yml) (weekly while
 result (typecheck, reproducible build, packaging). Upstream changes flow in
 automatically unless they collide with an override — in that case the override
 wins by construction, so nothing we've customized can be silently reverted.
+Exception: PRs containing One Dark Pro token changes are not auto-merged —
+ODP is a reviewed dependency, not canon (see the provenance rule in
+docs/PHILOSOPHY.md).
 
 ## Releasing
 

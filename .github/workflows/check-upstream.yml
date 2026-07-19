@@ -58,8 +58,26 @@ jobs:
             CI validates the build. If a change looks wrong, add or adjust an
             entry in `overrides/` on this branch before merging.
 
-      - name: Enable auto-merge
+      # ODP is a reviewed dependency, not canon (see PHILOSOPHY case law on
+      # provenance): token changes from OneDark-Pro require human review,
+      # while UI-generation churn (Dark Modern / 2026 / Zed) auto-merges.
+      - name: Check whether ODP changed
+        id: odp
         if: steps.pr.outputs.pull-request-operation == 'created'
+        run: |
+          if git diff HEAD~1 --name-only 2>/dev/null | grep -q 'OneDark-Pro.json' || \
+             git diff origin/main...HEAD --name-only 2>/dev/null | grep -q 'OneDark-Pro.json'; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Enable auto-merge (non-ODP changes only)
+        if: steps.pr.outputs.pull-request-operation == 'created' && steps.odp.outputs.changed != 'true'
         run: gh pr merge --auto --squash "${{ steps.pr.outputs.pull-request-number }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Flag ODP change for review
+        if: steps.pr.outputs.pull-request-operation == 'created' && steps.odp.outputs.changed == 'true'
+        run: gh pr comment "${{ steps.pr.outputs.pull-request-number }}" --body "OneDark-Pro changed upstream - auto-merge withheld. Review the token diff against PHILOSOPHY.md before merging (provenance rule: 'it was in ODP' alone is not a reason)."
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
