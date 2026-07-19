@@ -49,6 +49,11 @@
         "label": "Zed One Dark Modern",
         "uiTheme": "vs-dark",
         "path": "./themes/zed-one-dark-modern-color-theme.json"
+      },
+      {
+        "label": "Zed One Dark 2026",
+        "uiTheme": "vs-dark",
+        "path": "./themes/zed-one-dark-2026-color-theme.json"
       }
     ]
   }

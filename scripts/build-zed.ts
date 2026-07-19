@@ -1,13 +1,15 @@
 #!/usr/bin/env node
-// Build "Zed One Dark Modern": Zed's One Dark interpretation (desaturated
-// palette, austere roles - variables unpainted, types cyan, tags blue) on
-// the Dark Modern workbench.
+// Build the Zed-interpretation variants: "Zed One Dark Modern" and
+// "Zed One Dark 2026".
+//
+// Policy: backgrounds belong to the UI generation (Dark Modern / 2026 Dark);
+// the interpretation layer (Zed) only brings text colors, terminal palette,
+// selection and accent. Zed's editor background is deliberately NOT copied.
 //
 // Source of truth: upstream/zed-one.json (zed-industries/zed, auto-synced).
-// Unlike the ODP-based variants, the token layer here is authored fresh -
-// a direct translation of Zed's syntax slots into TM scopes + semantic
-// tokens, preserving Zed's philosophy (no color on plain variables, no
-// italic comments).
+// The token layer is authored fresh - a direct translation of Zed's syntax
+// slots into TM scopes + semantic tokens, preserving Zed's philosophy
+// (no color on plain variables, no italic comments).
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { readJson, root, type Theme } from "./lib.ts";
@@ -19,6 +21,8 @@ const style = readJson<ZedFile>("upstream/zed-one.json").themes.find((t) =>
   /dark/i.test(t.name)
 )!.style as Record<string, unknown>;
 const darkModern = readJson<Theme>("upstream/dark_modern.json");
+const dark2026 = readJson<Theme>("upstream/2026-dark.json");
+const accent2026 = readJson<Record<string, string>>("overrides/accent-2026.json");
 
 // zed colors are #rrggbbaa; drop the alpha when it is opaque
 const trim = (v: string): string => (v.toLowerCase().endsWith("ff") ? v.slice(0, 7) : v);
@@ -34,27 +38,45 @@ const s = (slot: string): string => {
   return trim(v);
 };
 const players = style.players as Array<{ cursor: string; selection: string }>;
-
-// ---- workbench: Dark Modern chrome, Zed editor + terminal, Zed accent ----
 const accent = z("text.accent"); // #74ade8
-// recolor Dark Modern's #0078D4 accent keys to Zed's, preserving alpha
-const chrome = Object.fromEntries(
-  Object.entries(darkModern.colors).map(([k, v]) => {
-    const lower = v.toLowerCase();
-    return lower.startsWith("#0078d4") ? [k, accent + lower.slice(7)] : [k, v];
-  })
-);
 
+// channel-ratio scaling: derive a family member of `target` that relates to
+// it the way `member` relates to `base` (same approach as accent-2026.json)
+const scale = (target: string, member: string, base: string): string => {
+  const ch = (hex: string, i: number) => parseInt(hex.slice(1 + i * 2, 3 + i * 2), 16);
+  let out = "#";
+  for (let i = 0; i < 3; i++) {
+    const v = Math.min(255, Math.round(ch(target, i) * (ch(member, i) / ch(base, i))));
+    out += v.toString(16).padStart(2, "0");
+  }
+  return out;
+};
+
+// accent recolor maps per UI generation, targeting Zed's accent
+const TEAL_PRIMARY = "#3994BC";
+const zedAccentMap: Record<string, string> = { "#0078d4": accent };
+for (const teal of Object.keys(accent2026)) {
+  const t = teal.toLowerCase();
+  if (t === "#0078d4") continue;
+  zedAccentMap[t] = t === TEAL_PRIMARY.toLowerCase() ? accent : scale(accent, t, TEAL_PRIMARY.toLowerCase());
+}
+const recolor = (colors: Record<string, string>): Record<string, string> =>
+  Object.fromEntries(
+    Object.entries(colors).map(([k, v]) => {
+      const lower = v.toLowerCase();
+      for (const [from, to] of Object.entries(zedAccentMap)) {
+        if (lower.startsWith(from)) return [k, to + lower.slice(from.length)];
+      }
+      return [k, v];
+    })
+  );
+
+// ---- Zed identity: text, terminal, selection - no backgrounds ----
 const ansi = (name: string): string => z(`terminal.ansi.${name}`);
-const colors: Record<string, string> = {
-  ...chrome,
-  "editor.background": z("editor.background"),
+const zedIdentity: Record<string, string> = {
   "editor.foreground": s("primary"),
-  "editor.lineHighlightBackground": trim(style["editor.active_line.background"] as string),
   "editor.selectionBackground": trim(players[0].selection),
   "editorCursor.foreground": trim(players[0].cursor),
-  "editorLineNumber.foreground": trim(style["editor.line_number"] as string ?? "#636d83ff"),
-  "editorLineNumber.activeForeground": trim(style["editor.active_line_number"] as string ?? "#abb2bfff"),
   "textLink.foreground": accent,
   "textLink.activeForeground": accent,
   "terminal.foreground": z("terminal.foreground"),
@@ -139,19 +161,24 @@ const semanticTokenColors: Record<string, unknown> = {
   "variable.readonly": s("constant"),
 };
 
-const theme = {
-  $schema: "vscode://schemas/color-theme",
-  name: "Zed One Dark Modern",
-  type: "dark",
-  semanticHighlighting: true,
-  colors: Object.fromEntries(Object.entries(colors).sort(([a], [b]) => a.localeCompare(b))),
-  tokenColors,
-  semanticTokenColors,
+const buildVariant = (name: string, file: string, chrome: Record<string, string>): void => {
+  const theme = {
+    $schema: "vscode://schemas/color-theme",
+    name,
+    type: "dark",
+    semanticHighlighting: true,
+    colors: Object.fromEntries(
+      Object.entries({ ...recolor(chrome), ...zedIdentity }).sort(([a], [b]) => a.localeCompare(b))
+    ),
+    tokenColors,
+    semanticTokenColors,
+  };
+  writeFileSync(join(root, "themes", file), JSON.stringify(theme, null, 2) + "\n");
+  console.log(`built ${name}: ${Object.keys(theme.colors).length} colors`);
 };
-writeFileSync(
-  join(root, "themes/zed-one-dark-modern-color-theme.json"),
-  JSON.stringify(theme, null, 2) + "\n"
-);
-console.log(
-  `built Zed One Dark Modern: ${Object.keys(colors).length} colors, ${tokenColors.length} token rules, ${Object.keys(semanticTokenColors).length} semantic`
-);
+
+buildVariant("Zed One Dark Modern", "zed-one-dark-modern-color-theme.json", darkModern.colors);
+buildVariant("Zed One Dark 2026", "zed-one-dark-2026-color-theme.json", {
+  ...darkModern.colors,
+  ...dark2026.colors,
+});
