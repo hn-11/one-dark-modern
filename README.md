@@ -26,6 +26,9 @@ attribute keys, with dedicated mappings for Java, Go, JS/TS, Python and
 Shell). It covers the editor, console ANSI colors and VCS gutters; the IDE
 chrome keeps whatever UI theme you use (Dark works well).
 
+Design principles and the case law behind color decisions live in
+[docs/PHILOSOPHY.md](docs/PHILOSOPHY.md).
+
 ## How it works
 
 The theme is **generated** from upstream snapshots plus this repo's overrides:
