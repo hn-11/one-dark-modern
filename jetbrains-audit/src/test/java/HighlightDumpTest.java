@@ -84,6 +84,8 @@ public class HighlightDumpTest extends BasePlatformTestCase {
         String goroot = System.getProperty("audit.goroot", "");
         Files.writeString(out.resolve("_sdk.log"), "goroot=" + goroot + "\n");
         if (goroot.isEmpty()) return;
+        // the test VFS guard rejects paths outside the project/home (e.g. CI toolcache)
+        com.intellij.testFramework.VfsRootAccess.allowRootAccess(getTestRootDisposable(), goroot);
         Class<?> sdkClass = Class.forName("com.goide.sdk.GoSdk");
         Object sdk = sdkClass.getMethod("fromHomePath", String.class).invoke(null, goroot);
         Files.writeString(out.resolve("_sdk.log"),
