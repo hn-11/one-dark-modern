@@ -79,9 +79,12 @@ decade of tuning against each grammar's quirks.
   - `variable.interpolation` -> `#BE5046`
   - markdown link URLs -> `#56B6C2` (cyan)
   The fourth (comment brightness) stays ODP per the readability ruling.
-  Separately, `string.regexp` was restored to cyan: ODP's red turned out to
-  be a duplicate-rule accident canonized, and it contradicted our own
-  semantic `regexp` and the color vocabulary (section 0).
+  Separately, `string.regexp` was restored to cyan. Archaeology correction:
+  ODP's red was not a pure accident - it was a deliberate 2022 change
+  mimicking Dark+ regex styling (issue #678), implemented by appending a
+  new rule while leaving the original cyan rule as dead code. We restore
+  cyan because origin + our semantic `regexp` + the vocabulary all say
+  cyan; mimicking Dark+ is not one of our principles.
 
 Case law (2026-07, the self-consistency purge): auditing the theme against
 this very document found five self-violations, four fixed: Go primitive
