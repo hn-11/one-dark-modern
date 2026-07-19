@@ -13,7 +13,6 @@
     "build": "node scripts/build.ts && node scripts/build-jetbrains.ts && node scripts/build-ghostty.ts && node scripts/build-windows-terminal.ts && node scripts/build-vim.ts",
     "typecheck": "tsc --noEmit",
     "package": "vsce package",
-    "package:jetbrains": "cd dist/jetbrains && zip -qr ../one-dark-modern-jetbrains-$npm_package_version.jar META-INF theme",
     "vscode:prepublish": "npm run build",
     "audit": "node scripts/audit-flicker.ts",
     "version": "npm run build && git add themes",

@@ -29,14 +29,13 @@ jobs:
 
       - run: npm run build
       - run: npm run package
-      - run: npm run package:jetbrains
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             *.vsix
-            dist/*.jar
+            dist/jetbrains/OneDarkModern.icls
             dist/ghostty/one-dark-modern
             dist/windows-terminal/one-dark-modern.json
             dist/vim/colors/one-dark-modern.vim

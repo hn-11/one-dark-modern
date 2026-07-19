@@ -1,19 +1,13 @@
 #!/usr/bin/env node
-// Generate a JetBrains theme plugin from the built VS Code theme.
-//
-// Reads themes/one-dark-modern-color-theme.json (single source of truth for
-// colors) and emits dist/jetbrains/ with:
-//   META-INF/plugin.xml
-//   theme/one-dark-modern.theme.json   (IDE UI, mapped from Dark Modern keys)
-//   theme/OneDarkModern.icls           (editor scheme, mapped from token colors)
-//
-// Package with: npm run package:jetbrains  (produces an installable .jar)
+// Generate a JetBrains editor color scheme (.icls) from the built VS Code
+// theme. Import via Settings > Editor > Color Scheme > gear > Import Scheme.
+// Editor colors, console ANSI palette and VCS gutters are all scheme-side;
+// only the IDE chrome (UI theme) is not covered by an .icls.
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { blend, loadBuiltTheme, raw, readJson, root, semanticColor, tokenColor, uiColor } from "./lib.ts";
+import { blend, loadBuiltTheme, raw, root, semanticColor, tokenColor, uiColor } from "./lib.ts";
 
 const theme = loadBuiltTheme();
-const pkg = readJson<{ version: string }>("package.json");
 
 const ui = (key: string, fallback: string): string => uiColor(theme, key, fallback);
 const token = (scope: string, fallback: string): string => tokenColor(theme, scope, fallback);
@@ -24,8 +18,6 @@ const editorBg = ui("editor.background", "#1f1f1f");
 const editorFg = ui("editor.foreground", "#abb2bf");
 const panelBg = ui("sideBar.background", "#181818");
 const border = ui("sideBar.border", "#2b2b2b");
-const accent = ui("focusBorder", "#0078d4");
-const uiFg = ui("foreground", "#cccccc");
 
 const keyword = token("keyword", "#c678dd");
 const str = token("string", "#98c379");
@@ -51,102 +43,6 @@ const selectionBg = blend(ui("editor.selectionBackground", "#67769660"), editorB
 const caretRow = blend(ui("editor.lineHighlightBackground", "#2c313c"), editorBg);
 const searchBg = blend(ui("editor.findMatchBackground", "#d19a6644"), editorBg);
 const wordHl = blend(ui("editor.wordHighlightBackground", "#d2e0ff2f"), editorBg);
-const listSel = "#04395e"; // Dark Modern list.activeSelectionBackground (VS Code default)
-const inputBg = ui("input.background", "#313131");
-const inputBorder = ui("input.border", "#3c3c3c");
-
-// ---- theme.json (IDE UI) -------------------------------------------------
-const themeJson = {
-  name: "One Dark Modern",
-  author: "hn-11",
-  dark: true,
-  editorScheme: "/theme/OneDarkModern.icls",
-  ui: {
-    "*": {
-      background: panelBg,
-      foreground: uiFg,
-      selectionBackground: listSel,
-      selectionForeground: "#ffffff",
-      selectionInactiveBackground: "#37373d",
-      borderColor: border,
-      separatorColor: border,
-      disabledForeground: ui("tab.inactiveForeground", "#9d9d9d"),
-      infoForeground: ui("descriptionForeground", "#9d9d9d"),
-      lightSelectionBackground: "#2a2d2e",
-      hoverBackground: "#2a2d2e",
-      focusColor: accent,
-      focusedBorderColor: accent,
-    },
-    Borders: { color: border, ContrastBorderColor: border },
-    Button: {
-      startBackground: ui("button.secondaryBackground", "#313131"),
-      endBackground: ui("button.secondaryBackground", "#313131"),
-      startBorderColor: inputBorder,
-      endBorderColor: inputBorder,
-      foreground: ui("button.secondaryForeground", "#cccccc"),
-      default: {
-        startBackground: ui("button.background", "#0078d4"),
-        endBackground: ui("button.background", "#0078d4"),
-        startBorderColor: ui("button.background", "#0078d4"),
-        endBorderColor: ui("button.background", "#0078d4"),
-        foreground: ui("button.foreground", "#ffffff"),
-        focusedBorderColor: accent,
-      },
-    },
-    ComboBox: { background: inputBg, nonEditableBackground: inputBg },
-    Component: {
-      background: inputBg,
-      borderColor: inputBorder,
-      focusColor: accent,
-      focusedBorderColor: accent,
-      infoForeground: ui("descriptionForeground", "#9d9d9d"),
-    },
-    Counter: { background: ui("badge.background", "#616161"), foreground: ui("badge.foreground", "#f8f8f8") },
-    Editor: { background: editorBg, shortcutForeground: accent },
-    EditorTabs: {
-      background: ui("editorGroupHeader.tabsBackground", "#181818"),
-      underlinedTabBackground: ui("tab.activeBackground", "#1f1f1f"),
-      underlinedTabForeground: ui("tab.activeForeground", "#ffffff"),
-      underlineColor: ui("tab.activeBorderTop", "#0078d4"),
-      inactiveUnderlineColor: border,
-      underlineHeight: 2,
-      hoverBackground: ui("tab.hoverBackground", "#1f1f1f"),
-    },
-    FileColor: { Yellow: "#2b2b2b", Green: "#2b2b2b" },
-    Link: { activeForeground: ui("textLink.foreground", "#4daafc"), hoverForeground: ui("textLink.activeForeground", "#4daafc") },
-    List: { background: panelBg, selectionBackground: listSel, hoverBackground: "#2a2d2e" },
-    MainToolbar: { background: ui("titleBar.activeBackground", "#181818"), inactiveBackground: ui("titleBar.inactiveBackground", "#1f1f1f") },
-    Menu: { background: ui("menu.background", "#1f1f1f"), borderColor: ui("menu.border", "#454545"), separatorColor: ui("menu.separatorBackground", "#454545") },
-    MenuItem: { background: ui("menu.background", "#1f1f1f"), selectionBackground: ui("menu.selectionBackground", "#0078d4") },
-    NotificationsToolwindow: { newNotification: { background: ui("notifications.background", "#1f1f1f") } },
-    Notification: { background: ui("notifications.background", "#1f1f1f"), borderColor: ui("notifications.border", "#2b2b2b") },
-    Panel: { background: panelBg },
-    Popup: {
-      background: ui("editorWidget.background", "#202020"),
-      borderColor: ui("menu.border", "#454545"),
-      Header: { activeBackground: ui("editorWidget.background", "#202020"), inactiveBackground: ui("editorWidget.background", "#202020") },
-    },
-    ProgressBar: { progressColor: accent, indeterminateStartColor: accent, indeterminateEndColor: ui("button.hoverBackground", "#026ec1") },
-    ScrollBar: { Transparent: { thumbColor: "#79797966", hoverThumbColor: "#646464b3" } },
-    SearchEverywhere: { SearchField: { background: inputBg, borderColor: inputBorder } },
-    StatusBar: { background: ui("statusBar.background", "#181818"), borderColor: ui("statusBar.border", "#2b2b2b"), hoverBackground: "#2a2d2e" },
-    Tree: { background: panelBg, selectionBackground: listSel, selectionInactiveBackground: "#37373d", hoverBackground: "#2a2d2e", rowHeight: 22 },
-    TabbedPane: { underlineColor: accent, tabSelectionHeight: 2 },
-    TextField: { background: inputBg, borderColor: inputBorder },
-    ToolWindow: {
-      Header: { background: panelBg, inactiveBackground: panelBg, borderColor: border },
-      HeaderTab: { selectedBackground: "#2a2d2e", selectedInactiveBackground: "#2a2d2e", hoverBackground: "#2a2d2e" },
-      background: panelBg,
-    },
-    ValidationTooltip: { errorBackground: "#5a1d1d", errorBorderColor: "#be1100" },
-    VersionControl: {
-      GitLog: { localBranchIconColor: str, remoteBranchIconColor: func },
-      FileHistory: { Commit: { selectedBranchBackground: listSel } },
-    },
-    Table: { background: panelBg, selectionBackground: listSel },
-    TitlePane: { background: ui("titleBar.activeBackground", "#181818"), inactiveBackground: ui("titleBar.inactiveBackground", "#1f1f1f") },
-  },
-};
 
 // ---- .icls editor scheme -------------------------------------------------
 type Attr = { fg?: string; bg?: string; font?: 1 | 2 | 3; effect?: string; effectType?: number };
@@ -379,31 +275,10 @@ ${attributes.map(([k, a]) => attr(k, a)).join("\n")}
 </scheme>
 `;
 
-// ---- plugin.xml ----------------------------------------------------------
-const pluginXml = `<idea-plugin>
-  <id>com.github.hn-11.one-dark-modern</id>
-  <name>One Dark Modern Theme</name>
-  <version>${pkg.version}</version>
-  <vendor url="https://github.com/hn-11/one-dark-modern">hn-11</vendor>
-  <description><![CDATA[
-    One Dark Pro syntax colors with the VS Code Dark Modern UI.
-    Generated from the VS Code theme of the same name.
-  ]]></description>
-  <idea-version since-build="233"/>
-  <depends>com.intellij.modules.platform</depends>
-  <extensions defaultExtensionNs="com.intellij">
-    <themeProvider id="com.github.hn-11.one-dark-modern" path="/theme/one-dark-modern.theme.json"/>
-  </extensions>
-</idea-plugin>
-`;
-
 // ---- write ---------------------------------------------------------------
 const out = join(root, "dist/jetbrains");
-mkdirSync(join(out, "META-INF"), { recursive: true });
-mkdirSync(join(out, "theme"), { recursive: true });
-writeFileSync(join(out, "META-INF/plugin.xml"), pluginXml);
-writeFileSync(join(out, "theme/one-dark-modern.theme.json"), JSON.stringify(themeJson, null, 2) + "\n");
-writeFileSync(join(out, "theme/OneDarkModern.icls"), icls);
+mkdirSync(out, { recursive: true });
+writeFileSync(join(out, "OneDarkModern.icls"), icls);
 console.log(
-  `jetbrains: ${Object.keys(colorOptions).length} scheme colors, ${attributes.length} attributes -> dist/jetbrains/`
+  `jetbrains: ${Object.keys(colorOptions).length} scheme colors, ${attributes.length} attributes -> dist/jetbrains/OneDarkModern.icls`
 );

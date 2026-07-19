@@ -18,11 +18,13 @@ Then select **One Dark Modern** via `Cmd+K Cmd+T`.
 
 ### JetBrains IDEs (IDEA / GoLand / WebStorm / PyCharm)
 
-Download `one-dark-modern-jetbrains-<version>.jar` from Releases, then
-**Settings → Plugins → ⚙ → Install Plugin from Disk…** and restart. The plugin
-is generated from the same VS Code theme file, so the palette is identical by
-construction (`scripts/build-jetbrains.ts` maps it to IntelliJ attribute keys,
-with dedicated mappings for Java, Go, JS/TS, and Python).
+Download `OneDarkModern.icls` from Releases, then
+**Settings → Editor → Color Scheme → ⚙ → Import Scheme…** and select it.
+The scheme is generated from the same VS Code theme file, so the palette is
+identical by construction (`scripts/build-jetbrains.ts` maps it to IntelliJ
+attribute keys, with dedicated mappings for Java, Go, JS/TS, Python and
+Shell). It covers the editor, console ANSI colors and VCS gutters; the IDE
+chrome keeps whatever UI theme you use (Dark works well).
 
 ## How it works
 

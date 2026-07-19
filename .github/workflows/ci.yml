@@ -44,4 +44,7 @@ jobs:
       - name: Flicker audit (TM vs semantic)
         run: npm run audit
       - run: npm run package
-      - run: npm run package:jetbrains
+      - name: Validate JetBrains scheme XML
+        run: |
+          sudo apt-get install -y --no-install-recommends libxml2-utils >/dev/null
+          xmllint --noout dist/jetbrains/OneDarkModern.icls
