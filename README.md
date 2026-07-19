@@ -31,8 +31,13 @@ by `scripts/build-zed.ts`, no ODP inheritance. Fidelity is verified by
 `npm run audit:zed` (CI): fixtures are parsed with tree-sitter using Zed's
 own vendored highlight queries, each capture resolved against Zed's syntax
 slots, and compared token-by-token with our VS Code rendering - 5,200+
-captures, zero mismatches, with 8 documented engine-difference exceptions
+captures, zero mismatches, with documented engine-difference exceptions
 in `audit/zed-allow.json`.
+
+Since the Zed variants model Zed's *combined* mode, enable semantic tokens
+for Go to see the audited rendering (`"gopls": {"ui.semanticTokens": true}`
+in settings - the golang extension ships with them off). Plain variables
+stay uncolored either way; that is the philosophy, not a gap.
 
 Across all four themes the policy is: **backgrounds belong to the UI
 generation** (Dark Modern `#1F1F1F` / 2026 Dark `#121314`); the
