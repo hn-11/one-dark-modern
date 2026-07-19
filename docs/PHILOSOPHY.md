@@ -95,6 +95,16 @@ yellow). The shell-green exception was reviewed and kept. Lesson: layer
 consistency (what the flicker audit checks) is not family consistency -
 the former can be satisfied while canonizing the latter's violation.
 
+Case law (2026-07, the Zed type-cyan investigation): before deferring to
+Zed's "types are cyan", we traced its origin - it is a survivor of Zed's
+early base16 multi-theme factory (a generic template that also had blue
+keywords and yellow functions before theme2 hand-tuning), not a One Dark
+deliberation. Zed's One Dark descends from base16-onedark, credits Chris
+Kempson, and its desaturation is chroma-ramp resampling. Our type-yellow is
+Atom's own entity.name.type color and stands. Corollary: base16's 0F slot
+(#BE5046, "embedded language tags") independently confirms the ${}
+restoration. Lesson: check the pedigree of an authority before joining it.
+
 ## 4. One source of truth, generated everywhere
 
 **The built VS Code theme (`themes/*.json`) is the single source of truth for
