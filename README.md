@@ -62,6 +62,25 @@ not repaint a color TextMate set deliberately — intentional exceptions live in
 `tmColor`). Python/Shell are TM-only (Pylance is closed-source; shell has no
 semantic server).
 
+### JetBrains headless audit
+
+`jetbrains-audit/` runs the same idea against the real IDEs: a Gradle test
+downloads GoLand / WebStorm, opens the fixtures headlessly, and dumps every
+token's `TextAttributesKey` fallback chain (lexer + annotator layers).
+`scripts/compare-jetbrains-dump.ts` resolves those chains against our `.icls`
+and checks `audit/jetbrains-expected.json`. Runs in CI monthly and on
+JetBrains-related changes:
+
+```sh
+cd jetbrains-audit
+gradle test -PideType=GO -PideVersion=2026.1   # requires JDK 21 (mise.toml provided)
+cd .. && node scripts/compare-jetbrains-dump.ts GO
+```
+
+Known vocabulary limits found this way: IntelliJ has no const/readonly key
+for TS (consts stay variable-red, unlike VS Code's yellow) and no parameter
+key for Python beyond `DEFAULT_PARAMETER`.
+
 Coverage is tracked two ways: observed semantic `type.modifier` combos are
 snapshotted in `audit/coverage-semantic.json` (new combos fail the audit until
 reviewed and accepted with `npm run audit -- --update`), and theme rules that

@@ -1,0 +1,100 @@
+[
+  {
+    "ide": "GO",
+    "file": "main.go",
+    "text": "func",
+    "color": "#c678dd",
+    "note": "keyword purple"
+  },
+  {
+    "ide": "GO",
+    "file": "main.go",
+    "text": "\"fmt\"",
+    "color": "#98c379",
+    "note": "import string green"
+  },
+  {
+    "ide": "GO",
+    "file": "main.go",
+    "text": "s",
+    "color": "#e06c75",
+    "note": "method receiver red (the original bug)"
+  },
+  {
+    "ide": "GO",
+    "file": "main.go",
+    "text": "prefix",
+    "color": "#e06c75",
+    "note": "parameter red"
+  },
+  {
+    "ide": "GO",
+    "file": "main.go",
+    "text": "MaxRetries",
+    "color": "#e5c07b",
+    "note": "const yellow"
+  },
+  {
+    "ide": "GO",
+    "file": "main.go",
+    "text": "Server",
+    "color": "#e5c07b",
+    "note": "type yellow"
+  },
+  {
+    "ide": "GO",
+    "file": "main.go",
+    "text": "8080",
+    "color": "#d19a66",
+    "note": "number orange"
+  },
+  {
+    "ide": "WS",
+    "file": "sample.ts",
+    "text": "BACK_LABELS",
+    "color": "#e06c75",
+    "note": "red: IntelliJ has no const/readonly key for TS (TS.LOCAL_VARIABLE chain) - documented divergence from VS Code const-yellow"
+  },
+  {
+    "ide": "WS",
+    "file": "sample.ts",
+    "text": "resolveLabel",
+    "color": "#61afef",
+    "note": "function blue"
+  },
+  {
+    "ide": "WS",
+    "file": "sample.ts",
+    "text": "interface",
+    "color": "#c678dd",
+    "note": "keyword purple"
+  },
+  {
+    "ide": "WS",
+    "file": "sample.ts",
+    "text": "parseInt",
+    "color": "#61afef",
+    "note": "builtin call blue"
+  },
+  {
+    "ide": "GO",
+    "file": "main.go",
+    "text": "msg",
+    "color": "#e06c75",
+    "note": "local variable red (via GO_LOCAL_VARIABLE -> DEFAULT_LOCAL_VARIABLE fallback)"
+  },
+  {
+    "ide": "GO",
+    "file": "main.go",
+    "text": "Greet",
+    "color": "#61afef",
+    "note": "method declaration blue"
+  },
+  {
+    "ide": "GO",
+    "file": "main.go",
+    "text": "Name",
+    "color": "#e06c75",
+    "note": "struct member red"
+  }
+]

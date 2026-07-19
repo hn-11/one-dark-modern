@@ -1,0 +1,52 @@
+name: JetBrains highlight audit
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 7 1 * *" # monthly, after the upstream sync
+  push:
+    branches: [main]
+    paths:
+      - "scripts/build-jetbrains.ts"
+      - "scripts/compare-jetbrains-dump.ts"
+      - "audit/jetbrains-expected.json"
+      - "jetbrains-audit/**"
+      - "overrides/**"
+
+concurrency:
+  group: jb-audit-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  audit:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - ide: GO
+            version: "2026.1"
+          - ide: WS
+            version: "2026.1"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.14.5"
+      - run: npm ci
+      - run: npm run build
+
+      - name: Dump highlighting from ${{ matrix.ide }}
+        working-directory: jetbrains-audit
+        run: gradle test -PideType=${{ matrix.ide }} -PideVersion=${{ matrix.version }} --no-daemon
+
+      - name: Compare against .icls expectations
+        run: node scripts/compare-jetbrains-dump.ts ${{ matrix.ide }}

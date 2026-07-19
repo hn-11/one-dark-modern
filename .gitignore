@@ -2,3 +2,6 @@ node_modules
 *.vsix
 one-dark-modern-*.vsix
 dist/
+jetbrains-audit/build/
+jetbrains-audit/.gradle/
+jetbrains-audit/.intellijPlatform/

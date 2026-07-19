@@ -9,3 +9,4 @@ package-lock.json
 *.md
 .gitignore
 dist/**
+jetbrains-audit/**
