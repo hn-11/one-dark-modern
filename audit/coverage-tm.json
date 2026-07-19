@@ -83,7 +83,6 @@
   "meta.selector",
   "markup.heading",
   "markup.heading punctuation.definition.heading, entity.name.section",
-  "keyword.other.unit",
   "markup.bold,todo.bold",
   "punctuation.definition.bold",
   "markup.italic, punctuation.definition.italic,todo.emphasis",
@@ -195,9 +194,6 @@
   ],
   [
     "punctuation.quasi.element"
-  ],
-  [
-    "constant.character.entity"
   ],
   [
     "entity.other.attribute-name.pseudo-element",
@@ -366,5 +362,7 @@
     "markup.underline.link.markdown",
     "markup.underline.link.image.markdown"
   ],
-  "source.json meta.structure.dictionary.json > constant.language.json,source.json meta.structure.array.json > constant.language.json"
+  "source.json meta.structure.dictionary.json > constant.language.json,source.json meta.structure.array.json > constant.language.json",
+  "constant.character.entity",
+  "keyword.other.unit"
 ]

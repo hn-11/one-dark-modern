@@ -988,13 +988,6 @@
       }
     },
     {
-      "name": "Units",
-      "scope": "keyword.other.unit",
-      "settings": {
-        "foreground": "#e06c75"
-      }
-    },
-    {
       "name": "Bold",
       "scope": "markup.bold,todo.bold",
       "settings": {
@@ -1598,15 +1591,6 @@
     {
       "name": "go operator",
       "scope": [
-        "keyword.operator.assignment.go"
-      ],
-      "settings": {
-        "foreground": "#e5c07b"
-      }
-    },
-    {
-      "name": "go operator",
-      "scope": [
         "keyword.operator.arithmetic.go",
         "keyword.operator.address.go"
       ],
@@ -1658,15 +1642,6 @@
       ],
       "settings": {
         "foreground": "#c678dd"
-      }
-    },
-    {
-      "name": "html/pug (jade) escaped characters and entities",
-      "scope": [
-        "constant.character.entity"
-      ],
-      "settings": {
-        "foreground": "#e06c75"
       }
     },
     {
@@ -2325,6 +2300,36 @@
     },
     {
       "scope": "source.json meta.structure.dictionary.json > constant.language.json,source.json meta.structure.array.json > constant.language.json",
+      "settings": {
+        "foreground": "#D19A66"
+      }
+    },
+    {
+      "scope": "keyword.operator.assignment.go",
+      "settings": {
+        "foreground": "#56B6C2"
+      }
+    },
+    {
+      "scope": "keyword.operator.arithmetic.go",
+      "settings": {
+        "foreground": "#56B6C2"
+      }
+    },
+    {
+      "scope": "keyword.operator.address.go",
+      "settings": {
+        "foreground": "#ABB2BF"
+      }
+    },
+    {
+      "scope": "constant.character.entity",
+      "settings": {
+        "foreground": "#D19A66"
+      }
+    },
+    {
+      "scope": "keyword.other.unit",
       "settings": {
         "foreground": "#D19A66"
       }
