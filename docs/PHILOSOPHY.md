@@ -95,15 +95,22 @@ yellow). The shell-green exception was reviewed and kept. Lesson: layer
 consistency (what the flicker audit checks) is not family consistency -
 the former can be satisfied while canonizing the latter's violation.
 
-Case law (2026-07, the Zed type-cyan investigation): before deferring to
-Zed's "types are cyan", we traced its origin - it is a survivor of Zed's
-early base16 multi-theme factory (a generic template that also had blue
-keywords and yellow functions before theme2 hand-tuning), not a One Dark
-deliberation. Zed's One Dark descends from base16-onedark, credits Chris
-Kempson, and its desaturation is chroma-ramp resampling. Our type-yellow is
-Atom's own entity.name.type color and stands. Corollary: base16's 0F slot
-(#BE5046, "embedded language tags") independently confirms the ${}
-restoration. Lesson: check the pedigree of an authority before joining it.
+Case law (2026-07, the Zed type-cyan investigation, CORRECTED after deep
+archaeology): the first ruling ("base16 template artifact") was half wrong.
+Full picture: Zed's One Dark began (2022-07) as base16-onedark through a
+generic factory (keyword blue, function yellow, type cyan - clearly not
+One Dark deliberation at that stage), but the 2023-02 hand-tuning by Nate
+Butler, answering issue #5793's demand for Atom fidelity, deliberately kept
+type=teal - and that IS faithful to LATE Atom: from 2018 the tree-sitter
+grammars mapped type_identifier to support.storage.type, rendering types
+CYAN. So both colors carry Atom ancestry from different eras: yellow =
+TextMate-era Atom (what ODP and we inherit), cyan = tree-sitter-era Atom
+(what Zed inherits). Our yellow stands - it matches our TM+LSP stack's
+lineage and hn's Record<> ruling - but the claim "cyan has no One Dark
+pedigree" is withdrawn. Lessons kept: check an authority's pedigree before
+joining it - and re-check your own verdicts when new strata surface.
+Corollary intact: base16's 0F slot (#BE5046, "embedded language tags")
+independently confirms the ${} restoration.
 
 ## 4. One source of truth, generated everywhere
 
