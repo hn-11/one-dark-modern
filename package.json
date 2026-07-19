@@ -15,7 +15,9 @@
     "package": "vsce package",
     "package:jetbrains": "cd dist/jetbrains && zip -qr ../one-dark-modern-jetbrains-$npm_package_version.jar META-INF theme",
     "vscode:prepublish": "npm run build",
-    "audit": "node scripts/audit-flicker.ts"
+    "audit": "node scripts/audit-flicker.ts",
+    "version": "npm run build && git add themes",
+    "postversion": "git push origin main --tags"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
@@ -26,7 +28,8 @@
     "vscode-textmate": "^9.3.2"
   },
   "engines": {
-    "vscode": "^1.90.0"
+    "vscode": "^1.90.0",
+    "node": ">=23.6.0"
   },
   "categories": [
     "Themes"

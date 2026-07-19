@@ -23,28 +23,18 @@ import { spawn, type ChildProcess } from "node:child_process";
 import { createRequire } from "node:module";
 import { readFileSync, writeFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { pathToFileURL, fileURLToPath } from "node:url";
+import { pathToFileURL } from "node:url";
 import type * as tmTypes from "vscode-textmate";
+import { loadBuiltTheme, root } from "./lib.ts";
 
 const require = createRequire(import.meta.url);
 // both packages are CJS; require() them for reliable interop
 const tm: typeof tmTypes = require("vscode-textmate");
 const oniguruma = require("vscode-oniguruma");
-const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const UPDATE = process.argv.includes("--update");
 
-interface TokenRule {
-  scope: string | string[];
-  settings: { foreground?: string; fontStyle?: string };
-}
-interface Theme {
-  colors: Record<string, string>;
-  tokenColors: TokenRule[];
-  semanticTokenColors: Record<string, string | { foreground?: string }>;
-}
-const theme: Theme = JSON.parse(
-  readFileSync(join(root, "themes/one-dark-modern-color-theme.json"), "utf8")
-);
+const theme = loadBuiltTheme();
+const semanticEntries = Object.entries(theme.semanticTokenColors ?? {});
 const editorFg = (theme.colors["editor.foreground"] ?? "#abb2bf").toLowerCase();
 
 interface AllowEntry {
@@ -175,7 +165,7 @@ function recordRuleCoverage(lines: TmLine[]): void {
 function semColor(type: string, modifiers: string[], lang: string): string | null {
   let best: string | null = null;
   let bestScore = -1;
-  for (const [sel, val] of Object.entries(theme.semanticTokenColors)) {
+  for (const [sel, val] of semanticEntries) {
     const [selPart, selLang] = sel.split(":");
     const [selType, ...selMods] = selPart.split(".");
     if (selType !== type) continue;

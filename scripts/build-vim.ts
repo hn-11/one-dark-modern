@@ -3,50 +3,14 @@
 // Emits dist/vim/colors/one-dark-modern.vim. Install by copying to
 // ~/.vim/colors/ or ~/.config/nvim/colors/, then :colorscheme one-dark-modern
 // (requires termguicolors).
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { blend, loadBuiltTheme, root, semanticColor, tokenColor, uiColor } from "./lib.ts";
 
-interface TokenRule {
-  scope: string | string[];
-  settings: { foreground?: string; fontStyle?: string };
-}
-const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const theme = JSON.parse(
-  readFileSync(join(root, "themes/one-dark-modern-color-theme.json"), "utf8")
-) as {
-  colors: Record<string, string>;
-  tokenColors: TokenRule[];
-  semanticTokenColors: Record<string, string | { foreground?: string }>;
-};
-const ui = (key: string, fallback: string): string => theme.colors[key] ?? fallback;
-const token = (scope: string, fallback: string): string => {
-  for (let i = theme.tokenColors.length - 1; i >= 0; i--) {
-    const r = theme.tokenColors[i];
-    const scopes = Array.isArray(r.scope) ? r.scope : [r.scope];
-    if (scopes.includes(scope) && r.settings.foreground) return r.settings.foreground;
-  }
-  return fallback;
-};
-const semantic = (key: string, fallback: string): string => {
-  const v = theme.semanticTokenColors[key];
-  if (typeof v === "string") return v;
-  if (v && typeof v === "object" && v.foreground) return v.foreground;
-  return fallback;
-};
-const blend = (color: string, base: string): string => {
-  const c = color.replace("#", "");
-  if (c.length !== 8) return "#" + c;
-  const a = parseInt(c.slice(6, 8), 16) / 255;
-  const mix = (i: number) =>
-    Math.round(
-      parseInt(c.slice(i, i + 2), 16) * a +
-        parseInt(base.replace("#", "").slice(i, i + 2), 16) * (1 - a)
-    )
-      .toString(16)
-      .padStart(2, "0");
-  return "#" + mix(0) + mix(2) + mix(4);
-};
+const theme = loadBuiltTheme();
+const ui = (key: string, fallback: string): string => uiColor(theme, key, fallback);
+const token = (scope: string, fallback: string): string => tokenColor(theme, scope, fallback);
+const semantic = (key: string, fallback: string): string => semanticColor(theme, key, fallback);
 
 // palette
 const bg = ui("editor.background", "#1f1f1f");

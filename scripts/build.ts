@@ -8,34 +8,9 @@
 //   overrides/semantic.json     our semantic token overrides
 //
 // The theme file is generated - edit overrides/ instead. Run: npm run build
-import { readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-
-interface TokenRule {
-  name?: string;
-  scope: string | string[];
-  settings: { foreground?: string; background?: string; fontStyle?: string };
-}
-
-interface Theme {
-  name?: string;
-  colors: Record<string, string>;
-  tokenColors: TokenRule[];
-  semanticTokenColors?: Record<string, unknown>;
-}
-
-const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-
-// Upstream files are JSONC (comments, trailing commas).
-const jsonc = <T>(s: string): T =>
-  JSON.parse(
-    s
-      .replace(/\/\*[\s\S]*?\*\//g, "")
-      .replace(/^\s*\/\/.*$/gm, "")
-      .replace(/,(\s*[}\]])/g, "$1")
-  ) as T;
-const read = <T>(p: string): T => jsonc<T>(readFileSync(join(root, p), "utf8"));
+import { writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { readJson as read, root, type Theme, type TokenRule } from "./lib.ts";
 
 const darkModern = read<Theme>("upstream/dark_modern.json");
 const oneDarkPro = read<Theme>("upstream/OneDark-Pro.json");
