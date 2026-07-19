@@ -25,7 +25,7 @@ based on One Dark Modern.
 
 **Zed One Dark Modern** and **Zed One Dark 2026** translate [Zed's One Dark
 interpretation](https://github.com/zed-industries/zed/blob/main/assets/themes/one/one.json)
-(desaturated palette, unpainted variables, cyan types, `#74ADE8` accent)
+(desaturated palette, cyan types, `#74ADE8` accent, rendered as Zed's `semantic_tokens: "combined"` mode - the LSP overlay is a mechanical translation of Zed's own semantic token rule files, auto-synced)
 onto the same two workbenches - generated fresh from `upstream/zed-one.json`
 by `scripts/build-zed.ts`, no ODP inheritance. Fidelity is verified by
 `npm run audit:zed` (CI): fixtures are parsed with tree-sitter using Zed's

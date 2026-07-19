@@ -35,6 +35,10 @@ jobs:
             https://raw.githubusercontent.com/zed-industries/zed/main/crates/grammars/src/go/highlights.scm
           curl -sSfL -o audit/zed-queries/typescript-highlights.scm \
             https://raw.githubusercontent.com/zed-industries/zed/main/crates/grammars/src/typescript/highlights.scm
+          curl -sSfL -o upstream/zed-semantic-default.json \
+            https://raw.githubusercontent.com/zed-industries/zed/main/assets/settings/default_semantic_token_rules.json
+          curl -sSfL -o upstream/zed-semantic-go.json \
+            https://raw.githubusercontent.com/zed-industries/zed/main/crates/grammars/src/go/semantic_token_rules.json
 
       - name: Rebuild theme from new snapshots
         run: npm run build

@@ -1,24 +1,6 @@
 [
   {
     "lang": "ts",
-    "capture": "variable",
-    "vscode": "#dfc184",
-    "reason": "TM tracks const-ness of every const binding; Zed only SCREAMING_CASE via #match heuristic - ours is a deliberate superset of the same intent"
-  },
-  {
-    "lang": "go",
-    "capture": "variable",
-    "vscode": "#d07277",
-    "reason": "Go parameter declarations: TM scopes them variable.parameter, Zed go query leaves them plain - keeping the ts-consistent parameter color"
-  },
-  {
-    "lang": "ts",
-    "capture": "variable",
-    "vscode": "#6eb4bf",
-    "reason": "enum declaration names: tsserver classifies as enum (type family); Zed ts query has no enum-name capture"
-  },
-  {
-    "lang": "ts",
     "capture": "keyword",
     "text": "void",
     "reason": "void in type position: TM/tsserver treat as primitive type, Zed query lists it as keyword"
@@ -32,18 +14,12 @@
     "lang": "ts",
     "capture": "property",
     "vscode": "#73ade9",
-    "reason": "interface method signatures: tsserver says method (blue); Zed ts query captures as property"
+    "reason": "interface method signatures: tsserver says method (blue); Zed ts query captures as property and tsserver emits no semantic token inside ambient declarations"
   },
   {
     "lang": "ts",
     "capture": "constant",
     "text": "B1",
     "reason": "SCREAMING-ish class member: Zed casing heuristic vs tsserver classification"
-  },
-  {
-    "lang": "ts",
-    "capture": "property",
-    "vscode": "#6eb4bf",
-    "reason": "class-typed property in constructor shorthand: tsserver says class reference"
   }
 ]

@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Zed fidelity audit: does our "Zed One Dark *" translation render the way
-// the real Zed would?
+// the real Zed would with semantic_tokens: "combined"?
 //
 // Zed side (ground truth): parse the fixtures with tree-sitter using ZED'S
 // OWN highlight queries (audit/zed-queries/*.scm, auto-vendored from
@@ -38,6 +38,31 @@ const zedSyntax = zedStyle.syntax as Record<string, { color: string }>;
 const trim = (v: string): string => (v.toLowerCase().endsWith("ff") ? v.slice(0, 7) : v).toLowerCase();
 const zedDefaultFg = trim((zedStyle["editor.foreground"] as string) ?? "#acb2beff");
 
+interface ZedSemRule {
+  token_type?: string;
+  token_modifiers?: string[];
+  style?: string[];
+  foreground_color?: string;
+}
+const zedRules: Record<string, ZedSemRule[]> = {
+  go: [
+    ...readJson<ZedSemRule[]>("upstream/zed-semantic-go.json"),
+    ...readJson<ZedSemRule[]>("upstream/zed-semantic-default.json"),
+  ],
+  ts: readJson<ZedSemRule[]>("upstream/zed-semantic-default.json"),
+};
+// Zed combined mode: first matching rule whose style resolves wins
+const zedSemanticColor = (lang: string, type: string, modifiers: string[]): string | null => {
+  for (const rule of zedRules[lang] ?? []) {
+    if (rule.token_type && rule.token_type !== type) continue;
+    if (!(rule.token_modifiers ?? []).every((m) => modifiers.includes(m))) continue;
+    if (rule.foreground_color) return rule.foreground_color.toLowerCase();
+    for (const slot of rule.style ?? []) if (zedSyntax[slot]) return trim(zedSyntax[slot].color);
+    // style unresolved: rule inapplicable, keep searching (Zed fallthrough)
+  }
+  return null;
+};
+
 // Zed resolves a capture name against syntax slots by trimming trailing
 // dotted segments until a slot matches
 const slotColor = (capture: string): { slot: string | null; color: string } => {
@@ -53,15 +78,16 @@ const slotColor = (capture: string): { slot: string | null; color: string } => {
 const theme = readJson<Theme>("themes/zed-one-dark-modern-color-theme.json");
 const editorFg = (theme.colors["editor.foreground"] ?? "#acb2be").toLowerCase();
 const semanticEntries = Object.entries(theme.semanticTokenColors ?? {});
-const semColor = (type: string, modifiers: string[]): string | null => {
+const semColor = (type: string, modifiers: string[], lang: string): string | null => {
   let best: string | null = null;
   let bestScore = -1;
   for (const [sel, val] of semanticEntries) {
-    const [selPart] = sel.split(":");
+    const [selPart, selLang] = sel.split(":");
     const [selType, ...selMods] = selPart.split(".");
     if (selType !== type) continue;
+    if (selLang && selLang !== lang) continue;
     if (!selMods.every((m) => modifiers.includes(m))) continue;
-    const score = selMods.length * 10;
+    const score = (selLang ? 100 : 0) + selMods.length * 10;
     if (score > bestScore) {
       const fg = typeof val === "string" ? val : (val as { foreground?: string }).foreground;
       if (fg) {
@@ -212,13 +238,20 @@ async function auditFile(
   const vsColorAt = (row: number, col: number): string => {
     for (const t of semByLine.get(row) ?? []) {
       if (t.start <= col && col < t.start + t.len) {
-        const c = semColor(t.type, t.modifiers);
+        const c = semColor(t.type, t.modifiers, languageId);
         if (c) return c;
         break; // semantic token present but unmapped -> TM shows through
       }
     }
     const tok = (tmLines[row] ?? []).find((k) => k.s <= col && col < k.e);
     return tok ? cmap[tok.c] || editorFg : editorFg;
+  };
+  const zedSemAt = (row: number, col: number): string | null => {
+    for (const t of semByLine.get(row) ?? []) {
+      if (t.start <= col && col < t.start + t.len)
+        return zedSemanticColor(lang, t.type, t.modifiers);
+    }
+    return null;
   };
 
   // keep the LAST capture per exact range (tree-sitter highlighting
@@ -239,7 +272,8 @@ async function auditFile(
   for (const cap of deduped) {
     if (containers.has(cap)) continue;
     if (cap.endRow !== cap.row) continue; // multi-line captures (strings/comments) - sample not needed
-    const { slot, color: zedColor } = slotColor(cap.name);
+    const { slot } = slotColor(cap.name);
+    const zedColor = zedSemAt(cap.row, cap.col) ?? slotColor(cap.name).color;
     const vs = vsColorAt(cap.row, cap.col);
     compared++;
     if (vs === zedColor) continue;

@@ -24,6 +24,16 @@ const darkModern = readJson<Theme>("upstream/dark_modern.json");
 const dark2026 = readJson<Theme>("upstream/2026-dark.json");
 const accent2026 = readJson<Record<string, string>>("overrides/accent-2026.json");
 
+interface ZedSemRule {
+  token_type?: string;
+  token_modifiers?: string[];
+  style?: string[];
+  foreground_color?: string;
+  font_style?: string;
+}
+const zedDefaultRules = readJson<ZedSemRule[]>("upstream/zed-semantic-default.json");
+const zedGoRules = readJson<ZedSemRule[]>("upstream/zed-semantic-go.json");
+
 // zed colors are #rrggbbaa; drop the alpha when it is opaque
 const trim = (v: string): string => (v.toLowerCase().endsWith("ff") ? v.slice(0, 7) : v);
 const z = (key: string): string => {
@@ -165,24 +175,32 @@ const tokenColors = [
   rule("string.unquoted.argument", s("primary")),
 ];
 
-// ---- semantic: Zed roles; variables deliberately undefined (unpainted) ----
-const semanticTokenColors: Record<string, unknown> = {
-  keyword: s("keyword"),
-  operator: s("operator"),
-  string: s("string"),
-  regexp: s("string.regex"),
-  number: s("number"),
-  comment: s("comment"),
-  function: s("function"),
-  method: s("function"),
-  class: s("type"),
-  interface: s("type"),
-  struct: s("type"),
-  enum: s("type"),
-  type: s("type"),
-  typeParameter: s("type"),
-  property: s("property"),
+// ---- semantic: mechanical translation of Zed's combined-mode rules ----
+// (semantic_tokens: "combined" in Zed). A rule's style list is tried in
+// order; the first slot the theme defines wins. Rules whose styles resolve
+// to nothing are inapplicable - exactly Zed's fallthrough behavior.
+const resolveStyle = (rule: ZedSemRule): string | null => {
+  if (rule.foreground_color) return rule.foreground_color.toLowerCase();
+  for (const slot of rule.style ?? []) if (syntax[slot]) return trim(syntax[slot].color);
+  return null;
 };
+const semanticTokenColors: Record<string, unknown> = {};
+const addRules = (rules: ZedSemRule[], langSuffix: string): void => {
+  for (const rule of rules) {
+    if (!rule.token_type) continue; // no catch-all selector in VS Code
+    const color = resolveStyle(rule);
+    if (!color) continue;
+    const sel =
+      rule.token_type +
+      (rule.token_modifiers?.length ? "." + rule.token_modifiers.join(".") : "") +
+      langSuffix;
+    if (sel in semanticTokenColors) continue; // first rule wins, like Zed
+    semanticTokenColors[sel] =
+      rule.font_style === "italic" ? { foreground: color, italic: true } : color;
+  }
+};
+addRules(zedGoRules, ":go");
+addRules(zedDefaultRules, "");
 
 const buildVariant = (name: string, file: string, chrome: Record<string, string>): void => {
   const theme = {
