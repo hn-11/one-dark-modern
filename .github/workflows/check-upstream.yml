@@ -78,6 +78,10 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Flag ODP change for review
         if: steps.pr.outputs.pull-request-operation == 'created' && steps.odp.outputs.changed == 'true'
-        run: gh pr comment "${{ steps.pr.outputs.pull-request-number }}" --body "OneDark-Pro changed upstream - auto-merge withheld. Review the token diff against PHILOSOPHY.md before merging (provenance rule: 'it was in ODP' alone is not a reason)."
+        run: >
+          gh pr comment "${{ steps.pr.outputs.pull-request-number }}"
+          --body "OneDark-Pro changed upstream - auto-merge withheld.
+          Review the token diff against PHILOSOPHY.md before merging
+          (provenance rule - 'it was in ODP' alone is not a reason)."
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
