@@ -2518,6 +2518,16 @@
     },
     {
       "scope": [
+        "variable.other.constant",
+        "variable.other.enummember",
+        "support.constant.math"
+      ],
+      "settings": {
+        "foreground": "#D19A66"
+      }
+    },
+    {
+      "scope": [
         "keyword.operator",
         "keyword.operator.ternary",
         "storage.type.function.arrow"
@@ -2541,7 +2551,7 @@
     "annotation:dart": {
       "foreground": "#d19a66"
     },
-    "enumMember": "#E5C07B",
+    "enumMember": "#D19A66",
     "macro": "#61AFEF",
     "memberOperatorOverload": {
       "foreground": "#c678dd"
@@ -2561,9 +2571,7 @@
     "variable.constant": {
       "foreground": "#d19a66"
     },
-    "variable.defaultLibrary": {
-      "foreground": "#e5c07b"
-    },
+    "variable.defaultLibrary": "#D19A66",
     "namespace": "#E5C07B",
     "class": "#E5C07B",
     "enum": "#E5C07B",
@@ -2575,7 +2583,7 @@
     "method": "#61AFEF",
     "decorator": "#61AFEF",
     "variable": "#E06C75",
-    "variable.readonly": "#E5C07B",
+    "variable.readonly": "#D19A66",
     "parameter": {
       "foreground": "#E06C75",
       "italic": true

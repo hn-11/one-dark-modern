@@ -11,13 +11,13 @@
   "decorator": "#61AFEF",
   "macro": "#61AFEF",
   "variable": "#E06C75",
-  "variable.readonly": "#E5C07B",
+  "variable.readonly": "#D19A66",
   "parameter": {
     "foreground": "#E06C75",
     "italic": true
   },
   "property": "#E06C75",
-  "enumMember": "#E5C07B",
+  "enumMember": "#D19A66",
   "event": "#E06C75",
   "keyword": "#C678DD",
   "string": "#98C379",
@@ -30,5 +30,6 @@
   "string.format": "#D19A66",
   "type.defaultLibrary.string:go": "#E5C07B",
   "type.defaultLibrary.number:go": "#E5C07B",
-  "type.defaultLibrary.bool:go": "#E5C07B"
+  "type.defaultLibrary.bool:go": "#E5C07B",
+  "variable.defaultLibrary": "#D19A66"
 }

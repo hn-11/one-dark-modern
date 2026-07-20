@@ -10,7 +10,7 @@
     "modifiers": [
       "readonly"
     ],
-    "reason": "consts are yellow by design (matches TS variable.readonly / ODP variable.other.constant); the Go TM grammar cannot see constness"
+    "reason": "consts are orange by design (constants merged into the literal family, ecosystem-majority ruling 2026-07-20); the Go TM grammar cannot see constness"
   },
   {
     "lang": [
@@ -23,7 +23,7 @@
     "modifiers": [
       "readonly"
     ],
-    "reason": "const locals are yellow by design; TM only marks some declaration sites"
+    "reason": "const locals are orange by design (constants merged into the literal family, 2026-07-20); TM only marks some declaration sites"
   },
   {
     "lang": [
@@ -33,7 +33,7 @@
       "javascriptreact"
     ],
     "type": "enumMember",
-    "reason": "enum members are compile-time constants - yellow like variable.readonly (self-consistency purge 2026-07); TM has no enum-member awareness"
+    "reason": "enum members are compile-time constants - orange like variable.readonly (constant/literal merge 2026-07-20); TM has no enum-member awareness"
   },
   {
     "lang": [

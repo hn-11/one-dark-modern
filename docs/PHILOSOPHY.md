@@ -14,11 +14,11 @@ mapping (borrowing a color for another family) are forbidden by default.
 |---|---|---|
 | Purple | `#C678DD` | Keywords, control flow, storage (`func` `if` `const` `import`) |
 | Blue | `#61AFEF` | Callables (functions, methods, decorators, macros) |
-| Yellow | `#E5C07B` | The type family (class/interface/enum/namespace) + const values + enum members |
+| Yellow | `#E5C07B` | The type family (class/interface/enum/namespace) |
 | Red | `#E06C75` | The variable family (variables, fields, parameters, `this`/`self`) + key-like names (JSON/YAML keys, CSS property names) + tags + headings |
 | Cyan | `#56B6C2` | Platform-provided magic: builtins (`support.*`), escapes, regexps, shell flags |
 | Green | `#98C379` | Strings, inserted diffs, shell command names |
-| Orange | `#D19A66` | Literals (numbers, booleans), attribute names, bold markup |
+| Orange | `#D19A66` | Constants and literals (numbers, booleans, named consts, enum members), attribute names, bold markup |
 | Gray | `#7F848E` | Comments (italic) |
 | Foreground | `#ABB2BF` | Operators, punctuation — and the deliberate choice *not* to highlight |
 
@@ -158,6 +158,21 @@ purple rule is more specific than the generic override). Go unchanged -
 already all-cyan. ODP-lineage themes now agree with the Zed variants on
 operators by taste, not just the Zed variants by contract.
 
+Case law (2026-07-20, the constant/literal merge): named constants and
+enum members yellow -> orange, joining numbers and booleans in one
+constant family. Trigger: an eight-implementation ecosystem survey
+(JetBrains plugin, akamud, joshdick, navarasu, olimorris ODP.nvim,
+Sublime, two Emacs themes) showed the constants/literals *merge* is the
+ecosystem majority and base16 files both under base09; splitting named
+constants off as yellow was an ODP-lineage signature no other family
+shares (the few splitters use cyan or violet, never yellow). Yellow now
+means exactly one thing: the type family. Side effect: the old
+yellow-collision argument for keeping Go primitive types yellow gets
+cleaner - value-world orange vs type-world yellow is now a strict
+two-world split. Parameter red-italic, the other ODP signature the survey
+isolated, was deliberately kept: hn's eyes are ODP-calibrated and it
+survives on taste, recorded as such.
+
 Doctrine (2026-07-20, adopted by hn): **the five witnesses**. Provenance
 scoring recognizes five strata: TextMate-era Atom, tree-sitter-era Atom,
 base16 (Kempson's slot roles), Zed, and the official tree-sitter grammar
@@ -167,8 +182,9 @@ is weighty on which distinctions exist, silent on colors, and NOT inerrant
 not Go - and it canonizes the SCREAMING-case @constructor heuristic).
 Re-scoring under five witnesses: ${} punctuation.special stands 4-0; Go
 primitives-as-plain-type supports our yellow; string.regexp cyan narrows to
-3-2 (old strata cyan vs official-TS+Zed "special string" orange) - held,
-flagged for future re-scoring; this/self: the modern ontology distinguishes
+3-2 (old strata cyan vs official-TS+Zed "special string" orange) - held;
+the 2026-07-20 ecosystem survey (JetBrains plugin, akamud, Sublime all
+cyan) widened the margin and the re-scoring flag is removed; this/self: the modern ontology distinguishes
 @variable.builtin, an objection recorded against our red merge - held on
 identity-family grounds. Corrected: Zed's regex orange is not an orphan;
 it sides with the modern ontology.
