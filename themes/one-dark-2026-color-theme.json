@@ -2512,6 +2512,15 @@
       "settings": {
         "foreground": "#E06C75"
       }
+    },
+    {
+      "scope": [
+        "keyword.operator.ternary",
+        "keyword.operator.optional"
+      ],
+      "settings": {
+        "foreground": "#ABB2BF"
+      }
     }
   ],
   "semanticTokenColors": {
