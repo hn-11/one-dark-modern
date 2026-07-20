@@ -1,266 +1,406 @@
 # Design Philosophy
 
-Every color decision in this theme follows from the principles below. Where
-principles collided in practice, the actual ruling is recorded as **case law**.
-When in doubt, come back here.
+This document explains, to a reader with no prior context, why this theme
+colors what it colors — the principles, the evidence system behind them, and
+the complete record of contested rulings. Every color decision in the
+repository should be derivable from this document; when a new question comes
+up, check the rulings here before inventing an answer.
 
-## 0. The color vocabulary
+## 1. What this theme is
 
-Each color maps to a **family of meaning**. Being able to read the kind of a
-symbol from its color is the theme's core value; changes that dilute a
-mapping (borrowing a color for another family) are forbidden by default.
+Four themes are built from one pipeline, expressing two *interpretations* of
+One Dark across two *workbench generations*:
+
+| Theme | Syntax interpretation | Workbench |
+|---|---|---|
+| One Dark Modern | ODP lineage (this document's rulings) | VS Code Dark Modern |
+| One Dark 2026 | ODP lineage | VS Code 2026 Dark (accent recolored to `#528BFF`) |
+| Zed One Dark Modern | Zed's One Dark, reproduced verbatim | Dark Modern |
+| Zed One Dark 2026 | Zed's One Dark, reproduced verbatim | 2026 Dark |
+
+The ODP-lineage themes are the opinionated ones — everything below applies to
+them. The Zed variants are governed by a different rule entirely: **fidelity,
+not judgment** (§8). Backgrounds always come from the workbench generation,
+never from the syntax interpretation.
+
+The identity blend of the ODP-lineage themes: One Dark syntax colors, the
+Dark Modern UI (`#181818`/`#1F1F1F`, accent `#0078D4`), and Atom
+one-dark-ui's 16-color ANSI terminal palette. This three-way blend *is* the
+concept.
+
+## 2. The color vocabulary
+
+Each color maps to a **family of meaning**. Reading a symbol's kind from its
+color is the theme's core value; borrowing a color for another family dilutes
+the mapping and is forbidden by default.
 
 | Color | Value | Meaning |
 |---|---|---|
-| Purple | `#C678DD` | Keywords, control flow, storage (`func` `if` `const` `import`) |
+| Purple | `#C678DD` | Keywords: control flow, storage, and word operators (`func` `if` `const` `import` `new` `typeof` `and`) |
 | Blue | `#61AFEF` | Callables (functions, methods, decorators, macros) |
-| Yellow | `#E5C07B` | The type family (class/interface/enum/namespace) |
-| Red | `#E06C75` | The variable family (variables, fields, parameters, `this`/`self`) + key-like names (JSON/YAML keys, CSS property names) + tags + headings |
-| Cyan | `#56B6C2` | Platform-provided magic: builtins (`support.*`), escapes, regexps, shell flags |
+| Yellow | `#E5C07B` | The type family, and nothing else (class/interface/enum/namespace/type parameter) |
+| Red | `#E06C75` | The variable family (variables, fields, parameters, `this`/`self`) + key-like names (JSON/YAML keys, CSS property names) + markup tags + headings |
+| Cyan | `#56B6C2` | Two families: platform-provided magic (builtins, escapes, regexps, shell flags) and symbol operators (`=` `=>` `&&` `? :`) |
 | Green | `#98C379` | Strings, inserted diffs, shell command names |
-| Orange | `#D19A66` | Constants and literals (numbers, booleans, named consts, enum members), attribute names, bold markup |
+| Orange | `#D19A66` | The value-constant family: numbers, booleans, `nil`/`null`, named constants, enum members, platform constants (`Math.PI`) — plus attribute names and bold markup |
+| Dark red | `#BE5046` | Embedded-world boundaries: `${}` in templates, JSX expression braces, `variable.interpolation` |
 | Gray | `#7F848E` | Comments (italic) |
-| Foreground | `#ABB2BF` | Operators, punctuation — and the deliberate choice *not* to highlight |
+| Foreground | `#ABB2BF` | Punctuation, type-annotation marks — the deliberate choice *not* to highlight |
 
-One canonized exception survives by design: shell command names are green
-(string color) to mirror zsh-syntax-highlighting in terminals - family-impure,
-kept deliberately.
+Two deliberate impurities are canonized:
 
-The UI is Dark Modern (`#181818` / `#1F1F1F`, accent `#0078D4`); the terminal
-palette is Atom one-dark-ui's ANSI 16. This three-way blend *is* the theme's
-concept.
+- Shell command names are green (string color) to mirror
+  zsh-syntax-highlighting in terminals.
+- Yellow/orange forms a strict two-world split: **yellow is the type world,
+  orange is the value world.** A symbol that names a type is yellow even if
+  it is builtin (`int`, `string` in Go); a symbol that names a value is
+  orange even if it is SCREAMING_CASE.
 
-## 1. Lexical belongs to TextMate; semantic corrects
+## 3. Provenance: a color's authority is its history
+
+The central doctrine: **an inherited color's authority is its provenance.**
+"It was in One Dark Pro" alone is not a reason once the history is known.
+One Dark exists in many implementations that disagree; when they do, the
+disagreement is settled by evidence, not by which implementation the theme
+happens to descend from.
+
+### The five witnesses
+
+Provenance scoring recognizes five strata of the One Dark family:
+
+1. **TextMate-era Atom** (`atom/one-dark-syntax` before 2018) — the origin.
+2. **Tree-sitter-era Atom** (2018 onward) — the same team after the engine
+   migration; some colors changed deliberately, others were lost in
+   translation (grammar scopes that no longer existed).
+3. **base16** (Kempson's 16-slot standard, with base16-onedark) — the only
+   witness that documents *roles in writing* ("base09: Integers, Boolean,
+   Constants, XML Attributes"), which makes it the dictionary of record for
+   what-color-means-what disputes, though it is coarse (16 slots) and not
+   authored by the One Dark originators.
+4. **Zed** — the Atom team's successor editor. Began as a base16 factory
+   (2022), hand-tuned toward Atom fidelity in 2023 (issue #5793). Carries
+   real lineage plus its own lone inventions.
+5. **Official tree-sitter grammar queries** (snapshotted in
+   `audit/provenance/official-treesitter/`) — weighty on *which distinctions
+   exist* (is `=>` an operator? is `nil` grouped with `true`?), silent on
+   colors, and not inerrant: its vocabulary is uneven across grammars and it
+   canonizes heuristics like SCREAMING-case `@constructor`.
+
+Scoring is not mechanical vote-counting. Observed regularities:
+
+- A lone deviation by any single witness is suspect (Zed's blue markup
+  tags, ODP's logical-operator cyan carve-out).
+- Two-generation agreement (TextMate-Atom + Zed) against ODP usually means
+  ODP drifted; such colors were restored to origin.
+- When witnesses split cleanly by era (types: yellow in the TextMate
+  stratum, cyan in the tree-sitter stratum), both positions are legitimate
+  lineage; the theme follows the stratum its own stack descends from.
+- A *split no witness makes* is weaker than any witness's position: schemes
+  that paint all symbol operators one color are positions; a scheme that
+  splits logical operators from the rest is an invention.
+
+### The ecosystem check
+
+Where the five witnesses leave a margin thin, the wider ecosystem serves as
+a sixth, advisory source. A survey of eight further implementations
+(JetBrains' one-dark plugin, akamud's Atom-generated VS Code port, the
+joshdick/navarasu/olimorris Vim/Neovim themes, the Sublime port, two Emacs
+themes) is used to detect whether a position is a broad consensus, a
+family signature, or an orphan. Findings that changed rulings are recorded
+in §6; the survey also confirmed that types-yellow is unanimous across the
+entire ecosystem and that the `${}` dark red is carried by every
+Atom-faithful port.
+
+## 4. Layering: lexical belongs to TextMate; semantic corrects
 
 - **What cannot be misclassified** (keywords, strings, numbers, comments,
   operators, punctuation) belongs to TextMate. Regexes are sufficient there,
   and TM keeps working before the LSP starts and inside Markdown fences.
 - **What can be misclassified** (the role of an identifier: variable? type?
   function?) is corrected by semantic tokens.
-- Therefore: **a semantic rule that repaints a color TextMate set deliberately
-  is a violation.** Semantic may only fill in tokens TM left at the plain
-  foreground, or fix places where TM's own guess is wrong.
+- Therefore: **a semantic rule that repaints a color TextMate set
+  deliberately is a violation.** Semantic may only fill in tokens TM left at
+  the plain foreground, or fix places where TM's own guess is wrong.
 - `npm run audit` (real grammars + real LSPs) enforces this mechanically.
   Exceptions exist only in `audit/allow.json`, each with a reason.
 
-Case law: the semantic `operator` entry was removed (rust-analyzer et al. were
-flattening TM's per-language operator colors to gray). A `function.defaultLibrary`
-cyan "fix" turned out to *introduce* flicker and was reverted after the
-harness falsified it.
+Rulings under this principle: the semantic `operator` entry was removed
+(rust-analyzer et al. were flattening TM's per-language operator colors);
+a `function.defaultLibrary` cyan "fix" turned out to *introduce* flicker and
+was reverted after the harness falsified it; the constant/literal merge (§6)
+was caught leaving `variable.defaultLibrary` yellow by three new flicker
+violations on `JSON`, and the audit forced the fix before release.
 
-## 2. Same symbol, same color
+## 5. Identity: same symbol, same color
 
 Color attaches to what a symbol **is**, not to **where it is written**.
 
-Case law: One Dark Pro has a hidden rule painting dot-receivers yellow
-(`variable.other.object`). The same variable changing color line-by-line
-violates this principle, so it was **rejected** (approved by hn). Mid-chain
-properties (`b` in `a.b.c`) fall under the same ruling. What ODP actually
-wanted from that rule — "container-like things look yellow" — is achieved
-honestly by semantic namespace/class/defaultLibrary.
+The defining ruling: One Dark Pro paints dot-receivers yellow
+(`variable.other.object`), so the same variable changes color depending on
+whether it precedes a dot. This was rejected. Mid-chain properties
+(`b` in `a.b.c`) fall under the same ruling. What ODP wanted from that rule
+— "container-like things look yellow" — is achieved honestly by semantic
+namespace/class rules. The corresponding TM↔semantic disagreements are
+permanent `allow.json` entries.
 
-## 3. ODP pragmatism (no purism)
+This principle outranks upstream fidelity (§7) when they collide. It also
+grounds the `this`/`self` ruling: they are values, so they wear variable
+red, not a special color — an objection from the modern tree-sitter
+ontology (`@variable.builtin` exists as a distinction) is on record, held
+on identity-family grounds.
 
-A faithful rebuild from atom/one-dark-syntax was tried once and **rejected**
-(gray parameters, white operators and dark comments did not survive daily
-use). One Dark Pro's ~150 language-specific rules are not cruft — they are a
-decade of tuning against each grammar's quirks.
+## 6. The rulings, by token family
 
-- The yardstick is not "what upstream did" but "what looks right to eyes
-  calibrated on ODP".
-- When this collides with principle 2 (identity), principle 2 wins
-  (see the receiver-yellow ruling).
-- The origin can win back individual tokens on taste (2026-07, hn's call).
-  Criterion used: when Atom AND Zed - two generations of the family - agree
-  and only ODP deviates, the deviation is suspect. A mechanical
-  reconciliation of all 78 base.less assignments found exactly four such
-  tokens; three were restored:
-  - template-expression / embedded punctuation -> `#BE5046` (hue-5-2)
-  - `variable.interpolation` -> `#BE5046`
-  - markdown link URLs -> `#56B6C2` (cyan)
-  The fourth (comment brightness) stays ODP per the readability ruling.
-  Separately, `string.regexp` was restored to cyan. Archaeology correction:
-  ODP's red was not a pure accident - it was a deliberate 2022 change
-  mimicking Dark+ regex styling (issue #678), implemented by appending a
-  new rule while leaving the original cyan rule as dead code. We restore
-  cyan because origin + our semantic `regexp` + the vocabulary all say
-  cyan; mimicking Dark+ is not one of our principles.
+The complete record of contested decisions. Dates are retained because
+several rulings supersede earlier ones.
 
-Case law (2026-07, the self-consistency purge): auditing the theme against
-this very document found five self-violations, four fixed: Go primitive
-types were purple while TS's were yellow (a flicker-fix had canonized the
-split - both now yellow); `this`/`self` wore type-yellow while being values
-(now variable-red, which is also Atom's original); Python parameters and
-JSON booleans had per-language exception colors (now uniform red / orange -
-the JSON fix also restores Atom+Zed two-generation agreement); enum members
-were cyan while consts were yellow (both compile-time constants - now both
-yellow). The shell-green exception was reviewed and kept. Lesson: layer
-consistency (what the flicker audit checks) is not family consistency -
-the former can be satisfied while canonizing the latter's violation.
+### Operators
 
-Case law (2026-07, the Zed type-cyan investigation, CORRECTED after deep
-archaeology): the first ruling ("base16 template artifact") was half wrong.
-Full picture: Zed's One Dark began (2022-07) as base16-onedark through a
-generic factory (keyword blue, function yellow, type cyan - clearly not
-One Dark deliberation at that stage), but the 2023-02 hand-tuning by Nate
-Butler, answering issue #5793's demand for Atom fidelity, deliberately kept
-type=teal - and that IS faithful to LATE Atom: from 2018 the tree-sitter
-grammars mapped type_identifier to support.storage.type, rendering types
-CYAN. So both colors carry Atom ancestry from different eras: yellow =
-TextMate-era Atom (what ODP and we inherit), cyan = tree-sitter-era Atom
-(what Zed inherits). Our yellow stands - it matches our TM+LSP stack's
-lineage and hn's Record<> ruling - but the claim "cyan has no One Dark
-pedigree" is withdrawn. Lessons kept: check an authority's pedigree before
-joining it - and re-check your own verdicts when new strata surface.
-Corollary intact: base16's 0F slot (#BE5046, "embedded language tags")
-independently confirms the ${} restoration.
+- **Symbol operators are cyan `#56B6C2`, in every language** (2026-07-20).
+  History of the position: TextMate-era Atom purpled all operators; late
+  Atom left all plain; Zed cyans all; base16 files operators under base05
+  (foreground); ODP shipped a mix (logical operators cyan, ternary/optional
+  purple via a word-operator group, arrow purple, rest plain). The mixes
+  failed provenance review — no witness splits the operator family — and
+  were shed in one sweep. A doctrinally-pure all-plain remedy shipped
+  first and was overruled on sight the same day: washed-out operators
+  failed the living-with-it test, and the all-cyan Zed position was adopted
+  instead. The ecosystem survey later showed cyan is one of three viable
+  camps (plain/cyan/purple), shared with akamud and One Dark Pro.nvim.
+- **`=>` is an operator, not a keyword** (2026-07-20). The purple arrow
+  (TextMate-Atom + ODP) lost to the modern witnesses: official tree-sitter
+  lists `"=>"` in the same `@operator` capture as every other symbol.
+- **Word operators stay purple**: `new`, `typeof`, `instanceof`, `in`,
+  `of`, `delete`, `void`, Python's `and/or/not`. Words are keywords,
+  symbols are operators; each family is internally uniform.
+- **Type-world marks stay plain**: annotation `:`, optional `?`, union
+  `|`. Zed paints these dark red (`punctuation.special`) — a lone Zed
+  invention, not imported.
+- **Go's operators are one cyan family** (`:=` `+` `*` `&` `&&` `==`).
+  ODP's Go quirks (`:=` yellow from a 2018 no-reason commit,
+  pointer-purple from a 2020 bug-report patch) were shed; when the
+  generic operator ruling later threatened to strand Go's `&&` on plain,
+  a `.go`-scoped entry kept the family whole.
 
-Case law (2026-07, the weak-pedigree shed): full archaeology of ODP's
-history graded each inherited quirk by provenance. Shed in one sweep:
-Go's := yellow and pointer-purple (a 2018 no-reason commit and a 2020
-bug-report patch - Go operators now just follow the generic rules, which
-lands := on cyan, same as Zed; hn then unified pointer * & to cyan too -
-all Go operators now read as one cyan family; TS ternary/optional ? shed from ODP's word-operator purple to plain - symbol operators are not word operators), HTML entities red -> orange (Atom+Zed
-two-generation agreement; ODP's red was an unexplained 2017 edit), CSS
-units red -> orange (ODP's red traced to an external 2018 bulk PR baked
-in by a generator rewrite - not even the author's design). Principle
-distilled: an inherited color's authority is its provenance; "it was in
-ODP" alone is not a reason once the history is known.
+### Constants and literals
 
-Case law (2026-07-20): CSS property names plain -> red. The cross-format
-key family (JSON and YAML keys are red) had a hole at CSS; Zed's red
-property names supplied the witness and the vocabulary supplied the reason.
-Vendored property names (-webkit-*) stay cyan: vendor prefixes are platform
-magic. (hn approved.)
+- **Named constants merged into the orange value family** (2026-07-20):
+  `const` locals, SCREAMING constants, enum members, and platform
+  constants (`Math.PI`, `JSON`) all wear `#D19A66`, same as numbers and
+  booleans. The previous yellow split was an ODP-lineage signature no
+  other One Dark family shares (the ecosystem's few splitters use cyan or
+  violet); base16 files constants and literals together under base09.
+  After this merge, yellow means exactly one thing: the type family.
+- **`nil`/`null`/`None` are orange** — they are literals. Zed's yellow
+  `nil` is doubly isolated: no other implementation uses yellow, and
+  Zed's own query splits `nil` from `true`/`false` — a split the official
+  tree-sitter query explicitly contradicts (it groups
+  `true`/`false`/`nil`/`iota` in one `@constant.builtin` capture).
+- **JSON booleans orange** (restores TextMate-Atom + Zed agreement over an
+  ODP per-language exception).
 
-Case law (2026-07-20, operator-family unification): TS's remaining symbol
-outliers shed. `=>` purple (storage.type.function.arrow) was TM-era-Atom+ODP
-only - official tree-sitter lists "=>" in the same @operator capture as
-every other symbol, Zed paints it with the bulk operator slot, late Atom
-was plain: arrow is an operator, not the `function` keyword in symbol form.
-ODP's logical-cyan (`&& || ! ??`) fell harder: the *split* of logical from
-other operators is an ODP lone invention - TM-era Atom purpled all
-operators, late Atom plained all, Zed cyans all, base16 files Operators
-under base05 (foreground), official tree-sitter draws no such line. Both
-fell together. First remedy was plain #ABB2BF ("symbols sink"), but hn
-saw it live and overruled within the hour: converge on Zed - plain
-operators look wrong.
-Final ruling: ALL symbol operators cyan #56B6C2, every language - the Zed
-position (Zed cyans all operators; TM-era Atom purpled all; the mixes
-were never a witness position, only all-one-color schemes are). Word
-operators (`new`, `typeof`, `instanceof`, Python `and/or/not`) stay
-purple via ODP's more specific rules: words are keywords, symbols are
-operators, and now each family is internally uniform. Type-world marks
-(annotation `:`, optional `?`, union `|`) stay plain - Zed's dark-red
-punctuation.special for these is a separate Zed invention we have not
-imported. keyword.operator.ternary needed an explicit cyan entry (ODP's
-purple rule is more specific than the generic override). Go unchanged -
-already all-cyan. ODP-lineage themes now agree with the Zed variants on
-operators by taste, not just the Zed variants by contract.
+### Types
 
-Case law (2026-07-20, the constant/literal merge): named constants and
-enum members yellow -> orange, joining numbers and booleans in one
-constant family. Trigger: an eight-implementation ecosystem survey
-(JetBrains plugin, akamud, joshdick, navarasu, olimorris ODP.nvim,
-Sublime, two Emacs themes) showed the constants/literals *merge* is the
-ecosystem majority and base16 files both under base09; splitting named
-constants off as yellow was an ODP-lineage signature no other family
-shares (the few splitters use cyan or violet, never yellow). Yellow now
-means exactly one thing: the type family. Side effect: the old
-yellow-collision argument for keeping Go primitive types yellow gets
-cleaner - value-world orange vs type-world yellow is now a strict
-two-world split. Parameter red-italic, the other ODP signature the survey
-isolated, was deliberately kept: hn's eyes are ODP-calibrated and it
-survives on taste, recorded as such.
+- **The type family is yellow, and yellow is only the type family.**
+  Class, interface, enum, namespace, struct, type parameters — including
+  Go's builtin primitive types (`int`, `string`, `error`): a type is
+  yellow because it is a type, not because of how it is spelled.
+- **Zed's type-cyan is legitimate lineage, not adopted.** Deep archaeology
+  corrected an earlier verdict here: cyan types are not a base16 factory
+  artifact — tree-sitter-era Atom itself rendered types cyan
+  (`type_identifier → support.storage.type`), and Zed's 2023 hand-tune
+  deliberately kept that. Yellow and cyan are both Atom ancestry from
+  different eras. This theme's stack (TextMate grammars + LSP) descends
+  from the TextMate stratum, and the ecosystem survey found types-yellow
+  unanimous across all eight implementations, so yellow stands.
 
-Doctrine (2026-07-20, adopted by hn): **the five witnesses**. Provenance
-scoring recognizes five strata: TextMate-era Atom, tree-sitter-era Atom,
-base16 (Kempson's slot roles), Zed, and the official tree-sitter grammar
-queries (snapshotted in audit/provenance/official-treesitter/). The fifth
-is weighty on which distinctions exist, silent on colors, and NOT inerrant
-(its vocabulary is uneven across grammars - @type.builtin exists for TS but
-not Go - and it canonizes the SCREAMING-case @constructor heuristic).
-Re-scoring under five witnesses: ${} punctuation.special stands 4-0; Go
-primitives-as-plain-type supports our yellow; string.regexp cyan narrows to
-3-2 (old strata cyan vs official-TS+Zed "special string" orange) - held;
-the 2026-07-20 ecosystem survey (JetBrains plugin, akamud, Sublime all
-cyan) widened the margin and the re-scoring flag is removed; this/self: the modern ontology distinguishes
-@variable.builtin, an objection recorded against our red merge - held on
-identity-family grounds. Corrected: Zed's regex orange is not an orphan;
-it sides with the modern ontology.
+### Variables, keys, and parameters
 
-## 4. One source of truth, generated everywhere
+- **The variable family is red**, including `this`/`self` (§5).
+- **The key family is red across formats**: JSON keys, YAML keys, and CSS
+  property names (the CSS entry closed a hole in the family, with Zed as
+  witness). Vendor-prefixed CSS properties (`-webkit-*`) stay cyan:
+  vendor prefixes are platform magic.
+- **Parameters are red italic.** The ecosystem survey isolated this as an
+  ODP signature (red is common; the italic is not). Kept deliberately as
+  a signature — recorded as taste, not provenance.
 
-**The built VS Code theme (`themes/*.json`) is the single source of truth for
-every platform.** The JetBrains `.icls`, Ghostty, Windows Terminal and Vim
-artifacts are all generated from it, so hex parity holds by construction.
+### Embedded boundaries and strings
+
+- **`${}` and embedded punctuation are dark red `#BE5046`** — restored to
+  origin after a mechanical reconciliation of all 78 TextMate-Atom
+  assignments. Tree-sitter-era Atom *lost* this color (the migration had
+  no brace mapping — translation loss, not a decision), ODP never carried
+  it, but origin + base16's 0F slot ("embedded language tags") + every
+  Atom-faithful port (akamud, joshdick, Sublime) agree. JSX expression
+  braces carry the same scope and the same meaning: a boundary between
+  worlds, deliberately exempt from the workbench's bracket-depth cycling.
+- **`variable.interpolation` dark red** — same family.
+- **Regexps are cyan.** ODP's red was a deliberate 2022 change mimicking
+  VS Code Dark+ (issue #678) — mimicking Dark+ is not one of this theme's
+  principles. The five-witness score was a thin 3-2 (the modern strata
+  read regexps as "special strings", orange); the ecosystem survey
+  (JetBrains, akamud, Sublime all cyan) widened the margin and closed the
+  question.
+- **Markdown link URLs cyan** (origin restoration, same reconciliation as
+  `${}`).
+- **HTML entities orange** (Atom+Zed two-generation agreement over an
+  unexplained 2017 ODP edit). **CSS units orange** (ODP's red traced to an
+  external 2018 bulk PR baked in by a generator rewrite — not even the
+  author's design).
+
+### Markup
+
+- **Tags red, attributes orange** — near-unanimous across witnesses and
+  ecosystem (base16 lists "XML Tags" under base08 red). Zed's blue markup
+  family is a lone philosophy axis, preserved in the Zed variants only.
+- **Headings red** (One Dark tradition, not the cyan of some derivatives).
+
+### Shell
+
+- Command names green, flags (`constant.other.option`) cyan, unquoted
+  arguments plain — the terminal-calibrated look, matching
+  zsh-syntax-highlighting.
+
+### Corrections record
+
+Verdicts this project got wrong and later fixed in public — kept here
+because re-checking your own rulings is part of the method:
+
+- "Zed doesn't support LSP semantic highlighting" — outdated; it landed
+  2026-02, opt-in. The Zed variants now model the `"combined"` mode.
+- "Type-cyan is a base16 template artifact" — half wrong; see Types.
+- "ODP's regexp red was an accident" — it was a deliberate Dark+ mimicry,
+  which changes the reason it was rejected, not the outcome.
+- "Zed's regexp orange is an orphan" — it sides with the modern
+  tree-sitter ontology; the cyan ruling stands on other grounds.
+- A `function.defaultLibrary` cyan fix and an all-plain operator scheme
+  both shipped briefly and were reverted when measurement (the former)
+  and daily use (the latter) falsified them.
+
+## 7. Upstream pragmatism (no purism)
+
+A faithful rebuild from `atom/one-dark-syntax` was tried once and rejected:
+gray parameters, foreground operators and dark comments did not survive
+daily use. One Dark Pro's ~150 language-specific rules are a decade of
+tuning against real grammars — valuable, but **ODP is a reviewed
+dependency, not canon**: it is synced automatically, and its rules stand
+only until provenance review finds one with a weak pedigree (§3, §6).
+
+The yardstick for taste calls is eyes calibrated by years of daily use of
+this lineage. Two consequences are recorded honestly: the theme keeps two
+ODP signatures on taste (parameter italic; and it inherited the
+constants-yellow signature for a long time before evidence retired it),
+and it once rejected a doctrinally-correct scheme (all-plain operators)
+because it looked wrong in practice. Provenance proposes; daily use
+disposes.
+
+A self-consistency purge (2026-07) is part of this record: auditing the
+theme against this very document found five self-violations (Go primitive
+types purple while TS's were yellow; `this`/`self` wearing type-yellow;
+per-language exception colors for Python parameters and JSON booleans;
+enum members cyan while consts were yellow). Four were fixed; the
+shell-green exception was reviewed and kept. Lesson: layer consistency
+(what the flicker audit checks) is not family consistency — the former
+can be satisfied while canonizing the latter's violation.
+
+## 8. The Zed variants: fidelity, not judgment
+
+The Zed-interpretation themes exist to reproduce Zed's One Dark exactly —
+including the parts this document's rulings reject (blue markup, cyan
+types, yellow `nil`, dark-red type marks). Their contract:
+
+- Syntax colors are a mechanical translation of Zed's theme slots and
+  semantic rule files, verified token-by-token against real tree-sitter
+  parses with Zed's own vendored queries (5,000+ captures, zero
+  mismatches; permanent constraints in `audit/zed-allow.json`).
+- **Gap-fills yes, bugs no**: where Zed ships no rule (TS semantic rules),
+  the variant fills the gap in Zed's spirit; where Zed's output is
+  arguably a bug, it is reproduced anyway and noted.
+- Repainting a Zed color to this document's preference would make the
+  variant a fifth theme instead of a faithful instrument; it is off the
+  table.
+- Workbench surfaces are the exception: backgrounds and selection colors
+  come from the UI generation (§1), with element-color overrides guarding
+  against VS Code's legacy blue defaults.
+
+## 9. One source of truth, generated everywhere
+
+**The built VS Code theme (`themes/*.json`) is the single source of truth
+for every platform.** The JetBrains `.icls`, Ghostty, Windows Terminal and
+Vim artifacts are generated from it, so hex parity holds by construction.
 
 - Never hand-edit generated files (`themes/`, `dist/`); CI verifies
   reproducibility.
 - The only hand-edited surfaces are `overrides/` and the judgment records
   under `audit/`.
 
-## 5. Overrides are the complete list of intent
+## 10. Overrides are the complete list of intent
 
-`overrides/` holds only what this theme **deliberately** does differently from
-its upstreams (Dark Modern / ODP). The test for keeping an entry: *"if this
-were deleted, would the theme's concept be damaged?"* If not, defer to
-upstream — the smaller the overrides, the more the monthly auto-sync pays off.
+`overrides/` holds only what this theme **deliberately** does differently
+from its upstreams (Dark Modern / 2026 Dark / ODP / Zed). The test for
+keeping an entry: *"if this were deleted, would the theme's concept be
+damaged?"* If not, defer to upstream — the smaller the overrides, the more
+the weekly auto-sync pays off. (Early cleanup deleted 15 entries that
+accidentally pinned stale upstream values and 5 leftovers from the atom
+experiment.)
 
-Case law: 15 color entries that accidentally pinned stale Dark Modern values
-and 5 leftovers from the atom experiment were deleted (v0.0.13). Current
-size: 41 colors, 7 token rules, 27 semantic entries.
+## 11. Decisions are data
 
-## 6. Decisions are data
-
-The *why* behind a color lives in machine-readable places with reasons, not
-in chat logs or commit messages:
+The *why* behind a color lives in machine-readable places with reasons,
+not in chat logs or commit messages:
 
 - `audit/allow.json` — where semantic may override TM, and why
-- `audit/jetbrains-expected.json` — colors guaranteed in the real IDEs, and
-  documented divergences
-- this document — principles and case law
+- `audit/zed-allow.json` — permanent constraints of the Zed reproduction
+- `audit/jetbrains-expected.json` — colors guaranteed in the real IDEs,
+  and documented divergences
+- this document — principles and rulings
 
-Together they form the case-law record of "which layer's intent wins".
-Changes should be checked against precedent first.
+Together they form the precedent record. Changes should be checked against
+precedent first.
 
-## 7. Measure, don't assume
+## 12. Measure, don't assume
 
-Colors are verified against **real engines**, not knowledge, mapping tables
-or corpora:
+Colors are verified against **real engines**, not knowledge, mapping
+tables or corpora:
 
 - VS Code: `vscode-textmate` + gopls / typescript-language-server
   (`npm run audit`)
-- JetBrains: headless GoLand / WebStorm dumping actual token attribute keys
-  (`jetbrains-audit/`)
+- Zed variants: web-tree-sitter with Zed's vendored queries
+  (`npm run audit:zed`)
+- JetBrains: headless GoLand / WebStorm dumping actual token attribute
+  keys with fallback chains (`jetbrains-audit/`)
+- 2026 accent: a hue-band scan guards the 13-color accent family remap
 
-Evidence, all from this repo's history: a careful manual audit misjudged the
-builtin color; the theme-corpus check missed the real key `GO_LOCAL_VARIABLE`;
-a lookup-table checker (rejected) can never find violations it doesn't
-already know about. **Every bug class that happened once gets a machine
-guard** (the receiver incident produced the attribute-key existence check).
+Evidence from this repo's history: a careful manual audit misjudged the
+builtin color; a theme-corpus check missed the real key
+`GO_LOCAL_VARIABLE`; a plausible semantic "fix" was falsified by the
+harness before it shipped; a doctrine change (constant merge) tripped
+three flicker violations that located the one rule the sweep had missed.
+**Every bug class that happened once gets a machine guard.**
 
-## 8. Accept platform vocabulary limits
+## 13. Accept platform vocabulary limits
 
 Distinctions a platform cannot express are documented as divergences, not
 fought:
 
 - IntelliJ has no const/readonly key for TS → consts stay red there
-  (VS Code: yellow)
 - PyCharm has no parameter-specific key → `DEFAULT_PARAMETER` (red italic)
-  stands in (VS Code Python: orange)
+  stands in
 - Pylance is closed-source → Python's semantic layer is outside automated
   verification (covered by eyeballs)
 
-Invest in verification proportionally to **how much intelligence sits between
-the theme and the pixels**: IntelliJ > VS Code > Vim > terminals (Ghostty/WT
-are passive palettes; generation correctness is all there is to check).
+Invest in verification proportionally to **how much intelligence sits
+between the theme and the pixels**: IntelliJ > VS Code > Zed queries >
+Vim > terminals (passive palettes; generation correctness is all there is
+to check).
 
 ## Operations
 
-- Upstreams sync monthly via an auto-merge PR gated by CI
-  (build + flicker-audit).
-- The human's job is only: (a) screenshot a mismatch, (b) add one entry to
-  `overrides/`, (c) record the ruling.
+- Upstreams (Dark Modern, 2026 Dark, ODP, Zed theme + queries + semantic
+  rules) sync weekly via an auto-merge PR gated by CI; ODP content changes
+  are excluded from auto-merge and flagged for provenance review instead.
+- The maintenance loop is: (a) screenshot a mismatch, (b) add one entry to
+  `overrides/`, (c) record the ruling here.
 - Releasing is `npm version patch` — five platform artifacts ship
   automatically.
