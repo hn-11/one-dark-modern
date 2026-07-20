@@ -1,7 +1,4 @@
 {
-  "annotation:dart": {
-    "family": "value-constant"
-  },
   "enumMember": {
     "family": "value-constant"
   },
@@ -11,17 +8,8 @@
   "memberOperatorOverload": {
     "family": "keyword"
   },
-  "parameter.label:dart": {
-    "family": "plain"
-  },
-  "property:dart": {
-    "family": "value-constant"
-  },
   "tomlArrayKey": {
-    "family": "type"
-  },
-  "variable:dart": {
-    "family": "value-constant"
+    "family": "variable-and-key"
   },
   "variable.constant": {
     "family": "value-constant"

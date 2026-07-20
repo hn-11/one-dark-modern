@@ -725,14 +725,10 @@
     }
   ],
   "semanticTokenColors": {
-    "annotation:dart": "#D19A66",
     "enumMember": "#D19A66",
     "macro": "#61AFEF",
     "memberOperatorOverload": "#C678DD",
-    "parameter.label:dart": "#ABB2BF",
-    "property:dart": "#D19A66",
-    "tomlArrayKey": "#E5C07B",
-    "variable:dart": "#D19A66",
+    "tomlArrayKey": "#E06C75",
     "variable.constant": "#D19A66",
     "variable.defaultLibrary": "#D19A66",
     "namespace": "#E5C07B",

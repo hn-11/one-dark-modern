@@ -215,9 +215,11 @@ several rulings supersede earlier ones.
 ### Variables, keys, and parameters
 
 - **The variable family is red**, including `this`/`self` (§5).
-- **The key family is red across formats**: JSON keys, YAML keys, and CSS
+- **The key family is red across formats**: JSON keys, YAML keys, CSS
   property names (the CSS entry closed a hole in the family, with Zed as
-  witness). Vendor-prefixed CSS properties (`-webkit-*`) stay cyan:
+  witness), and TOML array keys (an ODP leftover painted them type-yellow;
+  the fossil surfaced the moment semantic rules became family-named -
+  "tomlArrayKey: type" reads as wrong in a way "#e5c07b" never did). Vendor-prefixed CSS properties (`-webkit-*`) stay cyan:
   vendor prefixes are platform magic.
 - **Parameters are red italic.** The ecosystem survey isolated this as an
   ODP signature (red is common; the italic is not). Kept deliberately as
@@ -298,7 +300,9 @@ theme against this very document found five self-violations (Go primitive
 types purple while TS's were yellow; `this`/`self` wearing type-yellow;
 per-language exception colors for Python parameters and JSON booleans;
 enum members cyan while consts were yellow). Four were fixed; the
-shell-green exception was reviewed and kept. Lesson: layer consistency
+shell-green exception was reviewed and kept. A late echo: four Dart-only
+semantic exceptions (ODP leftovers) were purged once family-naming made
+them visible - the same decision as the Python-parameter purge. Lesson: layer consistency
 (what the flicker audit checks) is not family consistency — the former
 can be satisfied while canonizing the latter's violation.
 
