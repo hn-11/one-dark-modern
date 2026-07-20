@@ -133,6 +133,22 @@ property names supplied the witness and the vocabulary supplied the reason.
 Vendored property names (-webkit-*) stay cyan: vendor prefixes are platform
 magic. (hn approved.)
 
+Case law (2026-07-20, operator-family unification): TS's remaining symbol
+outliers shed. `=>` purple (storage.type.function.arrow) was TM-era-Atom+ODP
+only - official tree-sitter lists "=>" in the same @operator capture as
+every other symbol, Zed paints it with the bulk operator slot, late Atom
+was plain: arrow is an operator, not the `function` keyword in symbol form.
+ODP's logical-cyan (`&& || ! ??`) fell harder: the *split* of logical from
+other operators is an ODP lone invention - TM-era Atom purpled all
+operators, late Atom plained all, Zed cyans all, base16 files Operators
+under base05 (foreground), official tree-sitter draws no such line. Both
+now #ABB2BF: symbols sink, names speak. Survivors: Python's `and/or/not`
+stay purple (word keywords, not symbols - the more specific ODP rule
+outranks the override) and Go's `.go`-scoped operators stay cyan
+(keyword.operator.logical.go added so `&&` didn't fall out of the
+user-ratified all-cyan Go family). Zed variants untouched: their cyan
+operators are Zed fidelity, not this doctrine. (hn approved.)
+
 Doctrine (2026-07-20, adopted by hn): **the five witnesses**. Provenance
 scoring recognizes five strata: TextMate-era Atom, tree-sitter-era Atom,
 base16 (Kempson's slot roles), Zed, and the official tree-sitter grammar
