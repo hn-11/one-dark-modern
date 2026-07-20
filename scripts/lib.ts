@@ -44,22 +44,6 @@ export const familyColor = (families: Record<string, string>, name: string): str
 export const uiColor = (theme: Theme, key: string, fallback: string): string =>
   theme.colors[key] ?? fallback;
 
-// effective token color: last rule containing the exact scope wins
-export const tokenColor = (theme: Theme, scope: string, fallback: string): string => {
-  for (let i = theme.tokenColors.length - 1; i >= 0; i--) {
-    const r = theme.tokenColors[i];
-    const scopes = Array.isArray(r.scope) ? r.scope : [r.scope];
-    if (scopes.includes(scope) && r.settings.foreground) return r.settings.foreground;
-  }
-  return fallback;
-};
-
-export const semanticColor = (theme: Theme, key: string, fallback: string): string => {
-  const v = theme.semanticTokenColors?.[key];
-  if (typeof v === "string") return v;
-  if (v && typeof v === "object" && v.foreground) return v.foreground;
-  return fallback;
-};
 
 // blend #rrggbbaa over an opaque base; passthrough for #rrggbb
 export const blend = (color: string, base: string): string => {
