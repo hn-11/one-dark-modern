@@ -143,7 +143,8 @@ other operators is an ODP lone invention - TM-era Atom purpled all
 operators, late Atom plained all, Zed cyans all, base16 files Operators
 under base05 (foreground), official tree-sitter draws no such line. Both
 fell together. First remedy was plain #ABB2BF ("symbols sink"), but hn
-saw it live and overruled within the hour: "Zed 合流。白はおかしい."
+saw it live and overruled within the hour: converge on Zed - plain
+operators look wrong.
 Final ruling: ALL symbol operators cyan #56B6C2, every language - the Zed
 position (Zed cyans all operators; TM-era Atom purpled all; the mixes
 were never a witness position, only all-one-color schemes are). Word
