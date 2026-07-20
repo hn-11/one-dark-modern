@@ -30,6 +30,17 @@ export const readJson = <T>(p: string): T => jsonc<T>(readFileSync(join(root, p)
 
 export const loadBuiltTheme = (): Theme => readJson<Theme>("themes/one-dark-modern-color-theme.json");
 
+// the color vocabulary (docs/PHILOSOPHY.md section 2): second-generation
+// builders take syntax palette colors from here by family name; UI colors
+// still come from the built theme (merged, shipped values)
+export const loadFamilies = (): Record<string, string> =>
+  readJson<Record<string, string>>("syntax/families.json");
+export const familyColor = (families: Record<string, string>, name: string): string => {
+  const c = families[name];
+  if (!c) throw new Error(`unknown family: ${name}`);
+  return c;
+};
+
 export const uiColor = (theme: Theme, key: string, fallback: string): string =>
   theme.colors[key] ?? fallback;
 

@@ -5,13 +5,13 @@
 // only the IDE chrome (UI theme) is not covered by an .icls.
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { blend, loadBuiltTheme, raw, root, semanticColor, tokenColor, uiColor } from "./lib.ts";
+import { blend, familyColor, loadBuiltTheme, loadFamilies, raw, root, uiColor } from "./lib.ts";
 
 const theme = loadBuiltTheme();
 
+const families = loadFamilies();
 const ui = (key: string, fallback: string): string => uiColor(theme, key, fallback);
-const token = (scope: string, fallback: string): string => tokenColor(theme, scope, fallback);
-const semantic = (key: string, fallback: string): string => semanticColor(theme, key, fallback);
+const fam = (name: string): string => familyColor(families, name);
 
 // ---- palette (all values come from the built VS Code theme) --------------
 const editorBg = ui("editor.background", "#1f1f1f");
@@ -19,25 +19,25 @@ const editorFg = ui("editor.foreground", "#abb2bf");
 const panelBg = ui("sideBar.background", "#181818");
 const border = ui("sideBar.border", "#2b2b2b");
 
-const keyword = token("keyword", "#c678dd");
-const str = token("string", "#98c379");
-const num = token("constant.numeric", "#d19a66");
-const comment = semantic("comment", token("comment", "#7f848e"));
-const func = semantic("function", "#61afef");
-const cls = semantic("class", "#e5c07b");
-const variable = semantic("variable", "#e06c75");
-const constant = semantic("variable.readonly", "#e5c07b");
-const parameter = semantic("parameter", "#e06c75");
-const property = semantic("property", "#e06c75");
-const builtin = token("support.function", "#56b6c2");
-const escape = token("constant.character.escape", "#56b6c2");
-const regexp = semantic("regexp", "#56b6c2");
-const tag = token("entity.name.tag", "#e06c75");
-const attribute = token("entity.other.attribute-name", "#d19a66");
-const operator = token("keyword.operator", "#abb2bf");
-const namespace = semantic("namespace", "#e5c07b");
-const decorator = semantic("decorator", "#61afef");
-const invalid = token("invalid.illegal", "#f44747");
+const keyword = fam("keyword");
+const str = fam("string");
+const num = fam("value-constant");
+const comment = fam("comment");
+const func = fam("callable");
+const cls = fam("type");
+const variable = fam("variable-and-key");
+const constant = fam("value-constant");
+const parameter = fam("variable-and-key");
+const property = fam("variable-and-key");
+const builtin = fam("platform-and-operator");
+const escape = fam("platform-and-operator");
+const regexp = fam("platform-and-operator");
+const tag = fam("variable-and-key");
+const attribute = fam("value-constant");
+const operator = fam("platform-and-operator");
+const namespace = fam("type");
+const decorator = fam("callable");
+const invalid = fam("invalid");
 
 const selectionBg = blend(ui("editor.selectionBackground", "#67769660"), editorBg);
 const caretRow = blend(ui("editor.lineHighlightBackground", "#2c313c"), editorBg);
@@ -207,16 +207,16 @@ const attributes: Array<[string, Attr]> = [
   ["PY.BUILTIN_NAME", { fg: func }],
   ["PY.FUNCTION_CALL", { fg: func }],
   ["PY.METHOD_CALL", { fg: func }],
-  ["PY.SELF_PARAMETER", { fg: token("variable.parameter.function.language.special.self.python", "#e5c07b") }],
-  ["PY.KEYWORD_ARGUMENT", { fg: token("variable.parameter.function.python", "#d19a66") }],
+  ["PY.SELF_PARAMETER", { fg: fam("variable-and-key") }],
+  ["PY.KEYWORD_ARGUMENT", { fg: fam("variable-and-key") }],
   ["PY.ANNOTATION", { fg: cls }],
   ["PY.STRING.B", { fg: str }],
 
   // Shell script (Shell plugin)
-  ["BASH.EXTERNAL_COMMAND", { fg: token("entity.name.command.shell", "#98c379") }],
+  ["BASH.EXTERNAL_COMMAND", { fg: fam("string") }],
   ["BASH.FUNCTION_DEF_NAME", { fg: func }],
-  ["BASH.INTERNAL_COMMAND", { fg: token("support.function.builtin.shell", "#98c379") }],
-  ["BASH.FUNCTION_CALL", { fg: token("entity.name.command.shell", "#98c379") }],
+  ["BASH.INTERNAL_COMMAND", { fg: fam("string") }],
+  ["BASH.FUNCTION_CALL", { fg: fam("string") }],
 
   // console (terminal palette)
   ["CONSOLE_NORMAL_OUTPUT", { fg: ui("terminal.foreground", "#abb2bf") }],

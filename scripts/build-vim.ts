@@ -5,29 +5,29 @@
 // (requires termguicolors).
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { blend, loadBuiltTheme, root, semanticColor, tokenColor, uiColor } from "./lib.ts";
+import { blend, familyColor, loadBuiltTheme, loadFamilies, root, uiColor } from "./lib.ts";
 
 const theme = loadBuiltTheme();
+const families = loadFamilies();
 const ui = (key: string, fallback: string): string => uiColor(theme, key, fallback);
-const token = (scope: string, fallback: string): string => tokenColor(theme, scope, fallback);
-const semantic = (key: string, fallback: string): string => semanticColor(theme, key, fallback);
+const fam = (name: string): string => familyColor(families, name);
 
 // palette
 const bg = ui("editor.background", "#1f1f1f");
 const fg = ui("editor.foreground", "#abb2bf");
 const panelBg = ui("sideBar.background", "#181818");
 const border = ui("sideBar.border", "#2b2b2b");
-const keyword = token("keyword", "#c678dd");
-const str = token("string", "#98c379");
-const num = token("constant.numeric", "#d19a66");
-const comment = semantic("comment", "#7f848e");
-const func = semantic("function", "#61afef");
-const cls = semantic("class", "#e5c07b");
-const variable = semantic("variable", "#e06c75");
-const constant = semantic("variable.readonly", "#e5c07b");
-const builtin = token("support.function", "#56b6c2");
-const escape = token("constant.character.escape", "#56b6c2");
-const operator = token("keyword.operator", "#abb2bf");
+const keyword = fam("keyword");
+const str = fam("string");
+const num = fam("value-constant");
+const comment = fam("comment");
+const func = fam("callable");
+const cls = fam("type");
+const variable = fam("variable-and-key");
+const constant = fam("value-constant");
+const builtin = fam("platform-and-operator");
+const escape = fam("platform-and-operator");
+const operator = fam("platform-and-operator");
 const errorFg = ui("errorForeground", "#f85149");
 const warnFg = "#cca700";
 const cursorLine = blend(ui("editor.lineHighlightBackground", "#2c313c"), bg);
@@ -145,7 +145,7 @@ const lines: string[] = [
   hi("Delimiter", { fg }),
   hi("SpecialComment", { fg: comment, style: "italic" }),
   hi("Debug", { fg: keyword }),
-  hi("Error", { fg: token("invalid.illegal", "#f44747") }),
+  hi("Error", { fg: fam("invalid") }),
   hi("Todo", { fg: num, style: "italic" }),
   "",
   // diagnostics (Neovim LSP)
@@ -159,8 +159,8 @@ const lines: string[] = [
   // Treesitter / semantic (Neovim only - '@' is invalid in Vim group names)
   "if has('nvim')",
   hi("@variable", { fg: variable }),
-  hi("@variable.builtin", { fg: token("variable.language", "#e06c75") }),
-  hi("@variable.parameter", { fg: semantic("parameter", "#e06c75"), style: "italic" }),
+  hi("@variable.builtin", { fg: fam("variable-and-key") }),
+  hi("@variable.parameter", { fg: fam("variable-and-key"), style: "italic" }),
   hi("@variable.member", { fg: variable }),
   hi("@property", { fg: variable }),
   hi("@constant", { fg: constant }),
@@ -176,7 +176,7 @@ const lines: string[] = [
   hi("@keyword.operator", { fg: keyword }),
   hi("@operator", { fg: operator }),
   hi("@string.escape", { fg: escape }),
-  hi("@string.regexp", { fg: semantic("regexp", "#56b6c2") }),
+  hi("@string.regexp", { fg: fam("platform-and-operator") }),
   hi("@tag", { fg: variable }),
   hi("@tag.attribute", { fg: num }),
   hi("@markup.heading", { fg: variable }),
