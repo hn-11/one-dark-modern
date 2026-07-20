@@ -2492,7 +2492,7 @@
     {
       "scope": "keyword.operator.address.go",
       "settings": {
-        "foreground": "#ABB2BF"
+        "foreground": "#56B6C2"
       }
     },
     {

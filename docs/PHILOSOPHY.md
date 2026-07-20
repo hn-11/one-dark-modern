@@ -119,7 +119,8 @@ Case law (2026-07, the weak-pedigree shed): full archaeology of ODP's
 history graded each inherited quirk by provenance. Shed in one sweep:
 Go's := yellow and pointer-purple (a 2018 no-reason commit and a 2020
 bug-report patch - Go operators now just follow the generic rules, which
-lands := on cyan, same as Zed), HTML entities red -> orange (Atom+Zed
+lands := on cyan, same as Zed; hn then unified pointer * & to cyan too -
+all Go operators now read as one cyan family), HTML entities red -> orange (Atom+Zed
 two-generation agreement; ODP's red was an unexplained 2017 edit), CSS
 units red -> orange (ODP's red traced to an external 2018 bulk PR baked
 in by a generator rewrite - not even the author's design). Principle
