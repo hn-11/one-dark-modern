@@ -63,17 +63,19 @@ const tokenColors = syntaxRules.map(({ family, scope, settings }) => {
   };
   return { scope, settings: merged };
 });
-const semanticTokenColors = read<Record<string, unknown>>("syntax/semantic.json");
-
-// vocabulary lint: every semantic color must be a family color, so the whole
-// syntax layer provably stays inside the PHILOSOPHY vocabulary
-const familyColors = new Set(Object.values(families).map((c) => c.toLowerCase()));
-for (const [key, value] of Object.entries(semanticTokenColors)) {
-  const fg = typeof value === "string" ? value : (value as { foreground?: string }).foreground;
-  if (fg && !familyColors.has(fg.toLowerCase())) {
-    throw new Error(`semantic "${key}" uses ${fg}, which is not a family color`);
-  }
-}
+// semantic rules also reference families by name; the build resolves them,
+// so hex values exist in exactly one file: syntax/families.json
+type SemanticSource = { family: string; italic?: boolean };
+const semanticSource = read<Record<string, SemanticSource>>("syntax/semantic.json");
+const semanticTokenColors = Object.fromEntries(
+  Object.entries(semanticSource).map(([key, { family, ...styles }]) => {
+    if (!(family in families)) {
+      throw new Error(`semantic "${key}": unknown family ${family}`);
+    }
+    const fg = families[family];
+    return [key, Object.keys(styles).length ? { foreground: fg, ...styles } : fg];
+  })
+);
 
 const buildVariant = (
   name: string,

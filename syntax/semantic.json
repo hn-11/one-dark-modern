@@ -1,56 +1,106 @@
 {
   "annotation:dart": {
-    "foreground": "#d19a66"
+    "family": "value-constant"
   },
-  "enumMember": "#D19A66",
-  "macro": "#61AFEF",
+  "enumMember": {
+    "family": "value-constant"
+  },
+  "macro": {
+    "family": "callable"
+  },
   "memberOperatorOverload": {
-    "foreground": "#c678dd"
+    "family": "keyword"
   },
   "parameter.label:dart": {
-    "foreground": "#abb2bf"
+    "family": "plain"
   },
   "property:dart": {
-    "foreground": "#d19a66"
+    "family": "value-constant"
   },
   "tomlArrayKey": {
-    "foreground": "#e5c07b"
+    "family": "type"
   },
   "variable:dart": {
-    "foreground": "#d19a66"
+    "family": "value-constant"
   },
   "variable.constant": {
-    "foreground": "#d19a66"
+    "family": "value-constant"
   },
-  "variable.defaultLibrary": "#D19A66",
-  "namespace": "#E5C07B",
-  "class": "#E5C07B",
-  "enum": "#E5C07B",
-  "interface": "#E5C07B",
-  "struct": "#E5C07B",
-  "type": "#E5C07B",
-  "typeParameter": "#E5C07B",
-  "function": "#61AFEF",
-  "method": "#61AFEF",
-  "decorator": "#61AFEF",
-  "variable": "#E06C75",
-  "variable.readonly": "#D19A66",
+  "variable.defaultLibrary": {
+    "family": "value-constant"
+  },
+  "namespace": {
+    "family": "type"
+  },
+  "class": {
+    "family": "type"
+  },
+  "enum": {
+    "family": "type"
+  },
+  "interface": {
+    "family": "type"
+  },
+  "struct": {
+    "family": "type"
+  },
+  "type": {
+    "family": "type"
+  },
+  "typeParameter": {
+    "family": "type"
+  },
+  "function": {
+    "family": "callable"
+  },
+  "method": {
+    "family": "callable"
+  },
+  "decorator": {
+    "family": "callable"
+  },
+  "variable": {
+    "family": "variable-and-key"
+  },
+  "variable.readonly": {
+    "family": "value-constant"
+  },
   "parameter": {
-    "foreground": "#E06C75",
+    "family": "variable-and-key",
     "italic": true
   },
-  "property": "#E06C75",
-  "event": "#E06C75",
-  "keyword": "#C678DD",
-  "string": "#98C379",
-  "number": "#D19A66",
-  "regexp": "#56B6C2",
+  "property": {
+    "family": "variable-and-key"
+  },
+  "event": {
+    "family": "variable-and-key"
+  },
+  "keyword": {
+    "family": "keyword"
+  },
+  "string": {
+    "family": "string"
+  },
+  "number": {
+    "family": "value-constant"
+  },
+  "regexp": {
+    "family": "platform-and-operator"
+  },
   "comment": {
-    "foreground": "#7F848E",
+    "family": "comment",
     "italic": true
   },
-  "string.format": "#D19A66",
-  "type.defaultLibrary.string:go": "#E5C07B",
-  "type.defaultLibrary.number:go": "#E5C07B",
-  "type.defaultLibrary.bool:go": "#E5C07B"
+  "string.format": {
+    "family": "value-constant"
+  },
+  "type.defaultLibrary.string:go": {
+    "family": "type"
+  },
+  "type.defaultLibrary.number:go": {
+    "family": "type"
+  },
+  "type.defaultLibrary.bool:go": {
+    "family": "type"
+  }
 }

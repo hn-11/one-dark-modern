@@ -725,29 +725,15 @@
     }
   ],
   "semanticTokenColors": {
-    "annotation:dart": {
-      "foreground": "#d19a66"
-    },
+    "annotation:dart": "#D19A66",
     "enumMember": "#D19A66",
     "macro": "#61AFEF",
-    "memberOperatorOverload": {
-      "foreground": "#c678dd"
-    },
-    "parameter.label:dart": {
-      "foreground": "#abb2bf"
-    },
-    "property:dart": {
-      "foreground": "#d19a66"
-    },
-    "tomlArrayKey": {
-      "foreground": "#e5c07b"
-    },
-    "variable:dart": {
-      "foreground": "#d19a66"
-    },
-    "variable.constant": {
-      "foreground": "#d19a66"
-    },
+    "memberOperatorOverload": "#C678DD",
+    "parameter.label:dart": "#ABB2BF",
+    "property:dart": "#D19A66",
+    "tomlArrayKey": "#E5C07B",
+    "variable:dart": "#D19A66",
+    "variable.constant": "#D19A66",
     "variable.defaultLibrary": "#D19A66",
     "namespace": "#E5C07B",
     "class": "#E5C07B",
