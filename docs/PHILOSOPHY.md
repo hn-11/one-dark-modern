@@ -8,22 +8,20 @@ up, check the rulings here before inventing an answer.
 
 ## 1. What this theme is
 
-Four themes are built from one pipeline, expressing two *interpretations* of
-One Dark across two *workbench generations*:
+Two themes are built from one pipeline: one syntax interpretation across two
+workbench generations.
 
-| Theme | Syntax interpretation | Workbench |
-|---|---|---|
-| One Dark Modern | ODP lineage (this document's rulings) | VS Code Dark Modern |
-| One Dark 2026 | ODP lineage | VS Code 2026 Dark (accent recolored to `#528BFF`) |
-| Zed One Dark Modern | Zed's One Dark, reproduced verbatim | Dark Modern |
-| Zed One Dark 2026 | Zed's One Dark, reproduced verbatim | 2026 Dark |
+| Theme | Workbench |
+|---|---|
+| One Dark Modern | VS Code Dark Modern |
+| One Dark 2026 | VS Code 2026 Dark (accent recolored to `#528BFF`) |
 
-The ODP-lineage themes are the opinionated ones — everything below applies to
-them. The Zed variants are governed by a different rule entirely: **fidelity,
-not judgment** (§8). Backgrounds always come from the workbench generation,
-never from the syntax interpretation.
+Backgrounds always come from the workbench generation, never from the syntax
+layer. (Two further themes reproducing Zed's One Dark interpretation
+verbatim shipped between v0.0.x releases and were retired at v0.1.0; their
+legacy is §8 and the many Zed-informed rulings below.)
 
-The identity blend of the ODP-lineage themes: One Dark syntax colors, the
+The identity blend: this repository's One Dark syntax colors, the
 Dark Modern UI (`#181818`/`#1F1F1F`, accent `#0078D4`), and Atom
 one-dark-ui's 16-color ANSI terminal palette. This three-way blend *is* the
 concept.
@@ -304,25 +302,24 @@ shell-green exception was reviewed and kept. Lesson: layer consistency
 (what the flicker audit checks) is not family consistency — the former
 can be satisfied while canonizing the latter's violation.
 
-## 8. The Zed variants: fidelity, not judgment
+## 8. The Zed episode: fidelity as an instrument
 
-The Zed-interpretation themes exist to reproduce Zed's One Dark exactly —
-including the parts this document's rulings reject (blue markup, cyan
-types, yellow `nil`, dark-red type marks). Their contract:
+For a stretch of v0.0.x this repository also shipped two themes reproducing
+Zed's One Dark interpretation verbatim — including the parts this
+document's rulings reject (blue markup, cyan types, yellow `nil`). Their
+contract was **fidelity, not judgment**: a mechanical translation of Zed's
+theme slots and semantic rule files, verified token-by-token against real
+tree-sitter parses with Zed's own vendored queries (5,000+ captures, zero
+mismatches), with a "gap-fills yes, bugs no" rule for what Zed left
+unspecified.
 
-- Syntax colors are a mechanical translation of Zed's theme slots and
-  semantic rule files, verified token-by-token against real tree-sitter
-  parses with Zed's own vendored queries (5,000+ captures, zero
-  mismatches; permanent constraints in `audit/zed-allow.json`).
-- **Gap-fills yes, bugs no**: where Zed ships no rule (TS semantic rules),
-  the variant fills the gap in Zed's spirit; where Zed's output is
-  arguably a bug, it is reproduced anyway and noted.
-- Repainting a Zed color to this document's preference would make the
-  variant a fifth theme instead of a faithful instrument; it is off the
-  table.
-- Workbench surfaces are the exception: backgrounds and selection colors
-  come from the UI generation (§1), with element-color overrides guarding
-  against VS Code's legacy blue defaults.
+The variants were retired at v0.1.0, but the episode shaped the doctrine:
+living inside Zed's interpretation surfaced most of the operator, markup
+and type-family questions ruled on in §6, and the faithful reproduction
+served as a measuring instrument — several "is our color or Zed's correct?"
+disputes were settled by having both renderings side by side. Anyone who
+wants Zed's interpretation should use Zed's theme in Zed; reproducing
+another editor's judgment is a research tool, not a product.
 
 ## 9. One source of truth, generated everywhere
 
@@ -335,15 +332,23 @@ Vim artifacts are generated from it, so hex parity holds by construction.
 - The only hand-edited surfaces are `overrides/` and the judgment records
   under `audit/`.
 
-## 10. Overrides are the complete list of intent
+## 10. The syntax layer is owned; the UI layer is diffed
 
-`overrides/` holds only what this theme **deliberately** does differently
-from its upstreams (Dark Modern / 2026 Dark / ODP / Zed). The test for
-keeping an entry: *"if this were deleted, would the theme's concept be
-damaged?"* If not, defer to upstream — the smaller the overrides, the more
-the weekly auto-sync pays off. (Early cleanup deleted 15 entries that
-accidentally pinned stale upstream values and 5 leftovers from the atom
-experiment.)
+Since v0.1.0 the syntax colors have **no upstream**: `syntax/tokens.json`
+(family-annotated TextMate rules) and `syntax/semantic.json` are this
+repository's own source of truth. They were vendored from the built theme —
+byte-identical output, machine-verified — after One Dark Pro's decade of
+grammar tuning had been fully absorbed and its every contested rule either
+ratified or shed by the provenance process (§3, §6). ODP thereby completed
+its demotion arc: canon → reviewed dependency → reference. Its future
+changes are not synced; anything worth importing arrives the same way any
+other witness's position does — through a ruling.
+
+`overrides/` now holds only the UI layer's diffs against Dark Modern /
+2026 Dark, which remain live upstreams. The test for keeping an entry:
+*"if this were deleted, would the theme's concept be damaged?"* If not,
+defer to upstream — the smaller the overrides, the more the weekly
+auto-sync pays off.
 
 ## 11. Decisions are data
 
@@ -351,7 +356,6 @@ The *why* behind a color lives in machine-readable places with reasons,
 not in chat logs or commit messages:
 
 - `audit/allow.json` — where semantic may override TM, and why
-- `audit/zed-allow.json` — permanent constraints of the Zed reproduction
 - `audit/jetbrains-expected.json` — colors guaranteed in the real IDEs,
   and documented divergences
 - this document — principles and rulings
@@ -366,8 +370,6 @@ tables or corpora:
 
 - VS Code: `vscode-textmate` + gopls / typescript-language-server
   (`npm run audit`)
-- Zed variants: web-tree-sitter with Zed's vendored queries
-  (`npm run audit:zed`)
 - JetBrains: headless GoLand / WebStorm dumping actual token attribute
   keys with fallback chains (`jetbrains-audit/`)
 - 2026 accent: a hue-band scan guards the 13-color accent family remap
@@ -391,16 +393,14 @@ fought:
   verification (covered by eyeballs)
 
 Invest in verification proportionally to **how much intelligence sits
-between the theme and the pixels**: IntelliJ > VS Code > Zed queries >
-Vim > terminals (passive palettes; generation correctness is all there is
+between the theme and the pixels**: IntelliJ > VS Code > Vim > terminals (passive palettes; generation correctness is all there is
 to check).
 
 ## Operations
 
-- Upstreams (Dark Modern, 2026 Dark, ODP, Zed theme + queries + semantic
-  rules) sync weekly via an auto-merge PR gated by CI; ODP content changes
-  are excluded from auto-merge and flagged for provenance review instead.
-- The maintenance loop is: (a) screenshot a mismatch, (b) add one entry to
-  `overrides/`, (c) record the ruling here.
+- The UI upstreams (Dark Modern, 2026 Dark) sync weekly via an auto-merge
+  PR gated by CI. Syntax has no upstream and never changes via sync.
+- The maintenance loop is: (a) screenshot a mismatch, (b) adjust `syntax/`
+  or `overrides/`, (c) record the ruling here.
 - Releasing is `npm version patch` — five platform artifacts ship
   automatically.

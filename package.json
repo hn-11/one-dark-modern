@@ -10,14 +10,13 @@
     "url": "https://github.com/hn-11/one-dark-modern.git"
   },
   "scripts": {
-    "build": "node scripts/build.ts && node scripts/build-zed.ts && node scripts/build-jetbrains.ts && node scripts/build-ghostty.ts && node scripts/build-windows-terminal.ts && node scripts/build-vim.ts",
+    "build": "node scripts/build.ts && node scripts/build-jetbrains.ts && node scripts/build-ghostty.ts && node scripts/build-windows-terminal.ts && node scripts/build-vim.ts",
     "typecheck": "tsc --noEmit",
     "package": "vsce package",
     "vscode:prepublish": "npm run build",
     "audit": "node scripts/audit-flicker.ts",
     "version": "npm run build && git add themes",
-    "postversion": "git push origin main --tags",
-    "audit:zed": "node scripts/audit-zed.ts"
+    "postversion": "git push origin main --tags"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
@@ -48,16 +47,6 @@
         "label": "One Dark 2026",
         "uiTheme": "vs-dark",
         "path": "./themes/one-dark-2026-color-theme.json"
-      },
-      {
-        "label": "Zed One Dark Modern",
-        "uiTheme": "vs-dark",
-        "path": "./themes/zed-one-dark-modern-color-theme.json"
-      },
-      {
-        "label": "Zed One Dark 2026",
-        "uiTheme": "vs-dark",
-        "path": "./themes/zed-one-dark-2026-color-theme.json"
       }
     ]
   }

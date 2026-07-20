@@ -1,26 +1,29 @@
 #!/usr/bin/env node
-// Build the VS Code themes from upstream snapshots + overrides.
+// Build the VS Code themes from upstream UI snapshots + our own syntax source.
 //
 //   upstream/dark_modern.json   Dark Modern (microsoft/vscode)  -> UI base of "One Dark Modern"
 //   upstream/2026-dark.json     2026 Dark (includes dark_modern) -> UI base of "One Dark 2026"
-//   upstream/OneDark-Pro.json   One Dark Pro (Binaryify)        -> token colors base (shared)
-//   overrides/colors.json       our color overrides, shared by both variants
+//   syntax/tokens.json          the theme's own TextMate rules (family-annotated;
+//                               vendored from a decade of One Dark Pro tuning at
+//                               v0.1.0, curated under docs/PHILOSOPHY.md since)
+//   syntax/semantic.json        the theme's own semantic token rules
+//   overrides/colors.json       our UI color overrides, shared by both variants
 //   overrides/colors-2026.json  extra overrides applied only to One Dark 2026
 //   overrides/accent-2026.json  accent recolor map for One Dark 2026: any
 //                               upstream value with a listed RGB is replaced
 //                               (alpha preserved), so new accent keys added
 //                               upstream are remapped automatically
-//   overrides/tokens.json       our token rules (same scope replaces the upstream rule)
-//   overrides/semantic.json     our semantic token overrides
 //
-// The theme files are generated - edit overrides/ instead. Run: npm run build
+// The theme files are generated - edit syntax/ and overrides/ instead.
+// Run: npm run build
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { readJson as read, root, type Theme, type TokenRule } from "./lib.ts";
 
+type SyntaxRule = TokenRule & { family: string };
+
 const darkModern = read<Theme>("upstream/dark_modern.json");
 const dark2026 = read<Theme>("upstream/2026-dark.json");
-const oneDarkPro = read<Theme>("upstream/OneDark-Pro.json");
 const ovColors = read<Record<string, string>>("overrides/colors.json");
 const ovColors2026 = read<Record<string, string>>("overrides/colors-2026.json");
 const accent2026 = read<Record<string, string>>("overrides/accent-2026.json");
@@ -41,30 +44,14 @@ const recolor = (colors: Record<string, string>, map: Record<string, string>): R
     })
   );
 };
-const ovTokens = read<TokenRule[]>("overrides/tokens.json");
-const ovSemantic = read<Record<string, unknown>>("overrides/semantic.json");
 
-// ---- tokens: One Dark Pro base + our rules appended (shared by variants) ----
-// VS Code resolves equal-specificity scopes with last-rule-wins, so an
-// appended override with the same scope replaces the upstream rule.
-// (Upstream UI themes carry their own tokenColors; we ignore them - syntax
-// identity comes from One Dark Pro by design.)
-const scopeKey = (r: TokenRule): string =>
-  Array.isArray(r.scope) ? r.scope.join(",") : r.scope;
-const overridden = new Set(ovTokens.map(scopeKey));
-// Drop upstream rules an override replaces, and dead exact duplicates
-// (keep the last occurrence: that is the one VS Code applies).
-const lastIndex = new Map<string, number>();
-oneDarkPro.tokenColors.forEach((r, i) => lastIndex.set(scopeKey(r), i));
-const tokenColors = oneDarkPro.tokenColors
-  .filter((r, i) => lastIndex.get(scopeKey(r)) === i && !overridden.has(scopeKey(r)))
-  .concat(ovTokens);
-
-// ---- semantic: One Dark Pro base + our overrides (shared) ----
-const semanticTokenColors = {
-  ...(oneDarkPro.semanticTokenColors ?? {}),
-  ...ovSemantic,
-};
+// ---- syntax: the theme's own source of truth (shared by both variants) ----
+// Rule order is significant (VS Code resolves equal-specificity scopes with
+// last-rule-wins); the family field documents which vocabulary family a rule
+// serves (docs/PHILOSOPHY.md section 2) and is stripped from the output.
+const syntaxRules = read<SyntaxRule[]>("syntax/tokens.json");
+const tokenColors = syntaxRules.map(({ family: _family, ...rule }) => rule);
+const semanticTokenColors = read<Record<string, unknown>>("syntax/semantic.json");
 
 const buildVariant = (
   name: string,
@@ -104,6 +91,6 @@ buildVariant("One Dark 2026", "one-dark-2026-color-theme.json", [
   ovColors2026,
 ]);
 console.log(
-  `shared: ${tokenColors.length} token rules (${ovTokens.length} ours), ` +
-    `${Object.keys(semanticTokenColors).length} semantic entries (${Object.keys(ovSemantic).length} ours)`
+  `syntax: ${tokenColors.length} token rules, ` +
+    `${Object.keys(semanticTokenColors).length} semantic entries`
 );

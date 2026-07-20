@@ -1,4 +1,28 @@
 {
+  "annotation:dart": {
+    "foreground": "#d19a66"
+  },
+  "enumMember": "#D19A66",
+  "macro": "#61AFEF",
+  "memberOperatorOverload": {
+    "foreground": "#c678dd"
+  },
+  "parameter.label:dart": {
+    "foreground": "#abb2bf"
+  },
+  "property:dart": {
+    "foreground": "#d19a66"
+  },
+  "tomlArrayKey": {
+    "foreground": "#e5c07b"
+  },
+  "variable:dart": {
+    "foreground": "#d19a66"
+  },
+  "variable.constant": {
+    "foreground": "#d19a66"
+  },
+  "variable.defaultLibrary": "#D19A66",
   "namespace": "#E5C07B",
   "class": "#E5C07B",
   "enum": "#E5C07B",
@@ -9,7 +33,6 @@
   "function": "#61AFEF",
   "method": "#61AFEF",
   "decorator": "#61AFEF",
-  "macro": "#61AFEF",
   "variable": "#E06C75",
   "variable.readonly": "#D19A66",
   "parameter": {
@@ -17,7 +40,6 @@
     "italic": true
   },
   "property": "#E06C75",
-  "enumMember": "#D19A66",
   "event": "#E06C75",
   "keyword": "#C678DD",
   "string": "#98C379",
@@ -30,6 +52,5 @@
   "string.format": "#D19A66",
   "type.defaultLibrary.string:go": "#E5C07B",
   "type.defaultLibrary.number:go": "#E5C07B",
-  "type.defaultLibrary.bool:go": "#E5C07B",
-  "variable.defaultLibrary": "#D19A66"
+  "type.defaultLibrary.bool:go": "#E5C07B"
 }

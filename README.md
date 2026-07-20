@@ -1,8 +1,13 @@
 # One Dark Modern
 
-A VS Code color theme that combines [One Dark Pro](https://github.com/Binaryify/OneDark-Pro) syntax highlighting (originally from [Atom One Dark](https://github.com/atom/one-dark-syntax)) with the [Dark Modern](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/dark_modern.json) workbench UI.
+A VS Code color theme that pairs One Dark syntax highlighting with the
+[Dark Modern](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/dark_modern.json)
+workbench UI.
 
-- **Syntax**: One Dark Pro token & semantic colors, with a few fixes (`invalid.*` rendered as errors, dead duplicate rules dropped).
+- **Syntax**: this repository's own One Dark ruleset (`syntax/`) —
+  vendored from a decade of [One Dark Pro](https://github.com/Binaryify/OneDark-Pro)
+  grammar tuning at v0.1.0 and curated by provenance against the wider One
+  Dark family since (see [docs/PHILOSOPHY.md](docs/PHILOSOPHY.md)).
 - **UI**: Dark Modern's `#181818`/`#1f1f1f` workbench with the `#0078d4` accent.
 - **Terminal / brackets**: One Dark ANSI palette and bracket-pair colors.
 
@@ -18,31 +23,16 @@ Then select **One Dark Modern** via `Cmd+K Cmd+T`.
 
 The extension also ships **One Dark 2026** — the same One Dark syntax on
 VS Code's experimental [2026 Dark](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/2026-dark.json)
-workbench (darker `#121314` background), with the accent recolored to One Dark's `#528BFF` (Atom's accent, same as the cursor) via `overrides/accent-2026.json` - alpha-preserving, so upstream accent keys are remapped automatically. It tracks upstream
-through the same automated sync; variant-specific tweaks go in
-`overrides/colors-2026.json`. The JetBrains/terminal/Vim artifacts remain
-based on One Dark Modern.
+workbench (darker `#121314` background), with the accent recolored to One
+Dark's `#528BFF` (Atom's accent, same as the cursor) via
+`overrides/accent-2026.json` - alpha-preserving, so upstream accent keys are
+remapped automatically. It tracks upstream through the same automated sync;
+variant-specific tweaks go in `overrides/colors-2026.json`. The
+JetBrains/terminal/Vim artifacts remain based on One Dark Modern.
 
-**Zed One Dark Modern** and **Zed One Dark 2026** translate [Zed's One Dark
-interpretation](https://github.com/zed-industries/zed/blob/main/assets/themes/one/one.json)
-(desaturated palette, cyan types, `#74ADE8` accent, rendered as Zed's `semantic_tokens: "combined"` mode - the LSP overlay is a mechanical translation of Zed's own semantic token rule files, auto-synced)
-onto the same two workbenches - generated fresh from `upstream/zed-one.json`
-by `scripts/build-zed.ts`, no ODP inheritance. Fidelity is verified by
-`npm run audit:zed` (CI): fixtures are parsed with tree-sitter using Zed's
-own vendored highlight queries, each capture resolved against Zed's syntax
-slots, and compared token-by-token with our VS Code rendering - 5,200+
-captures, zero mismatches, with documented engine-difference exceptions
-in `audit/zed-allow.json`.
-
-Since the Zed variants model Zed's *combined* mode, enable semantic tokens
-for Go to see the audited rendering (`"gopls": {"ui.semanticTokens": true}`
-in settings - the golang extension ships with them off). Plain variables
-stay uncolored either way; that is the philosophy, not a gap.
-
-Across all four themes the policy is: **backgrounds belong to the UI
-generation** (Dark Modern `#1F1F1F` / 2026 Dark `#121314`); the
-interpretation layer (ODP or Zed) contributes only text colors, terminal
-palette, selection and accent.
+Across both themes the policy is: **backgrounds belong to the UI
+generation** (Dark Modern `#1F1F1F` / 2026 Dark `#121314`); the syntax layer
+contributes only text colors, terminal palette, selection and accent.
 
 ### JetBrains IDEs (IDEA / GoLand / WebStorm / PyCharm)
 
@@ -54,23 +44,27 @@ attribute keys, with dedicated mappings for Java, Go, JS/TS, Python and
 Shell). It covers the editor, console ANSI colors and VCS gutters; the IDE
 chrome keeps whatever UI theme you use (Dark works well).
 
-Design principles and the case law behind color decisions live in
+Design principles and the rulings behind color decisions live in
 [docs/PHILOSOPHY.md](docs/PHILOSOPHY.md).
 
 ## How it works
 
-The theme is **generated** from upstream snapshots plus this repo's overrides:
+The theme is **generated**. Syntax colors come from this repository's own
+source; only the workbench UI has upstreams:
 
 ```
-upstream/dark_modern.json   (auto-synced)  ─┐
-upstream/OneDark-Pro.json   (auto-synced)  ─┤→ scripts/build.ts → themes/one-dark-modern-color-theme.json
-overrides/{colors,tokens,semantic}.json    ─┘
+upstream/dark_modern.json  (auto-synced)   ─┐
+upstream/2026-dark.json    (auto-synced)   ─┤→ scripts/build.ts → themes/*.json
+syntax/{tokens,semantic}.json  (ours)      ─┤
+overrides/colors*.json         (ours)      ─┘
 ```
 
-`overrides/` is the only thing meant to be edited by hand — it holds everything
-this theme intentionally does differently from its upstreams (41 colors,
-7 token rules, 27 semantic entries, plus the 2026 accent map). An override with the same key/scope as an
-upstream entry replaces it; everything else flows through from upstream.
+- `syntax/` is the theme's own syntax definition: 288 family-annotated
+  TextMate rules and 34 semantic entries. It has **no upstream** — every
+  rule stands on the provenance record in `docs/PHILOSOPHY.md`.
+- `overrides/` holds the UI-layer diffs against Dark Modern / 2026 Dark
+  (41 colors, plus the 2026 accent map). An override with the same key as
+  an upstream entry replaces it; everything else flows through.
 
 ```sh
 npm ci
@@ -109,8 +103,7 @@ cd .. && node scripts/compare-jetbrains-dump.ts GO
 ```
 
 Known vocabulary limits found this way: IntelliJ has no const/readonly key
-for TS (consts stay variable-red, unlike VS Code's yellow) and no parameter
-key for Python beyond `DEFAULT_PARAMETER`.
+for TS and no parameter key for Python beyond `DEFAULT_PARAMETER`.
 
 Coverage is tracked two ways: observed semantic `type.modifier` combos are
 snapshotted in `audit/coverage-semantic.json` (new combos fail the audit until
@@ -122,13 +115,12 @@ colorize-tests suite (MIT), plus hand-written samples.
 ## Upstream sync (automated)
 
 A [scheduled workflow](.github/workflows/check-upstream.yml) (weekly while
-2026 Dark churns; monthly otherwise) re-fetches the upstream files, rebuilds the theme, and opens an auto-merge PR. CI guards the
-result (typecheck, reproducible build, packaging). Upstream changes flow in
-automatically unless they collide with an override — in that case the override
-wins by construction, so nothing we've customized can be silently reverted.
-Exception: PRs containing One Dark Pro token changes are not auto-merged —
-ODP is a reviewed dependency, not canon (see the provenance rule in
-docs/PHILOSOPHY.md).
+2026 Dark churns; monthly otherwise) re-fetches the Microsoft workbench
+themes, rebuilds, and opens an auto-merge PR. CI guards the result
+(typecheck, reproducible build, packaging). Upstream changes flow in
+automatically unless they collide with an override — in that case the
+override wins by construction, so nothing customized can be silently
+reverted. Syntax colors have no upstream and never change via sync.
 
 ## Releasing
 

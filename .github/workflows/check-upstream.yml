@@ -1,7 +1,9 @@
-# Weekly upstream sync: re-fetch Dark Modern (microsoft/vscode) and
-# One Dark Pro (Binaryify), rebuild with our overrides/ applied, and open
-# an auto-merge PR. CI (build + flicker-audit) is the merge gate; overrides
-# win over upstream by construction, so nothing customized can revert.
+# Weekly upstream sync: re-fetch the Microsoft workbench themes (Dark Modern
+# and the experimental 2026 Dark), rebuild with our overrides/ applied, and
+# open an auto-merge PR. CI (build + flicker-audit) is the merge gate;
+# overrides win over upstream by construction, so nothing customized can
+# revert. Syntax colors have no upstream: syntax/ is this repository's own
+# source of truth (vendored at v0.1.0, curated under docs/PHILOSOPHY.md).
 name: Sync upstream themes
 
 on:
@@ -27,18 +29,6 @@ jobs:
             https://raw.githubusercontent.com/microsoft/vscode/main/extensions/theme-defaults/themes/dark_modern.json
           curl -sSfL -o upstream/2026-dark.json \
             https://raw.githubusercontent.com/microsoft/vscode/main/extensions/theme-defaults/themes/2026-dark.json
-          curl -sSfL -o upstream/OneDark-Pro.json \
-            https://raw.githubusercontent.com/Binaryify/OneDark-Pro/master/themes/OneDark-Pro.json
-          curl -sSfL -o upstream/zed-one.json \
-            https://raw.githubusercontent.com/zed-industries/zed/main/assets/themes/one/one.json
-          curl -sSfL -o audit/zed-queries/go-highlights.scm \
-            https://raw.githubusercontent.com/zed-industries/zed/main/crates/grammars/src/go/highlights.scm
-          curl -sSfL -o audit/zed-queries/typescript-highlights.scm \
-            https://raw.githubusercontent.com/zed-industries/zed/main/crates/grammars/src/typescript/highlights.scm
-          curl -sSfL -o upstream/zed-semantic-default.json \
-            https://raw.githubusercontent.com/zed-industries/zed/main/assets/settings/default_semantic_token_rules.json
-          curl -sSfL -o upstream/zed-semantic-go.json \
-            https://raw.githubusercontent.com/zed-industries/zed/main/crates/grammars/src/go/semantic_token_rules.json
 
       - name: Rebuild theme from new snapshots
         run: npm run build
@@ -48,8 +38,8 @@ jobs:
         uses: peter-evans/create-pull-request@v6
         with:
           branch: chore/upstream-sync
-          commit-message: "chore: sync upstream themes (Dark Modern / One Dark Pro)"
-          title: "Sync upstream themes (Dark Modern / One Dark Pro)"
+          commit-message: "chore: sync upstream themes (Dark Modern / 2026 Dark)"
+          title: "Sync upstream themes (Dark Modern / 2026 Dark)"
           body: |
             Automated upstream sync. The diff of `upstream/` shows what changed
             in the sources; `themes/` is the rebuilt result with our
@@ -58,30 +48,8 @@ jobs:
             CI validates the build. If a change looks wrong, add or adjust an
             entry in `overrides/` on this branch before merging.
 
-      # ODP is a reviewed dependency, not canon (see PHILOSOPHY case law on
-      # provenance): token changes from OneDark-Pro require human review,
-      # while UI-generation churn (Dark Modern / 2026 / Zed) auto-merges.
-      - name: Check whether ODP changed
-        id: odp
+      - name: Enable auto-merge
         if: steps.pr.outputs.pull-request-operation == 'created'
-        run: |
-          if git diff HEAD~1 --name-only 2>/dev/null | grep -q 'OneDark-Pro.json' || \
-             git diff origin/main...HEAD --name-only 2>/dev/null | grep -q 'OneDark-Pro.json'; then
-            echo "changed=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "changed=false" >> "$GITHUB_OUTPUT"
-          fi
-      - name: Enable auto-merge (non-ODP changes only)
-        if: steps.pr.outputs.pull-request-operation == 'created' && steps.odp.outputs.changed != 'true'
         run: gh pr merge --auto --squash "${{ steps.pr.outputs.pull-request-number }}"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Flag ODP change for review
-        if: steps.pr.outputs.pull-request-operation == 'created' && steps.odp.outputs.changed == 'true'
-        run: >
-          gh pr comment "${{ steps.pr.outputs.pull-request-number }}"
-          --body "OneDark-Pro changed upstream - auto-merge withheld.
-          Review the token diff against PHILOSOPHY.md before merging
-          (provenance rule - 'it was in ODP' alone is not a reason)."
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
