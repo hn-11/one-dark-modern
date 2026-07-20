@@ -1,0 +1,14 @@
+{
+  "keyword": "#C678DD",
+  "callable": "#61AFEF",
+  "type": "#E5C07B",
+  "variable-and-key": "#E06C75",
+  "platform-and-operator": "#56B6C2",
+  "string": "#98C379",
+  "value-constant": "#D19A66",
+  "embedded-boundary": "#BE5046",
+  "comment": "#7F848E",
+  "comment-dim": "#5C6370",
+  "plain": "#ABB2BF",
+  "invalid": "#F44747"
+}

@@ -55,13 +55,16 @@ source; only the workbench UI has upstreams:
 ```
 upstream/dark_modern.json  (auto-synced)   ─┐
 upstream/2026-dark.json    (auto-synced)   ─┤→ scripts/build.ts → themes/*.json
-syntax/{tokens,semantic}.json  (ours)      ─┤
+syntax/{families,tokens,semantic}.json (ours) ─┤
 overrides/colors*.json         (ours)      ─┘
 ```
 
-- `syntax/` is the theme's own syntax definition: 288 family-annotated
-  TextMate rules and 34 semantic entries. It has **no upstream** — every
-  rule stands on the provenance record in `docs/PHILOSOPHY.md`.
+- `syntax/` is the theme's own syntax definition: `families.json` maps the
+  ten-color vocabulary to hex values, and `tokens.json` holds 14 TextMate
+  rules (~450 scopes) that reference families by name — plus 34 semantic
+  entries. It has **no upstream** — every rule stands on the provenance
+  record in `docs/PHILOSOPHY.md`, and the build fails if any rule or
+  semantic entry uses a color outside the vocabulary.
 - `overrides/` holds the UI-layer diffs against Dark Modern / 2026 Dark
   (41 colors, plus the 2026 accent map). An override with the same key as
   an upstream entry replaces it; everything else flows through.

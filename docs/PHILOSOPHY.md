@@ -334,9 +334,16 @@ Vim artifacts are generated from it, so hex parity holds by construction.
 
 ## 10. The syntax layer is owned; the UI layer is diffed
 
-Since v0.1.0 the syntax colors have **no upstream**: `syntax/tokens.json`
-(family-annotated TextMate rules) and `syntax/semantic.json` are this
-repository's own source of truth. They were vendored from the built theme —
+Since v0.1.0 the syntax colors have **no upstream**: `syntax/` is this
+repository's own source of truth. `families.json` maps the vocabulary of
+section 2 to hex values; `tokens.json` rules reference families by name,
+so a color exists in exactly one place, and the build rejects any rule or
+semantic entry whose color is outside the vocabulary — the vocabulary
+table is now executable, not just documentation. (The v0.1.1 refactor
+collapsed the vendored rules from 288 to 14 by merging same-family rules
+and deleting dead duplicates — every step verified against the real
+TextMate engine: identical resolution for all 6,762 fixture tokens and
+all 464 selectors.) They were vendored from the built theme —
 byte-identical output, machine-verified — after One Dark Pro's decade of
 grammar tuning had been fully absorbed and its every contested rule either
 ratified or shed by the provenance process (§3, §6). ODP thereby completed

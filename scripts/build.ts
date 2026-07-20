@@ -18,9 +18,9 @@
 // Run: npm run build
 import { writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { readJson as read, root, type Theme, type TokenRule } from "./lib.ts";
+import { readJson as read, root, type Theme } from "./lib.ts";
 
-type SyntaxRule = TokenRule & { family: string };
+type SyntaxRule = { family: string; scope: string[]; settings?: Record<string, string> };
 
 const darkModern = read<Theme>("upstream/dark_modern.json");
 const dark2026 = read<Theme>("upstream/2026-dark.json");
@@ -46,12 +46,34 @@ const recolor = (colors: Record<string, string>, map: Record<string, string>): R
 };
 
 // ---- syntax: the theme's own source of truth (shared by both variants) ----
+// syntax/families.json is the color vocabulary (docs/PHILOSOPHY.md section 2);
+// every token rule names a family instead of a hex, so a color exists in
+// exactly one place and a rule cannot use a color outside the vocabulary.
 // Rule order is significant (VS Code resolves equal-specificity scopes with
-// last-rule-wins); the family field documents which vocabulary family a rule
-// serves (docs/PHILOSOPHY.md section 2) and is stripped from the output.
+// last-rule-wins).
+const families = read<Record<string, string>>("syntax/families.json");
 const syntaxRules = read<SyntaxRule[]>("syntax/tokens.json");
-const tokenColors = syntaxRules.map(({ family: _family, ...rule }) => rule);
+const tokenColors = syntaxRules.map(({ family, scope, settings }) => {
+  if (family !== "style-only" && !(family in families)) {
+    throw new Error(`unknown family "${family}" for scope ${scope[0]}`);
+  }
+  const merged = {
+    ...(family === "style-only" ? {} : { foreground: families[family] }),
+    ...(settings ?? {}),
+  };
+  return { scope, settings: merged };
+});
 const semanticTokenColors = read<Record<string, unknown>>("syntax/semantic.json");
+
+// vocabulary lint: every semantic color must be a family color, so the whole
+// syntax layer provably stays inside the PHILOSOPHY vocabulary
+const familyColors = new Set(Object.values(families).map((c) => c.toLowerCase()));
+for (const [key, value] of Object.entries(semanticTokenColors)) {
+  const fg = typeof value === "string" ? value : (value as { foreground?: string }).foreground;
+  if (fg && !familyColors.has(fg.toLowerCase())) {
+    throw new Error(`semantic "${key}" uses ${fg}, which is not a family color`);
+  }
+}
 
 const buildVariant = (
   name: string,
