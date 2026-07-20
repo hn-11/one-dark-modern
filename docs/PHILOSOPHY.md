@@ -142,12 +142,20 @@ ODP's logical-cyan (`&& || ! ??`) fell harder: the *split* of logical from
 other operators is an ODP lone invention - TM-era Atom purpled all
 operators, late Atom plained all, Zed cyans all, base16 files Operators
 under base05 (foreground), official tree-sitter draws no such line. Both
-now #ABB2BF: symbols sink, names speak. Survivors: Python's `and/or/not`
-stay purple (word keywords, not symbols - the more specific ODP rule
-outranks the override) and Go's `.go`-scoped operators stay cyan
-(keyword.operator.logical.go added so `&&` didn't fall out of the
-user-ratified all-cyan Go family). Zed variants untouched: their cyan
-operators are Zed fidelity, not this doctrine. (hn approved.)
+fell together. First remedy was plain #ABB2BF ("symbols sink"), but hn
+saw it live and overruled within the hour: "Zed 合流。白はおかしい."
+Final ruling: ALL symbol operators cyan #56B6C2, every language - the Zed
+position (Zed cyans all operators; TM-era Atom purpled all; the mixes
+were never a witness position, only all-one-color schemes are). Word
+operators (`new`, `typeof`, `instanceof`, Python `and/or/not`) stay
+purple via ODP's more specific rules: words are keywords, symbols are
+operators, and now each family is internally uniform. Type-world marks
+(annotation `:`, optional `?`, union `|`) stay plain - Zed's dark-red
+punctuation.special for these is a separate Zed invention we have not
+imported. keyword.operator.ternary needed an explicit cyan entry (ODP's
+purple rule is more specific than the generic override). Go unchanged -
+already all-cyan. ODP-lineage themes now agree with the Zed variants on
+operators by taste, not just the Zed variants by contract.
 
 Doctrine (2026-07-20, adopted by hn): **the five witnesses**. Provenance
 scoring recognizes five strata: TextMate-era Atom, tree-sitter-era Atom,
