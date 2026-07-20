@@ -110,8 +110,13 @@ for TS and no parameter key for Python beyond `DEFAULT_PARAMETER`.
 
 Coverage is tracked two ways: observed semantic `type.modifier` combos are
 snapshotted in `audit/coverage-semantic.json` (new combos fail the audit until
-reviewed and accepted with `npm run audit -- --update`), and theme rules that
-no fixture exercises are listed in `audit/coverage-tm.json`. Fixtures under
+reviewed and accepted with `npm run audit -- --update`), and individual scope
+selectors that no fixture exercises are listed in `audit/coverage-tm.json`.
+JetBrains expectations in `audit/jetbrains-expected.json` name vocabulary
+*families*, not hex values, so they track doctrine changes automatically.
+`npm run oracle` dumps the real engine's resolution of every fixture token
+and every selector — snapshot before and after a `syntax/` restructure and
+diff to prove the restructure is invisible. Fixtures under
 `audit/fixtures/` include files borrowed from microsoft/vscode's
 colorize-tests suite (MIT), plus hand-written samples.
 

@@ -3,112 +3,112 @@
     "ide": "GO",
     "file": "main.go",
     "text": "func",
-    "color": "#c678dd",
-    "note": "keyword purple"
+    "note": "keyword purple",
+    "family": "keyword"
   },
   {
     "ide": "GO",
     "file": "main.go",
     "text": "\"fmt\"",
-    "color": "#98c379",
-    "note": "import string green"
+    "note": "import string green",
+    "family": "string"
   },
   {
     "ide": "GO",
     "file": "main.go",
     "text": "s",
-    "color": "#e06c75",
-    "note": "method receiver red (the original bug)"
+    "note": "method receiver red (the original bug)",
+    "family": "variable-and-key"
   },
   {
     "ide": "GO",
     "file": "main.go",
     "text": "prefix",
-    "color": "#e06c75",
-    "note": "parameter red"
+    "note": "parameter red",
+    "family": "variable-and-key"
   },
   {
     "ide": "GO",
     "file": "main.go",
     "text": "MaxRetries",
-    "color": "#d19a66",
-    "note": "const orange (constant/literal merge 2026-07-20)"
+    "note": "const orange (constant/literal merge 2026-07-20)",
+    "family": "value-constant"
   },
   {
     "ide": "GO",
     "file": "main.go",
     "text": "Server",
-    "color": "#e5c07b",
-    "note": "type yellow"
+    "note": "type yellow",
+    "family": "type"
   },
   {
     "ide": "GO",
     "file": "main.go",
     "text": "8080",
-    "color": "#d19a66",
-    "note": "number orange"
+    "note": "number orange",
+    "family": "value-constant"
   },
   {
     "ide": "WS",
     "file": "sample.ts",
     "text": "BACK_LABELS",
-    "color": "#e06c75",
-    "note": "red: IntelliJ has no const/readonly key for TS (TS.LOCAL_VARIABLE chain) - documented divergence from VS Code const-orange"
+    "note": "red: IntelliJ has no const/readonly key for TS (TS.LOCAL_VARIABLE chain) - documented divergence from VS Code const-orange",
+    "family": "variable-and-key"
   },
   {
     "ide": "WS",
     "file": "sample.ts",
     "text": "resolveLabel",
-    "color": "#61afef",
-    "note": "function blue"
+    "note": "function blue",
+    "family": "callable"
   },
   {
     "ide": "WS",
     "file": "sample.ts",
     "text": "interface",
-    "color": "#c678dd",
-    "note": "keyword purple"
+    "note": "keyword purple",
+    "family": "keyword"
   },
   {
     "ide": "WS",
     "file": "sample.ts",
     "text": "parseInt",
-    "color": "#61afef",
-    "note": "builtin call blue"
+    "note": "builtin call blue",
+    "family": "callable"
   },
   {
     "ide": "GO",
     "file": "main.go",
     "text": "msg",
-    "color": "#e06c75",
-    "note": "local variable red (via GO_LOCAL_VARIABLE -> DEFAULT_LOCAL_VARIABLE fallback)"
+    "note": "local variable red (via GO_LOCAL_VARIABLE -> DEFAULT_LOCAL_VARIABLE fallback)",
+    "family": "variable-and-key"
   },
   {
     "ide": "GO",
     "file": "main.go",
     "text": "Greet",
-    "color": "#61afef",
-    "note": "method declaration blue"
+    "note": "method declaration blue",
+    "family": "callable"
   },
   {
     "ide": "GO",
     "file": "main.go",
     "text": "Name",
-    "color": "#e06c75",
-    "note": "struct member red"
+    "note": "struct member red",
+    "family": "variable-and-key"
   },
   {
     "ide": "GO",
     "file": "main.go",
     "text": "len",
-    "color": "#61afef",
-    "note": "builtin call blue (requires GOROOT in the test env)"
+    "note": "builtin call blue (requires GOROOT in the test env)",
+    "family": "callable"
   },
   {
     "ide": "GO",
     "file": "main.go",
     "text": "make",
-    "color": "#61afef",
-    "note": "builtin blue via GO_BUILTIN_FUNCTION -> DEFAULT_FUNCTION_DECLARATION"
+    "note": "builtin blue via GO_BUILTIN_FUNCTION -> DEFAULT_FUNCTION_DECLARATION",
+    "family": "callable"
   }
 ]

@@ -29,7 +29,8 @@ interface Expectation {
   ide: string;
   file: string;
   text: string;
-  color: string;
+  family?: string; // vocabulary family, resolved via syntax/families.json
+  color?: string; // raw hex, only for colors outside the vocabulary
   note?: string;
 }
 
@@ -63,9 +64,19 @@ const dumps: Dump[] = readdirSync(dumpDir)
   .filter((f) => f.endsWith(".json"))
   .map((f) => JSON.parse(readFileSync(join(dumpDir, f), "utf8")));
 
+const families = readJson<Record<string, string>>("syntax/families.json");
 const expectations = readJson<Expectation[]>("audit/jetbrains-expected.json").filter(
   (e) => e.ide === ide
 );
+const expectedColor = (e: Expectation): string => {
+  if (e.family) {
+    const c = families[e.family];
+    if (!c) throw new Error(`expectation "${e.text}": unknown family ${e.family}`);
+    return c.toLowerCase();
+  }
+  if (!e.color) throw new Error(`expectation "${e.text}": needs family or color`);
+  return e.color.toLowerCase();
+};
 
 let failures = 0;
 let checked = 0;
@@ -91,9 +102,9 @@ for (const dump of dumps) {
     if (!colors) {
       console.log(`MISSING [${ide}] ${dump.file} "${e.text}" - token not found in dump`);
       failures++;
-    } else if (!colors.has(e.color.toLowerCase())) {
+    } else if (!colors.has(expectedColor(e))) {
       console.log(
-        `MISMATCH [${ide}] ${dump.file} "${e.text}" expected ${e.color}, got ${[...colors].join(", ")}` +
+        `MISMATCH [${ide}] ${dump.file} "${e.text}" expected ${e.family ?? e.color} (${expectedColor(e)}), got ${[...colors].join(", ")}` +
           (e.note ? `  (${e.note})` : "")
       );
       failures++;

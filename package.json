@@ -16,7 +16,8 @@
     "vscode:prepublish": "npm run build",
     "audit": "node scripts/audit-flicker.ts",
     "version": "npm run build && git add themes",
-    "postversion": "git push origin main --tags"
+    "postversion": "git push origin main --tags",
+    "oracle": "node scripts/oracle.ts"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",

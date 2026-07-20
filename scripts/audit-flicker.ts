@@ -144,17 +144,19 @@ function selectorMatches(selector: string, stack: string[]): boolean {
   }
   return true;
 }
-const ruleSelectors: string[][] = theme.tokenColors.map((r) => {
+// coverage is tracked per individual selector (rules are merged per family
+// since v0.1.1, so rule-level coverage would be trivially saturated)
+const allSelectors: string[] = theme.tokenColors.flatMap((r) => {
   const raw = Array.isArray(r.scope) ? r.scope : [r.scope];
-  return raw.flatMap((s) => s.split(","));
+  return raw.flatMap((s) => s.split(",")).map((s) => s.trim()).filter(Boolean);
 });
-const ruleFired = new Array<boolean>(theme.tokenColors.length).fill(false);
+const selectorFired = new Array<boolean>(allSelectors.length).fill(false);
 function recordRuleCoverage(lines: TmLine[]): void {
   for (const line of lines) {
     for (const tok of line.scopes) {
-      for (let r = 0; r < ruleSelectors.length; r++) {
-        if (ruleFired[r]) continue;
-        if (ruleSelectors[r].some((sel) => selectorMatches(sel, tok.stack))) ruleFired[r] = true;
+      for (let i = 0; i < allSelectors.length; i++) {
+        if (selectorFired[i]) continue;
+        if (selectorMatches(allSelectors[i], tok.stack)) selectorFired[i] = true;
       }
     }
   }
@@ -338,19 +340,17 @@ if (UPDATE || newCombos.length === 0) {
   for (const c of newCombos) console.log(`  ${c}`);
 }
 
-// TM rule coverage
-const unexercised = theme.tokenColors
-  .map((r, i) => ({ i, scope: r.scope }))
-  .filter(({ i }) => !ruleFired[i]);
+// TM selector coverage
+const unexercised = allSelectors.filter((_, i) => !selectorFired[i]).sort();
 writeFileSync(
   join(root, "audit/coverage-tm.json"),
-  JSON.stringify(unexercised.map((u) => u.scope), null, 2) + "\n"
+  JSON.stringify(unexercised, null, 2) + "\n"
 );
 
 console.log(`\nsemantic tokens: ${semTotal} (corrections of plain tokens: ${corrections})`);
 console.log(`semantic combos observed: ${combos.length} (${newCombos.length} new vs snapshot)`);
 console.log(
-  `TM rules exercised: ${ruleFired.filter(Boolean).length}/${theme.tokenColors.length} ` +
+  `TM selectors exercised: ${selectorFired.filter(Boolean).length}/${allSelectors.length} ` +
     `(unexercised list -> audit/coverage-tm.json)`
 );
 console.log(`py/sh TM-only tokens: ${tmOnlyTokens}`);
