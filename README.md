@@ -66,6 +66,9 @@ overrides/colors*.json         (ours)      ─┘
   entries. It has **no upstream** — every rule stands on the provenance
   record in `docs/PHILOSOPHY.md`, and the build fails if any rule or
   semantic entry uses a color outside the vocabulary.
+- `syntax/icons.json` maps workbench icon colors (`symbolIcon.*`,
+  `debugIcon.*`, test states, lightbulb) to the same families, replacing
+  VS Code's own icon palette with the vocabulary.
 - `overrides/` holds the UI-layer diffs against Dark Modern / 2026 Dark
   (41 colors, plus the 2026 accent map). An override with the same key as
   an upstream entry replaces it; everything else flows through.

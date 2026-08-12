@@ -262,6 +262,19 @@ several rulings supersede earlier ones.
   arguments plain — the terminal-calibrated look, matching
   zsh-syntax-highlighting.
 
+### Workbench icons
+
+- **Symbol and debug icons follow the vocabulary** (2026-08-12). VS Code's
+  defaults for `symbolIcon.*`, `debugIcon.*`, test-state icons and the
+  lightbulb are its own palette (`#EE9D28`/`#B180D7`/`#75BEFF`) — a
+  function icon sat in foreign purple next to a blue `callable` token.
+  `syntax/icons.json` maps these keys to families and the build resolves
+  them, same guard as tokens. `terminalSymbolIcon.*` derives from
+  `symbolIcon.*` upstream, so it follows for free. Deliberately left on
+  defaults: `scmGraph.foreground1-5` (IBM color-blind-safe palette —
+  overriding it would be a regression) and merge/diff state colors, where
+  semantics outrank aesthetics.
+
 ### Corrections record
 
 Verdicts this project got wrong and later fixed in public — kept here
