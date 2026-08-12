@@ -22,8 +22,9 @@ code --install-extension one-dark-modern-<version>.vsix
 Then select **One Dark Modern** via `Cmd+K Cmd+T`.
 
 The extension also ships **One Dark 2026** — the same One Dark syntax on
-VS Code's experimental [2026 Dark](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/2026-dark.json)
-workbench (darker `#121314` background), with the accent recolored to One
+VS Code's [2026 Dark](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/2026-dark.json)
+workbench (darker `#121314` background), which as of VS Code 1.113 is the
+editor's default dark theme, with the accent recolored to One
 Dark's `#528BFF` (Atom's accent, same as the cursor) via
 `overrides/accent-2026.json` - alpha-preserving, so upstream accent keys are
 remapped automatically. It tracks upstream through the same automated sync;
@@ -123,7 +124,8 @@ colorize-tests suite (MIT), plus hand-written samples.
 ## Upstream sync (automated)
 
 A [scheduled workflow](.github/workflows/check-upstream.yml) (weekly while
-2026 Dark churns; monthly otherwise) re-fetches the Microsoft workbench
+2026 Dark still churns as the new default; monthly once it settles)
+re-fetches the Microsoft workbench
 themes, rebuilds, and opens an auto-merge PR. CI guards the result
 (typecheck, reproducible build, packaging). Upstream changes flow in
 automatically unless they collide with an override — in that case the

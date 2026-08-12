@@ -1,0 +1,29 @@
+# Keeps the toolchain from rotting: the pinned actions went a full Node
+# runtime deprecation behind before anyone noticed. Action majors land as
+# PRs against CI (build + flicker-audit) like any other change; npm updates
+# are grouped so devDependency churn stays one PR.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    # "/" covers .github/workflows; the composite action needs its own entry,
+    # since Dependabot does not descend into .github/actions on its own.
+    directories:
+      - /
+      - /.github/actions/setup-node-project
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "chore"
+    groups:
+      actions:
+        patterns: ["*"]
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: monthly
+    commit-message:
+      prefix: "chore"
+    groups:
+      npm:
+        patterns: ["*"]
