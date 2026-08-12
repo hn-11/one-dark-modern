@@ -12,8 +12,12 @@ import java.util.*;
 /**
  * Dumps, for every token the real IDE produces (lexer layer + daemon/annotator
  * layer), the text range and the TextAttributesKey with its fallback chain.
- * JSON goes to build/dumps/<fixture>.json; color resolution against our .icls
- * happens in scripts/compare-jetbrains-dump.ts.
+ * JSON goes to build/dumps/&lt;fixture-relative-path&gt;.json; color resolution
+ * against our .icls happens in scripts/compare-jetbrains-dump.ts.
+ *
+ * Dumps are keyed by the path relative to audit/fixtures, not by basename:
+ * go/colorize/test.go and go/colorize13777/test.go are different fixtures and
+ * used to overwrite each other's test_go.json (last one wins).
  */
 public class HighlightDumpTest extends BasePlatformTestCase {
 
@@ -45,8 +49,12 @@ public class HighlightDumpTest extends BasePlatformTestCase {
             String text = Files.readString(file, StandardCharsets.UTF_8);
             myFixture.configureByText(file.getFileName().toString(), text);
 
+            // stable, collision-free identity: path relative to audit/fixtures,
+            // always with forward slashes (e.g. "go/colorize/test.go")
+            String key = fixtures.relativize(file).toString().replace(java.io.File.separatorChar, '/');
+
             StringBuilder json = new StringBuilder();
-            json.append("{\"file\":\"").append(file.getFileName()).append("\",\"tokens\":[");
+            json.append("{\"file\":").append(quote(key)).append(",\"tokens\":[");
             boolean first = true;
 
             // lexer layer
@@ -70,7 +78,9 @@ public class HighlightDumpTest extends BasePlatformTestCase {
             }
 
             json.append("]}");
-            String name = file.getFileName().toString().replaceAll("\\W", "_") + ".json";
+            // slashes and dots collapse to underscores: "go/base/main.go" ->
+            // "go_base_main_go.json"
+            String name = key.replaceAll("\\W", "_") + ".json";
             Files.writeString(out.resolve(name), json.toString(), StandardCharsets.UTF_8);
         }
     }

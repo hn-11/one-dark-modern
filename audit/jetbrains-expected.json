@@ -1,112 +1,112 @@
 [
   {
     "ide": "GO",
-    "file": "main.go",
+    "file": "go/base/main.go",
     "text": "func",
     "note": "keyword purple",
     "family": "keyword"
   },
   {
     "ide": "GO",
-    "file": "main.go",
+    "file": "go/base/main.go",
     "text": "\"fmt\"",
     "note": "import string green",
     "family": "string"
   },
   {
     "ide": "GO",
-    "file": "main.go",
+    "file": "go/base/main.go",
     "text": "s",
     "note": "method receiver red (the original bug)",
     "family": "variable-and-key"
   },
   {
     "ide": "GO",
-    "file": "main.go",
+    "file": "go/base/main.go",
     "text": "prefix",
     "note": "parameter red",
     "family": "variable-and-key"
   },
   {
     "ide": "GO",
-    "file": "main.go",
+    "file": "go/base/main.go",
     "text": "MaxRetries",
     "note": "const orange (constant/literal merge 2026-07-20)",
     "family": "value-constant"
   },
   {
     "ide": "GO",
-    "file": "main.go",
+    "file": "go/base/main.go",
     "text": "Server",
     "note": "type yellow",
     "family": "type"
   },
   {
     "ide": "GO",
-    "file": "main.go",
+    "file": "go/base/main.go",
     "text": "8080",
     "note": "number orange",
     "family": "value-constant"
   },
   {
     "ide": "WS",
-    "file": "sample.ts",
+    "file": "ts/sample.ts",
     "text": "BACK_LABELS",
     "note": "red: IntelliJ has no const/readonly key for TS (TS.LOCAL_VARIABLE chain) - documented divergence from VS Code const-orange",
     "family": "variable-and-key"
   },
   {
     "ide": "WS",
-    "file": "sample.ts",
+    "file": "ts/sample.ts",
     "text": "resolveLabel",
     "note": "function blue",
     "family": "callable"
   },
   {
     "ide": "WS",
-    "file": "sample.ts",
+    "file": "ts/sample.ts",
     "text": "interface",
     "note": "keyword purple",
     "family": "keyword"
   },
   {
     "ide": "WS",
-    "file": "sample.ts",
+    "file": "ts/sample.ts",
     "text": "parseInt",
     "note": "builtin call blue",
     "family": "callable"
   },
   {
     "ide": "GO",
-    "file": "main.go",
+    "file": "go/base/main.go",
     "text": "msg",
     "note": "local variable red (via GO_LOCAL_VARIABLE -> DEFAULT_LOCAL_VARIABLE fallback)",
     "family": "variable-and-key"
   },
   {
     "ide": "GO",
-    "file": "main.go",
+    "file": "go/base/main.go",
     "text": "Greet",
     "note": "method declaration blue",
     "family": "callable"
   },
   {
     "ide": "GO",
-    "file": "main.go",
+    "file": "go/base/main.go",
     "text": "Name",
     "note": "struct member red",
     "family": "variable-and-key"
   },
   {
     "ide": "GO",
-    "file": "main.go",
+    "file": "go/base/main.go",
     "text": "len",
     "note": "builtin call blue (requires GOROOT in the test env)",
     "family": "callable"
   },
   {
     "ide": "GO",
-    "file": "main.go",
+    "file": "go/base/main.go",
     "text": "make",
     "note": "builtin blue via GO_BUILTIN_FUNCTION -> DEFAULT_FUNCTION_DECLARATION",
     "family": "callable"

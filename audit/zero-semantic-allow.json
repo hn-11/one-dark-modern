@@ -1,0 +1,3 @@
+{
+  "audit/fixtures/go/colorize13777/test.go": "a bare `var e [][]*aType` line with no package clause - it is a TextMate regression fixture for microsoft/vscode#13777 (comments after `var`), not compilable Go, so gopls correctly emits nothing"
+}

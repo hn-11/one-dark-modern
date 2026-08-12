@@ -930,6 +930,7 @@
     },
     "property": "#E06C75",
     "property.readonly": "#D19A66",
+    "property.readonly.defaultLibrary": "#E06C75",
     "event": "#E06C75",
     "keyword": "#C678DD",
     "string": "#98C379",

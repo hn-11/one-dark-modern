@@ -77,5 +77,26 @@
     "type": "property",
     "tmColor": "#e5c07b",
     "reason": "mid-chain properties (a.b.c) get ODP receiver-yellow via variable.other.object.property; same decision as variable receivers: identity-consistent red wins"
+  },
+  {
+    "lang": "go",
+    "type": "parameter",
+    "aspects": [
+      "italic"
+    ],
+    "reason": "parameter italic is a deliberate One Dark Pro signature kept on taste (docs/PHILOSOPHY.md §6 'Variables, keys, and parameters' / §7); the Go TM grammar has no variable.parameter scope at all, so every parameter goes non-italic -> italic when gopls lands. Colour is unchanged (red both sides)."
+  },
+  {
+    "lang": [
+      "typescript",
+      "typescriptreact",
+      "javascript",
+      "javascriptreact"
+    ],
+    "type": "parameter",
+    "aspects": [
+      "italic"
+    ],
+    "reason": "same ruling as go/parameter: parameter italic is a kept ODP signature (docs/PHILOSOPHY.md §6/§7). The TS/JS grammars scope variable.parameter only at some declaration sites (not arrow-function or destructured params, never usages), so the italic arrives with the semantic layer. Colour is unchanged."
   }
 ]

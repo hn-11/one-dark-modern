@@ -1,196 +1,57 @@
 #!/usr/bin/env node
-// Generate a JetBrains theme plugin from the built VS Code theme.
-//
-// Reads themes/one-dark-modern-color-theme.json (single source of truth for
-// colors) and emits dist/jetbrains/ with:
-//   META-INF/plugin.xml
-//   theme/one-dark-modern.theme.json   (IDE UI, mapped from Dark Modern keys)
-//   theme/OneDarkModern.icls           (editor scheme, mapped from token colors)
-//
-// Package with: npm run package:jetbrains  (produces an installable .jar)
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+// Generate a JetBrains editor color scheme (.icls) from the built VS Code
+// theme. Import via Settings > Editor > Color Scheme > gear > Import Scheme.
+// Editor colors, console ANSI palette and VCS gutters are all scheme-side;
+// only the IDE chrome (UI theme) is not covered by an .icls.
+import { mkdirSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { blend, familyColor, loadBuiltTheme, loadFamilies, raw, root, uiColor } from "./lib.ts";
 
-interface TokenRule {
-  scope: string | string[];
-  settings: { foreground?: string; background?: string; fontStyle?: string };
-}
-interface Theme {
-  colors: Record<string, string>;
-  tokenColors: TokenRule[];
-  semanticTokenColors: Record<string, string | { foreground?: string; italic?: boolean }>;
-}
+const theme = loadBuiltTheme();
 
-const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-const theme: Theme = JSON.parse(
-  readFileSync(join(root, "themes/one-dark-modern-color-theme.json"), "utf8")
-);
-const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
+const families = loadFamilies();
+const fam = (name: string): string => familyColor(families, name);
 
-// ---- color helpers -------------------------------------------------------
-const ui = (key: string, fallback: string): string => theme.colors[key] ?? fallback;
-
-// effective token color: last rule containing the exact scope wins
-const token = (scope: string, fallback: string): string => {
-  for (let i = theme.tokenColors.length - 1; i >= 0; i--) {
-    const r = theme.tokenColors[i];
-    const scopes = Array.isArray(r.scope) ? r.scope : [r.scope];
-    if (scopes.includes(scope) && r.settings.foreground) return r.settings.foreground;
-  }
-  return fallback;
-};
-const semantic = (key: string, fallback: string): string => {
-  const v = theme.semanticTokenColors[key];
-  if (typeof v === "string") return v;
-  if (v && typeof v === "object" && v.foreground) return v.foreground;
-  return fallback;
-};
-
-// blend #rrggbbaa over an opaque base (IntelliJ mostly wants opaque colors)
-const blend = (color: string, base: string): string => {
-  const c = color.replace("#", "");
-  if (c.length !== 8) return "#" + c;
-  const a = parseInt(c.slice(6, 8), 16) / 255;
-  const mix = (i: number) =>
-    Math.round(
-      parseInt(c.slice(i, i + 2), 16) * a +
-        parseInt(base.replace("#", "").slice(i, i + 2), 16) * (1 - a)
-    )
-      .toString(16)
-      .padStart(2, "0");
-  return "#" + mix(0) + mix(2) + mix(4);
-};
-const raw = (hex: string): string => hex.replace("#", "").toLowerCase();
+// .icls has no alpha channel: every value must be an opaque #rrggbb. VS Code
+// colors may carry an 8-digit alpha, so each one is flattened onto the
+// surface it sits on before it reaches attr()/colorOptions/raw().
+const uiRaw = (key: string, fallback: string): string => uiColor(theme, key, fallback);
 
 // ---- palette (all values come from the built VS Code theme) --------------
-const editorBg = ui("editor.background", "#1f1f1f");
+const editorBg = blend(uiRaw("editor.background", "#1f1f1f"), "#1f1f1f");
+const panelBg = blend(uiRaw("sideBar.background", "#181818"), "#181818");
+
+// default surface is the editor background; pass a base for panel-side colors
+const ui = (key: string, fallback: string, base: string = editorBg): string =>
+  blend(uiColor(theme, key, fallback), base);
+
 const editorFg = ui("editor.foreground", "#abb2bf");
-const panelBg = ui("sideBar.background", "#181818");
-const border = ui("sideBar.border", "#2b2b2b");
-const accent = ui("focusBorder", "#0078d4");
-const uiFg = ui("foreground", "#cccccc");
+const border = blend(ui("sideBar.border", "#2b2b2b", panelBg), panelBg);
 
-const keyword = token("keyword", "#c678dd");
-const str = token("string", "#98c379");
-const num = token("constant.numeric", "#d19a66");
-const comment = semantic("comment", token("comment", "#7f848e"));
-const func = semantic("function", "#61afef");
-const cls = semantic("class", "#e5c07b");
-const variable = semantic("variable", "#e06c75");
-const constant = semantic("variable.readonly", "#e5c07b");
-const parameter = semantic("parameter", "#e06c75");
-const property = semantic("property", "#e06c75");
-const builtin = token("support.function", "#56b6c2");
-const escape = token("constant.character.escape", "#56b6c2");
-const regexp = semantic("regexp", "#56b6c2");
-const tag = token("entity.name.tag", "#e06c75");
-const attribute = token("entity.other.attribute-name", "#d19a66");
-const operator = token("keyword.operator", "#abb2bf");
-const namespace = semantic("namespace", "#e5c07b");
-const decorator = semantic("decorator", "#61afef");
-const invalid = token("invalid.illegal", "#f44747");
+const keyword = fam("keyword");
+const str = fam("string");
+const num = fam("value-constant");
+const comment = fam("comment");
+const func = fam("callable");
+const cls = fam("type");
+const variable = fam("variable-and-key");
+const constant = fam("value-constant");
+const parameter = fam("variable-and-key");
+const property = fam("variable-and-key");
+const builtin = fam("platform-and-operator");
+const escape = fam("platform-and-operator");
+const regexp = fam("platform-and-operator");
+const tag = fam("variable-and-key");
+const attribute = fam("value-constant");
+const operator = fam("platform-and-operator");
+const namespace = fam("type");
+const decorator = fam("callable");
+const invalid = fam("invalid");
 
-const selectionBg = blend(ui("editor.selectionBackground", "#67769660"), editorBg);
-const caretRow = blend(ui("editor.lineHighlightBackground", "#2c313c"), editorBg);
-const searchBg = blend(ui("editor.findMatchBackground", "#d19a6644"), editorBg);
-const wordHl = blend(ui("editor.wordHighlightBackground", "#d2e0ff2f"), editorBg);
-const listSel = "#04395e"; // Dark Modern list.activeSelectionBackground (VS Code default)
-const inputBg = ui("input.background", "#313131");
-const inputBorder = ui("input.border", "#3c3c3c");
-
-// ---- theme.json (IDE UI) -------------------------------------------------
-const themeJson = {
-  name: "One Dark Modern",
-  author: "hn-11",
-  dark: true,
-  editorScheme: "/theme/OneDarkModern.icls",
-  ui: {
-    "*": {
-      background: panelBg,
-      foreground: uiFg,
-      selectionBackground: listSel,
-      selectionForeground: "#ffffff",
-      selectionInactiveBackground: "#37373d",
-      borderColor: border,
-      separatorColor: border,
-      disabledForeground: ui("tab.inactiveForeground", "#9d9d9d"),
-      infoForeground: ui("descriptionForeground", "#9d9d9d"),
-      lightSelectionBackground: "#2a2d2e",
-      hoverBackground: "#2a2d2e",
-      focusColor: accent,
-      focusedBorderColor: accent,
-    },
-    Borders: { color: border, ContrastBorderColor: border },
-    Button: {
-      startBackground: ui("button.secondaryBackground", "#313131"),
-      endBackground: ui("button.secondaryBackground", "#313131"),
-      startBorderColor: inputBorder,
-      endBorderColor: inputBorder,
-      foreground: ui("button.secondaryForeground", "#cccccc"),
-      default: {
-        startBackground: ui("button.background", "#0078d4"),
-        endBackground: ui("button.background", "#0078d4"),
-        startBorderColor: ui("button.background", "#0078d4"),
-        endBorderColor: ui("button.background", "#0078d4"),
-        foreground: ui("button.foreground", "#ffffff"),
-        focusedBorderColor: accent,
-      },
-    },
-    ComboBox: { background: inputBg, nonEditableBackground: inputBg },
-    Component: {
-      background: inputBg,
-      borderColor: inputBorder,
-      focusColor: accent,
-      focusedBorderColor: accent,
-      infoForeground: ui("descriptionForeground", "#9d9d9d"),
-    },
-    Counter: { background: ui("badge.background", "#616161"), foreground: ui("badge.foreground", "#f8f8f8") },
-    Editor: { background: editorBg, shortcutForeground: accent },
-    EditorTabs: {
-      background: ui("editorGroupHeader.tabsBackground", "#181818"),
-      underlinedTabBackground: ui("tab.activeBackground", "#1f1f1f"),
-      underlinedTabForeground: ui("tab.activeForeground", "#ffffff"),
-      underlineColor: ui("tab.activeBorderTop", "#0078d4"),
-      inactiveUnderlineColor: border,
-      underlineHeight: 2,
-      hoverBackground: ui("tab.hoverBackground", "#1f1f1f"),
-    },
-    FileColor: { Yellow: "#2b2b2b", Green: "#2b2b2b" },
-    Link: { activeForeground: ui("textLink.foreground", "#4daafc"), hoverForeground: ui("textLink.activeForeground", "#4daafc") },
-    List: { background: panelBg, selectionBackground: listSel, hoverBackground: "#2a2d2e" },
-    MainToolbar: { background: ui("titleBar.activeBackground", "#181818"), inactiveBackground: ui("titleBar.inactiveBackground", "#1f1f1f") },
-    Menu: { background: ui("menu.background", "#1f1f1f"), borderColor: ui("menu.border", "#454545"), separatorColor: ui("menu.separatorBackground", "#454545") },
-    MenuItem: { background: ui("menu.background", "#1f1f1f"), selectionBackground: ui("menu.selectionBackground", "#0078d4") },
-    NotificationsToolwindow: { newNotification: { background: ui("notifications.background", "#1f1f1f") } },
-    Notification: { background: ui("notifications.background", "#1f1f1f"), borderColor: ui("notifications.border", "#2b2b2b") },
-    Panel: { background: panelBg },
-    Popup: {
-      background: ui("editorWidget.background", "#202020"),
-      borderColor: ui("menu.border", "#454545"),
-      Header: { activeBackground: ui("editorWidget.background", "#202020"), inactiveBackground: ui("editorWidget.background", "#202020") },
-    },
-    ProgressBar: { progressColor: accent, indeterminateStartColor: accent, indeterminateEndColor: ui("button.hoverBackground", "#026ec1") },
-    ScrollBar: { Transparent: { thumbColor: "#79797966", hoverThumbColor: "#646464b3" } },
-    SearchEverywhere: { SearchField: { background: inputBg, borderColor: inputBorder } },
-    StatusBar: { background: ui("statusBar.background", "#181818"), borderColor: ui("statusBar.border", "#2b2b2b"), hoverBackground: "#2a2d2e" },
-    Tree: { background: panelBg, selectionBackground: listSel, selectionInactiveBackground: "#37373d", hoverBackground: "#2a2d2e", rowHeight: 22 },
-    TabbedPane: { underlineColor: accent, tabSelectionHeight: 2 },
-    TextField: { background: inputBg, borderColor: inputBorder },
-    ToolWindow: {
-      Header: { background: panelBg, inactiveBackground: panelBg, borderColor: border },
-      HeaderTab: { selectedBackground: "#2a2d2e", selectedInactiveBackground: "#2a2d2e", hoverBackground: "#2a2d2e" },
-      background: panelBg,
-    },
-    ValidationTooltip: { errorBackground: "#5a1d1d", errorBorderColor: "#be1100" },
-    VersionControl: {
-      GitLog: { localBranchIconColor: str, remoteBranchIconColor: func },
-      FileHistory: { Commit: { selectedBranchBackground: listSel } },
-    },
-    Table: { background: panelBg, selectionBackground: listSel },
-    TitlePane: { background: ui("titleBar.activeBackground", "#181818"), inactiveBackground: ui("titleBar.inactiveBackground", "#1f1f1f") },
-  },
-};
+const selectionBg = ui("editor.selectionBackground", "#67769660");
+const caretRow = ui("editor.lineHighlightBackground", "#2c313c");
+const searchBg = ui("editor.findMatchBackground", "#d19a6644");
+const wordHl = ui("editor.wordHighlightBackground", "#d2e0ff2f");
 
 // ---- .icls editor scheme -------------------------------------------------
 type Attr = { fg?: string; bg?: string; font?: 1 | 2 | 3; effect?: string; effectType?: number };
@@ -204,7 +65,7 @@ const attr = (name: string, a: Attr): string => {
   return `    <option name="${name}">\n      <value>\n        ${opts.join("\n        ")}\n      </value>\n    </option>`;
 };
 
-const ansi = (k: string) => ui(`terminal.ansi${k}`, "#000000");
+const ansi = (k: string) => ui(`terminal.ansi${k}`, "#000000", panelBg);
 const colorOptions: Record<string, string> = {
   ADDED_LINES_COLOR: ui("editorGutter.addedBackground", "#2ea043"),
   ANNOTATIONS_COLOR: ui("editorLineNumber.foreground", "#6e7681"),
@@ -283,7 +144,6 @@ const attributes: Array<[string, Attr]> = [
   ["CSS.CLASS_NAME", { fg: attribute }],
   ["CSS.HASH", { fg: func }],
   ["CSS.FUNCTION", { fg: builtin }],
-  ["CSS.UNIT", { fg: num }],
 
   // JS / TS (WebStorm)
   ["JS.LOCAL_VARIABLE", { fg: variable }],
@@ -291,15 +151,11 @@ const attributes: Array<[string, Attr]> = [
   ["JS.PARAMETER", { fg: parameter, font: 2 }],
   ["JS.INSTANCE_MEMBER_FUNCTION", { fg: func }],
   ["JS.GLOBAL_FUNCTION", { fg: func }],
-  ["JS.LOCAL_FUNCTION", { fg: func }],
   ["JS.MODULE_NAME", { fg: namespace }],
-  ["JS.CLASS", { fg: cls }],
+  ["JS.FUNCTION", { fg: func }],
   ["JS.REGEXP", { fg: regexp }],
-  ["JS.PRIMITIVE.TYPE", { fg: cls }],
-  ["JS.TYPE_ALIAS", { fg: cls }],
   ["TS.TYPE_PARAMETER", { fg: cls }],
   ["TS.MODULE_NAME", { fg: namespace }],
-  ["JavaScript:INJECTED_LANGUAGE_FRAGMENT", { fg: editorFg }],
 
   // Java (IDEA)
   ["ANNOTATION_NAME_ATTRIBUTES", { fg: cls }],
@@ -312,7 +168,6 @@ const attributes: Array<[string, Attr]> = [
   ["STATIC_FINAL_FIELD_ATTRIBUTES", { fg: constant }],
   ["INSTANCE_FIELD_ATTRIBUTES", { fg: property }],
   ["STATIC_FIELD_ATTRIBUTES", { fg: property }],
-  ["LOCAL_VARIABLE_ATTRIBUTES", { fg: variable }],
   ["PARAMETER_ATTRIBUTES", { fg: parameter, font: 2 }],
   ["METHOD_DECLARATION_ATTRIBUTES", { fg: func }],
   ["METHOD_CALL_ATTRIBUTES", { fg: func }],
@@ -322,10 +177,20 @@ const attributes: Array<[string, Attr]> = [
 
   // Go (GoLand)
   ["GO_PACKAGE", { fg: namespace }],
-  ["GO_PACKAGE_EXPORTED", { fg: namespace }],
-  ["GO_PACKAGE_LOCAL", { fg: namespace }],
   ["GO_BUILTIN_TYPE_REFERENCE", { fg: cls }],
   ["GO_TYPE_REFERENCE", { fg: cls }],
+  ["GO_TYPE_SPECIFICATION", { fg: cls }],
+  ["GO_EXPORTED_STRUCT_REFERENCE", { fg: cls }],
+  ["GO_LOCAL_STRUCT_REFERENCE", { fg: cls }],
+  ["GO_EXPORTED_INTERFACE_REFERENCE", { fg: cls }],
+  ["GO_LOCAL_INTERFACE_REFERENCE", { fg: cls }],
+  ["GO_PACKAGE_EXPORTED_STRUCT", { fg: cls }],
+  ["GO_PACKAGE_LOCAL_STRUCT", { fg: cls }],
+  ["GO_PACKAGE_EXPORTED_INTERFACE", { fg: cls }],
+  ["GO_PACKAGE_LOCAL_INTERFACE", { fg: cls }],
+  ["GO_PACKAGE_EXPORTED_VARIABLE", { fg: variable }],
+  ["GO_PACKAGE_EXPORTED_VARIABLE_CALL", { fg: variable }],
+  ["GO_PACKAGE_LOCAL_VARIABLE_CALL", { fg: variable }],
   ["GO_BUILTIN_FUNCTION_CALL", { fg: func }],
   ["GO_EXPORTED_FUNCTION", { fg: func }],
   ["GO_EXPORTED_FUNCTION_CALL", { fg: func }],
@@ -334,9 +199,7 @@ const attributes: Array<[string, Attr]> = [
   ["GO_METHOD_RECEIVER", { fg: parameter, font: 2 }],
   ["GO_BUILTIN_CONSTANT", { fg: num }],
   ["GO_BUILTIN_VARIABLE", { fg: cls }],
-  ["GO_BUILTIN_TYPE", { fg: cls }],
   ["GO_FUNCTION_PARAMETER", { fg: parameter, font: 2 }],
-  ["GO_LOCAL_VARIABLE", { fg: variable }],
   ["GO_SHADOWING_VARIABLE", { fg: variable }],
   ["GO_STRUCT_EXPORTED_MEMBER", { fg: property }],
   ["GO_STRUCT_LOCAL_MEMBER", { fg: property }],
@@ -348,26 +211,27 @@ const attributes: Array<[string, Attr]> = [
   // Python (PyCharm / Python plugin)
   ["PY.DECORATOR", { fg: decorator }],
   ["PY.CLASS_DEFINITION", { fg: cls }],
-  ["PY.FUNC_DEFINITION", { fg: func }],
-  ["PY.NESTED_FUNC_DEFINITION", { fg: func }],
   ["PY.PREDEFINED_DEFINITION", { fg: func }],
   ["PY.PREDEFINED_USAGE", { fg: func }],
   ["PY.BUILTIN_NAME", { fg: func }],
-  ["PY.SELF_PARAMETER", { fg: token("variable.parameter.function.language.special.self.python", "#e5c07b") }],
-  ["PY.KEYWORD_ARGUMENT", { fg: token("variable.parameter.function.python", "#d19a66") }],
+  ["PY.FUNCTION_CALL", { fg: func }],
+  ["PY.METHOD_CALL", { fg: func }],
+  ["PY.SELF_PARAMETER", { fg: fam("variable-and-key") }],
+  ["PY.KEYWORD_ARGUMENT", { fg: fam("variable-and-key") }],
   ["PY.ANNOTATION", { fg: cls }],
   ["PY.STRING.B", { fg: str }],
 
   // Shell script (Shell plugin)
-  ["BASH.EXTERNAL_COMMAND", { fg: token("entity.name.command.shell", "#98c379") }],
-  ["BASH.SUBSHELL_COMMAND", { fg: token("entity.name.command.shell", "#98c379") }],
+  ["BASH.EXTERNAL_COMMAND", { fg: fam("string") }],
   ["BASH.FUNCTION_DEF_NAME", { fg: func }],
+  ["BASH.INTERNAL_COMMAND", { fg: fam("string") }],
+  ["BASH.FUNCTION_CALL", { fg: fam("string") }],
 
   // console (terminal palette)
-  ["CONSOLE_NORMAL_OUTPUT", { fg: ui("terminal.foreground", "#abb2bf") }],
+  ["CONSOLE_NORMAL_OUTPUT", { fg: ui("terminal.foreground", "#abb2bf", panelBg) }],
   ["CONSOLE_ERROR_OUTPUT", { fg: ansi("Red") }],
   ["CONSOLE_USER_INPUT", { fg: str }],
-  ["CONSOLE_SYSTEM_OUTPUT", { fg: ui("terminal.foreground", "#abb2bf") }],
+  ["CONSOLE_SYSTEM_OUTPUT", { fg: ui("terminal.foreground", "#abb2bf", panelBg) }],
   ["CONSOLE_BLACK_OUTPUT", { fg: ansi("Black") }],
   ["CONSOLE_RED_OUTPUT", { fg: ansi("Red") }],
   ["CONSOLE_GREEN_OUTPUT", { fg: ansi("Green") }],
@@ -387,7 +251,7 @@ const attributes: Array<[string, Attr]> = [
 
   // editor highlights
   ["IDENTIFIER_UNDER_CARET_ATTRIBUTES", { bg: wordHl }],
-  ["WRITE_IDENTIFIER_UNDER_CARET_ATTRIBUTES", { bg: blend(ui("editor.wordHighlightStrongBackground", "#abb2bf26"), editorBg) }],
+  ["WRITE_IDENTIFIER_UNDER_CARET_ATTRIBUTES", { bg: ui("editor.wordHighlightStrongBackground", "#abb2bf26") }],
   ["SEARCH_RESULT_ATTRIBUTES", { bg: searchBg }],
   ["TEXT_SEARCH_RESULT_ATTRIBUTES", { bg: searchBg }],
   ["WRONG_REFERENCES_ATTRIBUTES", { fg: ui("errorForeground", "#f85149") }],
@@ -423,31 +287,10 @@ ${attributes.map(([k, a]) => attr(k, a)).join("\n")}
 </scheme>
 `;
 
-// ---- plugin.xml ----------------------------------------------------------
-const pluginXml = `<idea-plugin>
-  <id>com.github.hn-11.one-dark-modern</id>
-  <name>One Dark Modern Theme</name>
-  <version>${pkg.version}</version>
-  <vendor url="https://github.com/hn-11/one-dark-modern">hn-11</vendor>
-  <description><![CDATA[
-    One Dark Pro syntax colors with the VS Code Dark Modern UI.
-    Generated from the VS Code theme of the same name.
-  ]]></description>
-  <idea-version since-build="233"/>
-  <depends>com.intellij.modules.platform</depends>
-  <extensions defaultExtensionNs="com.intellij">
-    <themeProvider id="com.github.hn-11.one-dark-modern" path="/theme/one-dark-modern.theme.json"/>
-  </extensions>
-</idea-plugin>
-`;
-
 // ---- write ---------------------------------------------------------------
 const out = join(root, "dist/jetbrains");
-mkdirSync(join(out, "META-INF"), { recursive: true });
-mkdirSync(join(out, "theme"), { recursive: true });
-writeFileSync(join(out, "META-INF/plugin.xml"), pluginXml);
-writeFileSync(join(out, "theme/one-dark-modern.theme.json"), JSON.stringify(themeJson, null, 2) + "\n");
-writeFileSync(join(out, "theme/OneDarkModern.icls"), icls);
+mkdirSync(out, { recursive: true });
+writeFileSync(join(out, "OneDarkModern.icls"), icls);
 console.log(
-  `jetbrains: ${Object.keys(colorOptions).length} scheme colors, ${attributes.length} attributes -> dist/jetbrains/`
+  `jetbrains: ${Object.keys(colorOptions).length} scheme colors, ${attributes.length} attributes -> dist/jetbrains/OneDarkModern.icls`
 );

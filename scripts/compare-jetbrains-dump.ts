@@ -9,6 +9,8 @@
 //
 // Expectations live in audit/jetbrains-expected.json:
 //   { ide, file, text, color }  - token with this text must resolve to color
+// `file` is the fixture-relative path ("go/base/main.go"), matching the `file`
+// field the dump carries - basenames collide (two fixtures named test.go).
 // Run after: cd jetbrains-audit && gradle test -PideType=GO|WS
 import { readFileSync, readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
@@ -27,7 +29,7 @@ interface Dump {
 }
 interface Expectation {
   ide: string;
-  file: string;
+  file: string; // fixture-relative path, e.g. "go/base/main.go"
   text: string;
   family?: string; // vocabulary family, resolved via syntax/families.json
   color?: string; // raw hex, only for colors outside the vocabulary
@@ -112,7 +114,19 @@ for (const dump of dumps) {
   }
 }
 
-const topUnresolved = [...unresolvedKeys.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
+// an expectation whose `file` matches no dump is silently never checked - the
+// exact failure mode the basename collision used to hide
+const dumpFiles = new Set(dumps.map((d) => d.file));
+for (const file of new Set(expectations.map((e) => e.file))) {
+  if (dumpFiles.has(file)) continue;
+  console.log(
+    `UNMATCHED [${ide}] expectation file "${file}" has no dump ` +
+      `(dumps present: ${[...dumpFiles].join(", ") || "none"})`
+  );
+  failures++;
+}
+
+const topUnresolved =[...unresolvedKeys.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
 if (topUnresolved.length) {
   console.log("\nkeys resolving to default fg (top 10 - candidates for mapping):");
   for (const [k, n] of topUnresolved) console.log(`  ${k} x${n}`);

@@ -77,7 +77,9 @@ for (const f of files.sort()) {
   const grammar = await registry.loadGrammar(g.scope);
   if (!grammar) continue;
   let stack: tmTypes.StateStack | null = null;
-  const lines = readFileSync(f, "utf8").split("\n");
+  // CRLF-tolerant: a stray \r would otherwise ride along on every line and
+  // shift the reported column offsets (docs/IMPROVEMENT-IDEAS.md item 36)
+  const lines = readFileSync(f, "utf8").split(/\r?\n/);
   for (let ln = 0; ln < lines.length; ln++) {
     const r: tmTypes.ITokenizeLineResult2 = grammar.tokenizeLine2(lines[ln], stack);
     stack = r.ruleStack;

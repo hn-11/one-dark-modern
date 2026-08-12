@@ -63,6 +63,9 @@
   "property.readonly": {
     "family": "value-constant"
   },
+  "property.readonly.defaultLibrary": {
+    "family": "variable-and-key"
+  },
   "event": {
     "family": "variable-and-key"
   },
