@@ -69,7 +69,7 @@
 		"list.invalidItemForeground": "#444444",
 		"list.errorForeground": "#f48771",
 		"list.warningForeground": "#e5ba7d",
-			"activityBar.background": "#191A1B",
+		"activityBar.background": "#191A1B",
 		"activityBar.foreground": "#bfbfbf",
 		"activityBar.inactiveForeground": "#8C8C8C",
 		"activityBar.activeBackground": "#313233",
