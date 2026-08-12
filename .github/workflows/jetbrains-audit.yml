@@ -1,5 +1,5 @@
 # Headless verification against the real JetBrains IDEs: a Gradle test
-# opens audit/fixtures in GoLand/WebStorm and dumps every token's
+# opens audit/fixtures in GoLand/WebStorm/IDEA CE/PyCharm CE and dumps every token's
 # TextAttributesKey fallback chain; compare-jetbrains-dump.ts resolves the
 # chains against our .icls and asserts audit/jetbrains-expected.json.
 # Heavy (~1GB IDE download, cached) - so not a required merge check; runs
@@ -19,6 +19,7 @@ on:
       - "audit/jetbrains-expected.json"
       - "audit/fixtures/**"
       - "jetbrains-audit/**"
+      - "syntax/**"
       - "overrides/**"
       - ".github/workflows/jetbrains-audit.yml"
 
@@ -31,13 +32,19 @@ concurrency:
 
 jobs:
   audit:
+    # This matrix is the single source of truth for the IDE version;
+    # jetbrains-audit/build.gradle.kts only mirrors it as a local default.
     strategy:
       fail-fast: false
       matrix:
         include:
-          - ide: GO
+          - ide: GO # GoLand
             version: "2026.1"
-          - ide: WS
+          - ide: WS # WebStorm
+            version: "2026.1"
+          - ide: IC # IntelliJ IDEA Community - Java
+            version: "2026.1"
+          - ide: PC # PyCharm Community - Python
             version: "2026.1"
     runs-on: ubuntu-latest
     timeout-minutes: 30

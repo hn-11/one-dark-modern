@@ -3,8 +3,13 @@
 // token: text range + TextAttributesKey + its fallback chain. Color
 // resolution against our .icls happens outside (scripts/compare-jetbrains-dump.ts).
 //
-//   ./gradlew test -PideType=GO -PideVersion=2025.1   # GoLand
-//   ./gradlew test -PideType=WS -PideVersion=2025.1   # WebStorm
+//   ./gradlew test -PideType=GO -PideVersion=2026.1   # GoLand
+//   ./gradlew test -PideType=WS -PideVersion=2026.1   # WebStorm
+//   ./gradlew test -PideType=IC -PideVersion=2026.1   # IntelliJ IDEA Community (Java)
+//   ./gradlew test -PideType=PC -PideVersion=2026.1   # PyCharm Community (Python)
+//
+// The IDE version lives in .github/workflows/jetbrains-audit.yml (the matrix is
+// the single source of truth); the default below only mirrors it for local runs.
 import org.jetbrains.intellij.platform.gradle.TestFrameworkType
 
 plugins {
@@ -18,12 +23,16 @@ repositories {
 }
 
 val ideType = providers.gradleProperty("ideType").getOrElse("GO")
-val ideVersion = providers.gradleProperty("ideVersion").getOrElse("2025.1")
+// keep in sync with the workflow matrix (which is authoritative)
+val ideVersion = providers.gradleProperty("ideVersion").getOrElse("2026.1")
 
 // language support is a bundled plugin and must be enabled explicitly in tests
 val bundled = when (ideType) {
     "GO" -> listOf("org.jetbrains.plugins.go", "com.intellij.modules.json", "com.intellij.platform.images")
     "WS" -> listOf("JavaScript", "com.intellij.css", "com.intellij.modules.json", "com.intellij.platform.images")
+    // IDEA ships Java as a bundled plugin; PyCharm ships Python as "PythonCore"
+    "IC", "IU" -> listOf("com.intellij.java", "com.intellij.modules.json", "com.intellij.platform.images")
+    "PC", "PY" -> listOf("PythonCore", "com.intellij.modules.json", "com.intellij.platform.images")
     else -> listOf("com.intellij.platform.images")
 }
 
@@ -32,6 +41,9 @@ dependencies {
         create(ideType, ideVersion)
         bundledPlugins(bundled)
         testFramework(TestFrameworkType.Platform)
+        // Java highlighting tests need the Java test framework artifact on top
+        // of the platform one (JavaCodeInsightFixtureTestCase infrastructure).
+        if (ideType == "IC" || ideType == "IU") testFramework(TestFrameworkType.Plugin.Java)
     }
     testImplementation("junit:junit:4.13.2")
 }

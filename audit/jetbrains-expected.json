@@ -3,6 +3,7 @@
     "ide": "GO",
     "file": "go/base/main.go",
     "text": "func",
+    "line": 16,
     "note": "keyword purple",
     "family": "keyword"
   },
@@ -10,6 +11,7 @@
     "ide": "GO",
     "file": "go/base/main.go",
     "text": "\"fmt\"",
+    "line": 3,
     "note": "import string green",
     "family": "string"
   },
@@ -17,6 +19,7 @@
     "ide": "GO",
     "file": "go/base/main.go",
     "text": "s",
+    "line": 16,
     "note": "method receiver red (the original bug)",
     "family": "variable-and-key"
   },
@@ -24,13 +27,15 @@
     "ide": "GO",
     "file": "go/base/main.go",
     "text": "prefix",
-    "note": "parameter red",
+    "line": 16,
+    "note": "parameter red (declaration in the Greet signature)",
     "family": "variable-and-key"
   },
   {
     "ide": "GO",
     "file": "go/base/main.go",
     "text": "MaxRetries",
+    "line": 5,
     "note": "const orange (constant/literal merge 2026-07-20)",
     "family": "value-constant"
   },
@@ -38,13 +43,15 @@
     "ide": "GO",
     "file": "go/base/main.go",
     "text": "Server",
-    "note": "type yellow",
+    "line": 7,
+    "note": "type yellow (type specification)",
     "family": "type"
   },
   {
     "ide": "GO",
     "file": "go/base/main.go",
     "text": "8080",
+    "line": 31,
     "note": "number orange",
     "family": "value-constant"
   },
@@ -52,6 +59,7 @@
     "ide": "WS",
     "file": "ts/sample.ts",
     "text": "BACK_LABELS",
+    "line": 1,
     "note": "red: IntelliJ has no const/readonly key for TS (TS.LOCAL_VARIABLE chain) - documented divergence from VS Code const-orange",
     "family": "variable-and-key"
   },
@@ -59,13 +67,15 @@
     "ide": "WS",
     "file": "ts/sample.ts",
     "text": "resolveLabel",
-    "note": "function blue",
+    "line": 24,
+    "note": "function blue (declaration)",
     "family": "callable"
   },
   {
     "ide": "WS",
     "file": "ts/sample.ts",
     "text": "interface",
+    "line": 10,
     "note": "keyword purple",
     "family": "keyword"
   },
@@ -73,6 +83,7 @@
     "ide": "WS",
     "file": "ts/sample.ts",
     "text": "parseInt",
+    "line": 25,
     "note": "builtin call blue",
     "family": "callable"
   },
@@ -80,6 +91,7 @@
     "ide": "GO",
     "file": "go/base/main.go",
     "text": "msg",
+    "line": 17,
     "note": "local variable red (via GO_LOCAL_VARIABLE -> DEFAULT_LOCAL_VARIABLE fallback)",
     "family": "variable-and-key"
   },
@@ -87,6 +99,7 @@
     "ide": "GO",
     "file": "go/base/main.go",
     "text": "Greet",
+    "line": 16,
     "note": "method declaration blue",
     "family": "callable"
   },
@@ -94,13 +107,15 @@
     "ide": "GO",
     "file": "go/base/main.go",
     "text": "Name",
-    "note": "struct member red",
+    "line": 8,
+    "note": "struct member red (field declaration)",
     "family": "variable-and-key"
   },
   {
     "ide": "GO",
     "file": "go/base/main.go",
     "text": "len",
+    "line": 18,
     "note": "builtin call blue (requires GOROOT in the test env)",
     "family": "callable"
   },
@@ -108,7 +123,136 @@
     "ide": "GO",
     "file": "go/base/main.go",
     "text": "make",
+    "line": 22,
     "note": "builtin blue via GO_BUILTIN_FUNCTION -> DEFAULT_FUNCTION_DECLARATION",
     "family": "callable"
+  },
+  {
+    "ide": "IC",
+    "file": "java/Main.java",
+    "text": "class",
+    "line": 10,
+    "note": "keyword purple via JAVA_KEYWORD -> DEFAULT_KEYWORD",
+    "family": "keyword"
+  },
+  {
+    "ide": "IC",
+    "file": "java/Main.java",
+    "text": "Main",
+    "line": 10,
+    "note": "class declaration yellow via CLASS_NAME_ATTRIBUTES",
+    "family": "type"
+  },
+  {
+    "ide": "IC",
+    "file": "java/Main.java",
+    "text": "MAX_RETRIES",
+    "line": 12,
+    "note": "static final field orange via STATIC_FINAL_FIELD_ATTRIBUTES",
+    "family": "value-constant"
+  },
+  {
+    "ide": "IC",
+    "file": "java/Main.java",
+    "text": "3",
+    "line": 12,
+    "note": "number orange via JAVA_NUMBER -> DEFAULT_NUMBER",
+    "family": "value-constant"
+  },
+  {
+    "ide": "IC",
+    "file": "java/Main.java",
+    "text": "Greeter",
+    "line": 20,
+    "note": "interface declaration yellow via INTERFACE_NAME_ATTRIBUTES",
+    "family": "type"
+  },
+  {
+    "ide": "IC",
+    "file": "java/Main.java",
+    "text": "Level",
+    "line": 24,
+    "note": "enum declaration yellow via ENUM_NAME_ATTRIBUTES",
+    "family": "type"
+  },
+  {
+    "ide": "IC",
+    "file": "java/Main.java",
+    "text": "Override",
+    "line": 33,
+    "note": "annotation name yellow via ANNOTATION_NAME_ATTRIBUTES",
+    "family": "type"
+  },
+  {
+    "ide": "IC",
+    "file": "java/Main.java",
+    "text": "greet",
+    "line": 42,
+    "note": "method declaration blue via METHOD_DECLARATION_ATTRIBUTES",
+    "family": "callable"
+  },
+  {
+    "ide": "IC",
+    "file": "java/Main.java",
+    "text": "prefix",
+    "line": 42,
+    "note": "parameter red via PARAMETER_ATTRIBUTES",
+    "family": "variable-and-key"
+  },
+  {
+    "ide": "IC",
+    "file": "java/Main.java",
+    "text": "\"one-dark\"",
+    "line": 54,
+    "note": "string literal green via JAVA_STRING -> DEFAULT_STRING",
+    "family": "string"
+  },
+  {
+    "ide": "PC",
+    "file": "py/sample.py",
+    "text": "def",
+    "line": 7,
+    "note": "keyword purple via PY.KEYWORD -> DEFAULT_KEYWORD",
+    "family": "keyword"
+  },
+  {
+    "ide": "PC",
+    "file": "py/sample.py",
+    "text": "Server",
+    "line": 14,
+    "note": "class definition yellow via PY.CLASS_DEFINITION",
+    "family": "type"
+  },
+  {
+    "ide": "PC",
+    "file": "py/sample.py",
+    "text": "len",
+    "line": 8,
+    "note": "builtin blue via PY.BUILTIN_NAME",
+    "family": "callable"
+  },
+  {
+    "ide": "PC",
+    "file": "py/sample.py",
+    "text": "self",
+    "line": 16,
+    "note": "self parameter red via PY.SELF_PARAMETER",
+    "family": "variable-and-key"
+  },
+  {
+    "ide": "PC",
+    "file": "py/sample.py",
+    "text": "3",
+    "line": 3,
+    "note": "number orange via PY.NUMBER -> DEFAULT_NUMBER",
+    "family": "value-constant"
+  },
+  {
+    "ide": "PC",
+    "file": "py/sample.py",
+    "text": "\"one-dark\"",
+    "line": 25,
+    "note": "string literal green via PY.STRING -> DEFAULT_STRING",
+    "family": "string"
   }
 ]

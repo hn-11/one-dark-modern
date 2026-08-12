@@ -15,9 +15,18 @@ import java.util.*;
  * JSON goes to build/dumps/&lt;fixture-relative-path&gt;.json; color resolution
  * against our .icls happens in scripts/compare-jetbrains-dump.ts.
  *
+ * Each token carries start/end offsets plus the 1-based line/column of its
+ * start, so expectations can be pinned to a position instead of matching by
+ * bare token text. Tokens are emitted lexer-layer first, daemon layer second -
+ * the compare script relies on that order for "last write wins per range
+ * start" (daemon/annotator beats lexer).
+ *
  * Dumps are keyed by the path relative to audit/fixtures, not by basename:
  * go/colorize/test.go and go/colorize13777/test.go are different fixtures and
  * used to overwrite each other's test_go.json (last one wins).
+ *
+ * Fixture discovery is driven by ideType: GO -&gt; audit/fixtures/go,
+ * IC/IU -&gt; java, PC/PY -&gt; py, everything else (WS) -&gt; ts + js.
  */
 public class HighlightDumpTest extends BasePlatformTestCase {
 
@@ -27,26 +36,46 @@ public class HighlightDumpTest extends BasePlatformTestCase {
         Path out = Paths.get(System.getProperty("audit.out"));
         Files.createDirectories(out);
 
-        List<Path> files = new ArrayList<>();
-        if (ideType.equals("GO")) {
-            configureGoSdk(out);
-            try (var s = Files.walk(fixtures.resolve("go"))) {
-                s.filter(p -> p.toString().endsWith(".go")).forEach(files::add);
+        String[] dirs;
+        String[] exts;
+        switch (ideType) {
+            case "GO" -> {
+                dirs = new String[]{"go"};
+                exts = new String[]{".go"};
+                configureGoSdk(out);
             }
-        } else { // WS and anything JS-capable
-            for (String dir : new String[]{"ts", "js"}) {
-                try (var s = Files.walk(fixtures.resolve(dir))) {
-                    s.filter(p -> {
-                        String n = p.toString();
-                        return n.endsWith(".ts") || n.endsWith(".tsx") || n.endsWith(".js") || n.endsWith(".jsx");
-                    }).forEach(files::add);
-                }
+            case "IC", "IU" -> {
+                dirs = new String[]{"java"};
+                exts = new String[]{".java"};
+            }
+            case "PC", "PY" -> {
+                dirs = new String[]{"py"};
+                exts = new String[]{".py"};
+            }
+            default -> { // WS and anything JS-capable
+                dirs = new String[]{"ts", "js"};
+                exts = new String[]{".ts", ".tsx", ".js", ".jsx"};
             }
         }
-        assertFalse("no fixtures found", files.isEmpty());
+
+        List<Path> files = new ArrayList<>();
+        for (String dir : dirs) {
+            Path base = fixtures.resolve(dir);
+            if (!Files.isDirectory(base)) continue;
+            try (var s = Files.walk(base)) {
+                s.filter(p -> {
+                    String n = p.toString();
+                    for (String ext : exts) if (n.endsWith(ext)) return true;
+                    return false;
+                }).forEach(files::add);
+            }
+        }
+        Collections.sort(files);
+        assertFalse("no fixtures found for ideType=" + ideType, files.isEmpty());
 
         for (Path file : files) {
             String text = Files.readString(file, StandardCharsets.UTF_8);
+            int[] lineStarts = lineStarts(text);
             myFixture.configureByText(file.getFileName().toString(), text);
 
             // stable, collision-free identity: path relative to audit/fixtures,
@@ -62,19 +91,20 @@ public class HighlightDumpTest extends BasePlatformTestCase {
             while (!it.atEnd()) {
                 TextAttributesKey[] keys = it.getTextAttributesKeys();
                 if (keys != null && keys.length > 0) {
-                    first = appendToken(json, first, "lexer", it.getStart(), it.getEnd(), keys, text);
+                    first = appendToken(json, first, "lexer", it.getStart(), it.getEnd(), keys, text, lineStarts);
                 }
                 it.advance();
             }
 
             // daemon layer (annotators - the "semantic" side of IntelliJ)
             for (HighlightInfo info : myFixture.doHighlighting()) {
-                TextAttributesKey key = info.forcedTextAttributesKey != null
+                // not "key": the fixture-relative dump key above already uses that name
+                TextAttributesKey attrKey = info.forcedTextAttributesKey != null
                         ? info.forcedTextAttributesKey
                         : (info.type != null ? info.type.getAttributesKey() : null);
-                if (key == null) continue;
+                if (attrKey == null) continue;
                 first = appendToken(json, first, "daemon", info.getStartOffset(), info.getEndOffset(),
-                        new TextAttributesKey[]{key}, text);
+                        new TextAttributesKey[]{attrKey}, text, lineStarts);
             }
 
             json.append("]}");
@@ -109,14 +139,34 @@ public class HighlightDumpTest extends BasePlatformTestCase {
         Files.writeString(out.resolve("_sdk.log"), "applied\n", java.nio.file.StandardOpenOption.APPEND);
     }
 
+    /** Offsets of the first character of every line, for offset -> line/column. */
+    private static int[] lineStarts(String text) {
+        List<Integer> starts = new ArrayList<>();
+        starts.add(0);
+        for (int i = 0; i < text.length(); i++) if (text.charAt(i) == '\n') starts.add(i + 1);
+        int[] a = new int[starts.size()];
+        for (int i = 0; i < a.length; i++) a[i] = starts.get(i);
+        return a;
+    }
+
+    /** 1-based line number of {@code offset}. */
+    private static int lineOf(int[] lineStarts, int offset) {
+        int i = Arrays.binarySearch(lineStarts, offset);
+        return (i >= 0 ? i : -i - 2) + 1;
+    }
+
     private static boolean appendToken(StringBuilder json, boolean first, String layer,
-                                       int start, int end, TextAttributesKey[] keys, String text) {
+                                       int start, int end, TextAttributesKey[] keys, String text,
+                                       int[] lineStarts) {
         if (end <= start || end > text.length()) return first;
         if (!first) json.append(',');
         String snippet = text.substring(start, Math.min(end, start + 40));
+        int line = lineOf(lineStarts, start);
         json.append("{\"layer\":\"").append(layer)
             .append("\",\"start\":").append(start)
             .append(",\"end\":").append(end)
+            .append(",\"line\":").append(line)
+            .append(",\"col\":").append(start - lineStarts[line - 1] + 1)
             .append(",\"text\":").append(quote(snippet))
             .append(",\"keys\":[");
         for (int i = 0; i < keys.length; i++) {
