@@ -329,7 +329,10 @@ another editor's judgment is a research tool, not a product.
 
 **The built VS Code theme (`themes/*.json`) is the single source of truth
 for every platform.** The JetBrains `.icls`, Ghostty, Windows Terminal and
-Vim artifacts are generated from it, so hex parity holds by construction.
+Vim artifacts are generated from One Dark 2026 (`scripts/lib.ts`,
+`loadBuiltTheme`), so hex parity holds by construction. They keep the
+"One Dark Modern" scheme name, which is the extension's identity rather
+than a variant label.
 
 - Never hand-edit generated files (`themes/`, `dist/`); CI verifies
   reproducibility.

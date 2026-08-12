@@ -28,7 +28,7 @@ export const jsonc = <T>(s: string): T =>
 
 export const readJson = <T>(p: string): T => jsonc<T>(readFileSync(join(root, p), "utf8"));
 
-export const loadBuiltTheme = (): Theme => readJson<Theme>("themes/one-dark-modern-color-theme.json");
+export const loadBuiltTheme = (): Theme => readJson<Theme>("themes/one-dark-2026-color-theme.json");
 
 // the color vocabulary (docs/PHILOSOPHY.md section 2): second-generation
 // builders take syntax palette colors from here by family name; UI colors
