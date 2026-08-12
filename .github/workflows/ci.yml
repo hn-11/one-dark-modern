@@ -47,7 +47,9 @@ jobs:
   # flags tokens whose color changes when semantic highlighting lands.
   flicker-audit:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # 20, not 15: rust-analyzer has to run `cargo metadata` + `cargo check` on
+    # the Rust fixture before its semantic tokens are trustworthy
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup-node-project
@@ -68,7 +70,40 @@ jobs:
       - name: Install gopls
         if: steps.gopls-cache.outputs.cache-hit != 'true'
         run: go install golang.org/x/tools/gopls@v0.23.0
-      - run: echo "$HOME/go/bin" >> "$GITHUB_PATH"
+      - name: Cache rust-analyzer
+        id: rust-analyzer-cache
+        uses: actions/cache@v6
+        with:
+          # the real component binary - ~/.cargo/bin/rust-analyzer is only a
+          # rustup shim and exists even when the component is not installed
+          path: ~/.rustup/toolchains/stable-x86_64-unknown-linux-gnu/bin/rust-analyzer
+          # same monthly refresh as gopls: fast CI, still tracks releases
+          key: rust-analyzer-${{ runner.os }}-${{ steps.date.outputs.month }}
+      # rustup's component (rather than a standalone release download) so the
+      # server always matches the runner's toolchain - a rust-analyzer built
+      # against a different rustc reports different token modifiers, which the
+      # combo snapshot would (correctly) flag as drift.
+      - name: Install rust-analyzer
+        if: steps.rust-analyzer-cache.outputs.cache-hit != 'true'
+        run: rustup component add rust-analyzer
+      # NOT cached: rust-src is a source tree, not a binary, and rust-analyzer
+      # needs it to resolve std - without it `Option::Some` and friends come
+      # back as unresolved and half the Rust combos disappear.
+      - name: Install rust-src
+        run: rustup component add rust-src
+      # clangd comes from apt rather than a cached download: the Ubuntu package
+      # is what the runner image already has index metadata for, and unlike
+      # gopls/rust-analyzer it is a multi-file install (a cached single binary
+      # would still be missing its resource directory).
+      - name: Install clangd
+        run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends clangd >/dev/null
+      - run: |
+          echo "$HOME/go/bin" >> "$GITHUB_PATH"
+          echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+      # rust-analyzer needs a cargo toolchain to load audit/fixtures/rust; the
+      # runner image ships one, so this only proves it before the audit runs.
+      - name: Check cargo is available
+        run: cargo --version && rust-analyzer --version && clangd --version
       - run: npm run audit
       - name: WCAG contrast guard (syntax + ANSI palettes)
         run: npm run audit:contrast

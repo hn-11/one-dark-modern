@@ -1,0 +1,9 @@
+# Standalone clangd configuration for the flicker-audit fixture.
+#
+# There is no build system here, so clangd would otherwise fall back to a bare
+# default command and mis-parse C++20 sources. Adding the flags this way (rather
+# than shipping a compile_commands.json) keeps the fixture path-independent:
+# a compilation database has to name absolute paths, which differ between a
+# developer checkout and CI.
+CompileFlags:
+  Add: [-xc++, -std=c++20, -Wall]

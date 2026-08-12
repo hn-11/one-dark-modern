@@ -22,15 +22,27 @@
 //     token; the unexercised list is snapshotted in audit/coverage-tm.json and
 //     growth of that list fails the audit
 //
-// Coverage: Go (gopls) and TypeScript (typescript-language-server).
+// Coverage: Go (gopls), TypeScript (typescript-language-server), Rust
+// (rust-analyzer) and C++ (clangd). Rust and C++ are what reach the semantic
+// entries no other language emits — `macro`, `typeParameter`, `enum`, `struct`,
+// `variable.constant` (docs/IMPROVEMENT-IDEAS.md item 12).
 // Python/Shell have no open-source semantic token servers (Pylance is
 // closed; bash-ls emits none), so they are TM-only here; the same goes for
 // the data/markup languages JSON, JSONC, YAML, Markdown and CSS, which are
 // carried purely for TextMate selector coverage.
 //
-// Usage: npm run audit [-- --update]   (requires gopls on PATH)
+// gopls and typescript-language-server are mandatory. rust-analyzer and clangd
+// are OPTIONAL locally: a missing one prints a warning and skips that language's
+// *semantic* pass (its TextMate pass always runs, so TM coverage never depends
+// on a toolchain being installed). CI installs both, so the skip can never hide
+// a regression on main.
+//
+// Usage: npm run audit [-- --update]
+//   requires: gopls on PATH; optionally rust-analyzer (`rustup component add
+//   rust-analyzer rust-src`) and clangd (`apt-get install clangd`).
 import { createRequire } from "node:module";
-import { readFileSync, writeFileSync, readdirSync, statSync } from "node:fs";
+import { readFileSync, writeFileSync, readdirSync, statSync, mkdirSync } from "node:fs";
+import { execFileSync } from "node:child_process";
 import { join, relative } from "node:path";
 import type * as tmTypes from "vscode-textmate";
 import { loadBuiltTheme, readJson, root, type Theme, type TokenRule } from "./lib.ts";
@@ -118,6 +130,8 @@ const GRAMMARS: Record<string, { scope: string; file: string }> = {
   yaml: { scope: "source.yaml", file: "yaml.tmLanguage.json" },
   md: { scope: "text.html.markdown", file: "markdown.tmLanguage.json" },
   css: { scope: "source.css", file: "css.tmLanguage.json" },
+  rs: { scope: "source.rust", file: "rust.tmLanguage.json" },
+  cpp: { scope: "source.cpp", file: "cpp.tmLanguage.json" },
 };
 // grammars that exist only to satisfy an `include` from one of the above
 // (VS Code's YAML grammar dispatches to a per-spec-version sub-grammar). They
@@ -128,6 +142,8 @@ const SUPPORT_GRAMMARS: Array<{ scope: string; file: string }> = [
   { scope: "source.yaml.1.1", file: "yaml-1.1.tmLanguage.json" },
   { scope: "source.yaml.1.0", file: "yaml-1.0.tmLanguage.json" },
   { scope: "source.yaml.embedded", file: "yaml-embedded.tmLanguage.json" },
+  // VS Code's C++ grammar hands the body of a #define over to this sub-grammar
+  { scope: "source.cpp.embedded.macro", file: "cpp.embedded.macro.tmLanguage.json" },
 ];
 // file extension -> (grammar key, LSP languageId)
 const EXT_LANG: Record<string, { grammar: string; languageId: string }> = {
@@ -565,6 +581,34 @@ function compare(
   return { findings, corrections };
 }
 
+// ---------- optional language servers (item 12) ----------
+// Rust/C++ need a toolchain that not every contributor has installed. Rather
+// than making `npm run audit` unrunnable without them, a missing server is a
+// loud skip: the language's TextMate pass still runs, only its semantic pass is
+// dropped, and the combo snapshot stops being compared for that language (so a
+// skip cannot look like "the server lost these combos").
+const skippedLangs = new Map<string, string>();
+function findServer(candidates: string[]): string | null {
+  for (const cmd of candidates) {
+    try {
+      execFileSync("command", ["-v", cmd], { stdio: "ignore", shell: true });
+      return cmd;
+    } catch {
+      /* not on PATH; try the next spelling */
+    }
+  }
+  return null;
+}
+function skipLang(langs: string[], candidates: string[], hint: string): void {
+  for (const l of langs) skippedLangs.set(l, hint);
+  console.log(
+    `\nWARNING: none of [${candidates.join(", ")}] is on PATH - skipping the ` +
+      `SEMANTIC pass for ${langs.join("/")} (TextMate coverage still runs).\n` +
+      `  ${hint}\n` +
+      `  CI installs this server, so main is always audited with it.`
+  );
+}
+
 const listFiles = (dir: string, ext: string): string[] =>
   readdirSync(dir)
     .filter((f) => f.endsWith(ext))
@@ -654,6 +698,83 @@ for (const sub of ["ts", "js"]) {
   }
 }
 
+// Rust: one rust-analyzer session per cargo project root. CARGO_TARGET_DIR is
+// redirected out of the fixture tree - rust-analyzer runs `cargo check`, and a
+// `target/` directory inside audit/fixtures/ would end up in the oracle's walk.
+{
+  const rsRoot = join(root, "audit/fixtures/rust");
+  const server = findServer(["rust-analyzer"]);
+  if (!server)
+    skipLang(
+      ["rust"],
+      ["rust-analyzer"],
+      "install it with `rustup component add rust-analyzer rust-src` (rust-src " +
+        "is what lets it resolve std)."
+    );
+  const targetDir = join(root, ".audit-cache/rust-target");
+  if (server) mkdirSync(targetDir, { recursive: true });
+  for (const sub of readdirSync(rsRoot)) {
+    const dir = join(rsRoot, sub);
+    if (!statSync(dir).isDirectory()) continue;
+    const files = listFiles(join(dir, "src"), ".rs");
+    const session = server
+      ? new SemanticSession(server, [], dir, {}, {}, {
+          env: { CARGO_TARGET_DIR: targetDir },
+          // without this the audit would grade rust-analyzer's provisional,
+          // name-resolution-free highlighting (see SemanticSession.waitQuiescent)
+          waitQuiescent: true,
+        })
+      : null;
+    try {
+      for (const file of files) {
+        const text = readFileSync(file, "utf8");
+        const tmLines = await tmTokenize("rs", text);
+        recordRuleCoverage(tmLines);
+        if (!session) continue;
+        const sem = await session.tokens(file, "rust", text);
+        checkNonEmpty(file, sem.length);
+        semTotal += sem.length;
+        const r = compare("rust", relative(root, file), text, tmLines, sem);
+        findings.push(...r.findings);
+        corrections += r.corrections;
+      }
+    } finally {
+      session?.kill();
+    }
+  }
+}
+
+// C++: clangd reads audit/fixtures/cpp/.clangd for its compile flags, so the
+// fixture needs no build system and no machine-specific compilation database.
+// Ubuntu ships the binary unversioned in the `clangd` package and versioned in
+// `clangd-NN`; both spellings are accepted.
+{
+  const dir = join(root, "audit/fixtures/cpp");
+  const candidates = ["clangd", "clangd-20", "clangd-19", "clangd-18"];
+  const server = findServer(candidates);
+  if (!server)
+    skipLang(["cpp"], candidates, "install it with `sudo apt-get install -y clangd`.");
+  const session = server
+    ? new SemanticSession(server, ["--background-index=false"], dir, {}, {})
+    : null;
+  try {
+    for (const file of listFiles(dir, ".cpp")) {
+      const text = readFileSync(file, "utf8");
+      const tmLines = await tmTokenize("cpp", text);
+      recordRuleCoverage(tmLines);
+      if (!session) continue;
+      const sem = await session.tokens(file, "cpp", text);
+      checkNonEmpty(file, sem.length);
+      semTotal += sem.length;
+      const r = compare("cpp", relative(root, file), text, tmLines, sem);
+      findings.push(...r.findings);
+      corrections += r.corrections;
+    }
+  } finally {
+    session?.kill();
+  }
+}
+
 // TM-only languages: no open-source semantic token server is wired up for
 // these, so they contribute rule coverage only (Python/Shell as before, plus
 // the data/markup languages — JSON/JSONC/YAML/Markdown/CSS).
@@ -686,7 +807,14 @@ for (const f of findings) {
 }
 
 // stale allow entries (item 13)
-const stale = allow.map((a, i) => ({ a, i })).filter(({ i }) => allowHits[i] === 0);
+// An entry can only be stale if every language it covers actually ran: a
+// multi-language entry may well be exercised only by the language that was
+// skipped, and a missing toolchain must never be able to fail the audit.
+const anyLangSkipped = (a: AllowEntry): boolean =>
+  (Array.isArray(a.lang) ? a.lang : [a.lang]).some((l) => skippedLangs.has(l));
+const stale = allow
+  .map((a, i) => ({ a, i }))
+  .filter(({ a, i }) => allowHits[i] === 0 && !anyLangSkipped(a));
 if (stale.length) {
   const lines = stale
     .map(({ a }) => `  ${describeAllow(a)}\n      reason: ${a.reason}`)
@@ -702,13 +830,18 @@ if (stale.length) {
 
 // semantic combo coverage vs snapshot (item 19: both directions)
 const comboPath = join(root, "audit/coverage-semantic.json");
-const combos = [...observedCombos].sort();
+let combos = [...observedCombos].sort();
 let newCombos: string[] = [];
 let lostCombos: string[] = [];
+// a language whose server was skipped contributes nothing this run; its
+// snapshot entries are neither confirmed nor lost, so they are carried over
+const skipped = (c: string): boolean => skippedLangs.has(c.slice(0, c.indexOf("|")));
 try {
   const known: string[] = JSON.parse(readFileSync(comboPath, "utf8"));
   newCombos = combos.filter((c) => !known.includes(c));
-  lostCombos = known.filter((c) => !combos.includes(c));
+  lostCombos = known.filter((c) => !combos.includes(c) && !skipped(c));
+  if (skippedLangs.size)
+    combos = [...new Set([...combos, ...known.filter(skipped)])].sort();
 } catch {
   newCombos = combos;
 }
@@ -771,6 +904,11 @@ console.log(
 );
 console.log(`allow.json entries: ${allow.length} (${stale.length} unused)`);
 console.log(`TM-only tokens (py/sh/json/jsonc/yaml/md/css): ${tmOnlyTokens}`);
+if (skippedLangs.size)
+  console.log(
+    `semantic pass SKIPPED for: ${[...skippedLangs.keys()].join(", ")} ` +
+      `(server not installed - CI runs them)`
+  );
 console.log(`violations: ${findings.length}`);
 
 if (errors.length) {

@@ -20,6 +20,8 @@ export interface Legend {
 }
 
 const INITIALIZE_TIMEOUT_MS = 60_000;
+// generous: a cold rust-analyzer has to run `cargo metadata` + `cargo check`
+const QUIESCENT_TIMEOUT_MS = 300_000;
 
 interface RpcError {
   code: number;
@@ -40,13 +42,25 @@ class Lsp {
   private exited: { code: number | null; signal: NodeJS.Signals | null } | null = null;
   private spawnError: Error | null = null;
   readonly label: string;
+  /** set by the owner to observe server -> client notifications */
+  onNotification?: (method: string, params: unknown) => void;
 
-  constructor(cmd: string, args: string[], cwd: string, configResponse: unknown) {
+  constructor(
+    cmd: string,
+    args: string[],
+    cwd: string,
+    configResponse: unknown,
+    env?: Record<string, string>
+  ) {
     this.configResponse = configResponse;
     this.label = [cmd, ...args].join(" ");
     // stderr is piped (not "ignore") so a crash/panic message survives to the
     // failure report instead of being thrown away.
-    this.proc = spawn(cmd, args, { cwd, stdio: ["pipe", "pipe", "pipe"] });
+    this.proc = spawn(cmd, args, {
+      cwd,
+      stdio: ["pipe", "pipe", "pipe"],
+      env: env ? { ...process.env, ...env } : process.env,
+    });
     this.proc.stdout!.on("data", (chunk: Buffer) => this.onData(chunk));
     this.proc.stderr!.on("data", (chunk: Buffer) => {
       this.stderrChunks.push(chunk.toString());
@@ -122,6 +136,9 @@ class Lsp {
         result = items.map(() => this.configResponse);
       }
       this.send({ jsonrpc: "2.0", id: msg.id, result });
+    } else if (msg.method && msg.id === undefined) {
+      // server -> client notification
+      this.onNotification?.(msg.method, msg.params);
     } else if (msg.id !== undefined && this.pending.has(msg.id)) {
       const p = this.pending.get(msg.id)!;
       this.pending.delete(msg.id);
@@ -185,8 +202,65 @@ export class SemanticSession {
   private lsp: Lsp;
   private legend: Legend | undefined;
   private ready: Promise<void>;
-  constructor(cmd: string, args: string[], cwd: string, initOptions: unknown, configResponse: unknown) {
-    this.lsp = new Lsp(cmd, args, cwd, configResponse);
+  private quiescent: Promise<void> | null = null;
+  /**
+   * `opts.env` is merged over the inherited environment. It exists for servers
+   * that write build artefacts next to the fixture they are reading
+   * (rust-analyzer runs `cargo check`, which would drop a `target/` directory
+   * inside `audit/fixtures/` and change what the oracle walks); pointing the
+   * tool at a scratch directory keeps the fixture tree exactly as committed.
+   *
+   * `opts.waitQuiescent` is the rust-analyzer correctness fix. While the
+   * workspace is still loading, rust-analyzer answers semanticTokens/full with
+   * a *provisional* highlighting computed without name resolution: `usize`
+   * comes back as `namespace`, a `const` usage as `struct`, a parameter as
+   * `const`. Those answers are non-empty and stable for several seconds, so
+   * neither the retry loop below nor a "wait until it stops changing" heuristic
+   * can tell them apart from the real thing - and auditing them would compare
+   * the theme against colours no user ever sees. rust-analyzer announces the
+   * real state with `experimental/serverStatus` (`quiescent: true`), which this
+   * flag opts into and waits for.
+   */
+  constructor(
+    cmd: string,
+    args: string[],
+    cwd: string,
+    initOptions: unknown,
+    configResponse: unknown,
+    opts: { env?: Record<string, string>; waitQuiescent?: boolean } = {}
+  ) {
+    this.lsp = new Lsp(cmd, args, cwd, configResponse, opts.env);
+    if (opts.waitQuiescent) {
+      this.quiescent = new Promise<void>((resolve, reject) => {
+        const timer = setTimeout(
+          () =>
+            reject(
+              new Error(
+                `${this.lsp.label}: no quiescent experimental/serverStatus within ` +
+                  `${QUIESCENT_TIMEOUT_MS}ms - the workspace never finished loading, so ` +
+                  `every semantic token would be provisional\n  ${this.lsp.diagnostics()}`
+              )
+            ),
+          QUIESCENT_TIMEOUT_MS
+        );
+        timer.unref?.();
+        this.lsp.onNotification = (method, params): void => {
+          if (method !== "experimental/serverStatus") return;
+          const p = params as { quiescent?: boolean; health?: string };
+          if (p.quiescent !== true) return;
+          clearTimeout(timer);
+          if (p.health === "error")
+            reject(
+              new Error(
+                `${this.lsp.label}: reported health="error" while loading the workspace\n  ` +
+                  this.lsp.diagnostics()
+              )
+            );
+          else resolve();
+        };
+      });
+      this.quiescent.catch(() => {});
+    }
     this.ready = this.lsp
       .request<{ capabilities: { semanticTokensProvider?: { legend: Legend } } }>(
         "initialize",
@@ -197,6 +271,9 @@ export class SemanticSession {
           initializationOptions: initOptions,
           capabilities: {
             workspace: { configuration: true },
+            // rust-analyzer only sends experimental/serverStatus to a client
+            // that asks for it; harmless noise for every other server
+            experimental: { serverStatusNotification: true },
             textDocument: {
               semanticTokens: {
                 requests: { full: true },
@@ -224,6 +301,7 @@ export class SemanticSession {
 
   async tokens(path: string, languageId: string, text: string): Promise<SemToken[]> {
     await this.ready;
+    if (this.quiescent) await this.quiescent;
     const uri = pathToFileURL(path).toString();
     this.lsp.notify("textDocument/didOpen", {
       textDocument: { uri, languageId, version: 1, text },

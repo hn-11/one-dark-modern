@@ -88,6 +88,12 @@
   "string.format": {
     "family": "value-constant"
   },
+  "operator:c": {
+    "family": "platform-and-operator"
+  },
+  "operator:cpp": {
+    "family": "platform-and-operator"
+  },
   "type.defaultLibrary.string:go": {
     "family": "type"
   },

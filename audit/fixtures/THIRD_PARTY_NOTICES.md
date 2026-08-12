@@ -74,6 +74,16 @@ modified locally.
 | `yaml-embedded.tmLanguage.json` | `extensions/yaml/syntaxes/yaml-embedded.tmLanguage.json` |
 | `markdown.tmLanguage.json` | `extensions/markdown-basics/syntaxes/markdown.tmLanguage.json` |
 | `css.tmLanguage.json` | `extensions/css/syntaxes/css.tmLanguage.json` |
+| `rust.tmLanguage.json` | `extensions/rust/syntaxes/rust.tmLanguage.json` |
+| `cpp.tmLanguage.json` | `extensions/cpp/syntaxes/cpp.tmLanguage.json` |
+| `cpp.embedded.macro.tmLanguage.json` | `extensions/cpp/syntaxes/cpp.embedded.macro.tmLanguage.json` |
+
+`cpp.embedded.macro.tmLanguage.json` is likewise not a language of its own:
+VS Code's C++ grammar hands the body of a `#define` to it, so `source.cpp`
+cannot tokenize a macro definition without it. (Both grammars also `include`
+`source.asm`, `source.arm` and `source.glsl` for inline-assembly and shader
+blocks; those are deliberately not vendored - no fixture contains inline
+assembly, and an unresolved include simply leaves the region untokenized.)
 
 The five `yaml-*` files are not languages of their own: VS Code's YAML grammar
 is a dispatcher that `include`s a per-spec-version sub-grammar, so all of them
@@ -81,7 +91,11 @@ must be registered for `source.yaml` to tokenize at all.
 
 The JSON/YAML/Markdown/CSS fixtures added alongside them
 (`audit/fixtures/json/`, `yaml/`, `md/`, `css/`) are hand-written for this
-repository and are not attributed to microsoft/vscode.
+repository and are not attributed to microsoft/vscode. The same goes for the
+Rust and C++ fixtures added for the semantic-coverage work
+(`audit/fixtures/rust/base/` — a minimal cargo project so rust-analyzer has a
+workspace to load — and `audit/fixtures/cpp/`, whose `.clangd` file gives
+clangd its compile flags without a machine-specific compilation database).
 
 ## microsoft/vscode license (MIT)
 

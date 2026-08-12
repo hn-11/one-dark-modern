@@ -58,6 +58,13 @@ const GRAMMARS: Record<string, { scope: string; file: string; ext: string[] }> =
   yaml: { scope: "source.yaml", file: "yaml.tmLanguage.json", ext: [".yaml", ".yml"] },
   md: { scope: "text.html.markdown", file: "markdown.tmLanguage.json", ext: [".md"] },
   css: { scope: "source.css", file: "css.tmLanguage.json", ext: [".css"] },
+  rs: { scope: "source.rust", file: "rust.tmLanguage.json", ext: [".rs"] },
+  cpp: { scope: "source.cpp", file: "cpp.tmLanguage.json", ext: [".cpp"] },
+  "cpp-embedded-macro": {
+    scope: "source.cpp.embedded.macro",
+    file: "cpp.embedded.macro.tmLanguage.json",
+    ext: [],
+  },
   // include-only sub-grammars (VS Code's YAML grammar dispatches per spec
   // version); no extension, so no fixture is ever tokenized with them directly
   "yaml-1.3": { scope: "source.yaml.1.3", file: "yaml-1.3.tmLanguage.json", ext: [] },

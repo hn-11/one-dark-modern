@@ -123,7 +123,19 @@ Atom-faithful port.
   Exceptions exist only in `audit/allow.json`, each with a reason.
 
 Rulings under this principle: the semantic `operator` entry was removed
-(rust-analyzer et al. were flattening TM's per-language operator colors);
+(rust-analyzer et al. were flattening TM's per-language operator colors) —
+and later (2026-08-12) the harness, once taught VS Code's default
+scope-map fallback, proved removal alone insufficient — and surfaced a
+contradiction: the vendored ruleset painted most C/C++ symbol operators
+keyword-purple through sixteen language-suffixed selectors while leaving
+`logical`/`ternary` at the family's universal cyan, a split the "symbol
+operators are cyan, in every language" ruling (§6) already forbids and
+one no semantic entry can preserve (clangd reports every operator as one
+token type; with clangd active the split collapses regardless). Resolved
+by doctrine: the sixteen purple selectors were removed so C/C++ symbol
+operators fall through to the universal cyan like every other language
+(`sizeof` keeps word-operator purple), and explicit `operator:c` /
+`operator:cpp` cyan entries pin the semantic side to match;
 a `function.defaultLibrary` cyan "fix" turned out to *introduce* flicker and
 was reverted after the harness falsified it; the constant/literal merge (§6)
 was caught leaving `variable.defaultLibrary` yellow by three new flicker

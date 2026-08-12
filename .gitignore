@@ -5,3 +5,4 @@ dist/
 jetbrains-audit/build/
 jetbrains-audit/.gradle/
 jetbrains-audit/.intellijPlatform/
+.audit-cache/
