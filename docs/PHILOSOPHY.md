@@ -282,6 +282,51 @@ several rulings supersede earlier ones.
   both `#7F848E`. Matching them makes the occurrence-marking borders one
   color drawn from the vocabulary instead of two, one of them an orphan.
 
+### Dead selectors
+
+- **Eleven inherited TextMate selectors are deleted as provably unfirable**
+  (2026-08-12). They came in with the vendored One Dark Pro ruleset at
+  `c810530` and never matched a token, because their scope names are not
+  prefixes of anything the grammars emit. Each was checked against the
+  vendored grammars in `audit/grammars/`, against the upstream grammar
+  repositories' full histories, and against ODP master (which still ships
+  all of them):
+  - `markup.inline.raw.markdown` — VS Code's markdown grammar has emitted
+    `markup.inline.raw.string.markdown` since its first commit and never
+    the shorter form; TextMate's own bundle spells it
+    `markup.raw.inline.markdown`. The selector matches no grammar, past or
+    present.
+  - `beginning.punctuation.definition.list.markdown` — real, but retired:
+    `microsoft/vscode-markdown-tm-grammar@935f7a6` (2018-08-20, "use more
+    standard naming scheme for begin punctuators") renamed it to
+    `punctuation.definition.list.begin.markdown`, which this theme already
+    carries. No live derivative (quarto, mdx) kept the old spelling.
+  - `emphasis md` — a descendant selector for `emphasis` inside a scope
+    element named `md`. No grammar has a scope whose first segment is
+    `md`; markdown's root is `text.html.markdown`. An ODP artifact.
+  - `keyword.operator.css` — the CSS grammar only ever emits qualified
+    forms (`keyword.operator.combinator.css`, `.arithmetic.`, …), and
+    prefix matching runs on whole dot segments, so the bare form matches
+    none of them. The exact string appears nowhere in `microsoft/vscode-css`
+    or `textmate/css.tmbundle` history.
+  - `support.constant.json` — the JSON grammar has no `support.*` scope at
+    all, in either the VS Code or the TextMate lineage.
+  - six `source.json meta.structure.… > …` descendant selectors naming
+    `value.json` and `string.quoted.json`. The real scopes are
+    `meta.structure.dictionary.value.json` and `string.quoted.double.json`;
+    a standalone `value.json` element has never existed, and
+    `string.quoted.json` is not a segment prefix of `string.quoted.double.json`.
+
+  `punctuation.definition.list.markdown` was a candidate and is **kept**:
+  `textmate/markdown.tmbundle` still emits exactly that scope, so the
+  selector is live for TextMate-lineage grammars even though VS Code's
+  markdown grammar does not produce it.
+
+  Removal is invisible by construction: a selector that cannot match
+  contributes no color, so no fixture token can change. The oracle snapshot
+  is the proof — regenerating it after the deletion shows only the selector
+  strings disappearing and not a single token color moving.
+
 ### Corrections record
 
 Verdicts this project got wrong and later fixed in public — kept here

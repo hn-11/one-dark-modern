@@ -11070,7 +11070,6 @@
 /audit/fixtures/yaml/ci.yaml:84:17:#d19a66:0
 /audit/fixtures/yaml/ci.yaml:85:0:#abb2bf:0
 /audit/fixtures/yaml/ci.yaml:86:0:#abb2bf:0
-SEL beginning.punctuation.definition.list.markdown -> #e06c75/-
 SEL block.scope.begin -> #abb2bf/-
 SEL block.scope.end -> #abb2bf/-
 SEL comment -> #7f848e/italic
@@ -11095,7 +11094,6 @@ SEL constant.other.option -> #56b6c2/-
 SEL constant.other.php -> #abb2bf/-
 SEL constant.other.symbol -> #56b6c2/-
 SEL control.elements -> #d19a66/-
-SEL emphasis md -> #c678dd/-
 SEL entity.global.clojure -> #e5c07b/-
 SEL entity.name.class -> #e5c07b/-
 SEL entity.name.class.identifier.namespace.type -> #e5c07b/-
@@ -11172,7 +11170,6 @@ SEL keyword.operator.comparison.c -> #c678dd/-
 SEL keyword.operator.comparison.cpp -> #c678dd/-
 SEL keyword.operator.comparison.php -> #56b6c2/-
 SEL keyword.operator.cpp -> #c678dd/-
-SEL keyword.operator.css -> #56b6c2/-
 SEL keyword.operator.decrement -> #56b6c2/-
 SEL keyword.operator.decrement.c -> #c678dd/-
 SEL keyword.operator.decrement.cpp -> #c678dd/-
@@ -11235,7 +11232,6 @@ SEL markup.heading punctuation.definition.heading -> #61afef/-
 SEL markup.heading.setext -> #abb2bf/-
 SEL markup.heading.setext.1.markdown -> #e06c75/-
 SEL markup.heading.setext.2.markdown -> #e06c75/-
-SEL markup.inline.raw.markdown -> #98c379/-
 SEL markup.inline.raw.string.markdown -> #98c379/-
 SEL markup.inserted -> #98c379/-
 SEL markup.inserted.diff -> #98c379/-
@@ -11382,13 +11378,7 @@ SEL selector.sass -> #e06c75/-
 SEL source.ini -> #98c379/-
 SEL source.java -> #e06c75/-
 SEL source.json meta.structure.array.json > constant.language.json -> #d19a66/-
-SEL source.json meta.structure.array.json > value.json > string.quoted.json -> #98c379/-
-SEL source.json meta.structure.array.json > value.json > string.quoted.json > punctuation -> #98c379/-
 SEL source.json meta.structure.dictionary.json > constant.language.json -> #d19a66/-
-SEL source.json meta.structure.dictionary.json > string.quoted.json -> #e06c75/-
-SEL source.json meta.structure.dictionary.json > string.quoted.json > punctuation.string -> #e06c75/-
-SEL source.json meta.structure.dictionary.json > value.json > string.quoted.json -> #98c379/-
-SEL source.json meta.structure.dictionary.json > value.json > string.quoted.json > punctuation -> #98c379/-
 SEL source.makefile -> #e5c07b/-
 SEL storage -> #c678dd/-
 SEL storage.modifier.import.groovy -> #e5c07b/-
@@ -11425,7 +11415,6 @@ SEL support.constant.edge -> #c678dd/-
 SEL support.constant.elm -> #d19a66/-
 SEL support.constant.ext.php -> #d19a66/-
 SEL support.constant.font-name -> #d19a66/-
-SEL support.constant.json -> #d19a66/-
 SEL support.constant.math -> #d19a66/-
 SEL support.constant.parser-token.php -> #d19a66/-
 SEL support.constant.property-value -> #abb2bf/-
