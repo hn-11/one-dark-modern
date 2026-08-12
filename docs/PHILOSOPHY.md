@@ -264,19 +264,16 @@ several rulings supersede earlier ones.
 
 ### Workbench icons
 
-- **Symbol icons follow the vocabulary; action icons do not** (2026-08-12).
-  `symbolIcon.*` renders the same semantic classification as tokens
-  (function, class, variable), so §5 applies: a function icon in VS Code's
-  own purple (`#B180D7`) next to a blue `callable` token is the same
-  symbol in two colors. `syntax/icons.json` maps the 25 classified keys to
-  families; the build resolves them under the same guard as tokens, and
-  `terminalSymbolIcon.*` derives from `symbolIcon.*` upstream so it
-  follows for free. Everything that colors *actions or state* rather than
-  symbols — `debugIcon.*`, test-state icons, the lightbulb, `charts.*`,
-  `scmGraph.foreground1-5` (IBM color-blind-safe) — belongs to the UI
-  generation and stays on defaults. An earlier draft recolored those too;
-  it was reverted the same day for contradicting this boundary (and the
-  recorded charts.blue ruling in `audit/accent-allow.json`).
+- **Icon colors stay on VS Code defaults** (2026-08-12). Symbol icons
+  (`symbolIcon.*`) render the same classification as tokens, and a
+  vocabulary mapping was built and shipped briefly — then removed the same
+  day. The doctrine that decided it: this is a syntax theme; the UI layer
+  is touched only when something is genuinely hard to see, and VS Code's
+  icon palette (`#EE9D28`/`#B180D7`/`#75BEFF`) is perfectly legible on the
+  dark workbench. Consistency with the token vocabulary alone does not
+  clear that bar. The same reasoning already keeps `scmGraph`'s
+  color-blind-safe palette, charts, and merge/diff state colors on
+  defaults.
 
 ### Corrections record
 

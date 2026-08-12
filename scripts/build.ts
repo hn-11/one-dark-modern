@@ -7,7 +7,6 @@
 //                               vendored from a decade of One Dark Pro tuning at
 //                               v0.1.0, curated under docs/PHILOSOPHY.md since)
 //   syntax/semantic.json        the theme's own semantic token rules
-//   syntax/icons.json           workbench icon colors, by family name
 //   overrides/colors.json       our UI color overrides, shared by both variants
 //   overrides/colors-2026.json  extra overrides applied only to One Dark 2026
 //   overrides/accent-2026.json  accent recolor map for One Dark 2026: any
@@ -78,19 +77,6 @@ const semanticTokenColors = Object.fromEntries(
   })
 );
 
-// workbench icon colors (symbol icons, debug toolbar, test states) also
-// reference families by name; VS Code's defaults here are its own palette
-// (#EE9D28/#B180D7/#75BEFF), which is outside the vocabulary
-const iconSource = read<Record<string, string>>("syntax/icons.json");
-const iconColors = Object.fromEntries(
-  Object.entries(iconSource).map(([key, family]) => {
-    if (!(family in families)) {
-      throw new Error(`icon "${key}": unknown family ${family}`);
-    }
-    return [key, families[family]];
-  })
-);
-
 const buildVariant = (
   name: string,
   file: string,
@@ -117,7 +103,6 @@ const buildVariant = (
 // One Dark Modern: Dark Modern UI + shared One Dark overrides
 buildVariant("One Dark Modern", "one-dark-modern-color-theme.json", [
   darkModern.colors,
-  iconColors,
   ovColors,
 ]);
 // One Dark 2026: 2026 Dark includes dark_modern upstream, so resolve the
@@ -126,7 +111,6 @@ buildVariant("One Dark Modern", "one-dark-modern-color-theme.json", [
 // apply our overrides.
 buildVariant("One Dark 2026", "one-dark-2026-color-theme.json", [
   recolor({ ...darkModern.colors, ...dark2026.colors }, accent2026),
-  iconColors,
   ovColors,
   ovColors2026,
 ]);
