@@ -1,7 +1,7 @@
 # Weekly upstream sync: re-fetch the Microsoft workbench themes (Dark Modern
 # and 2026 Dark, VS Code's default dark theme since 1.113), rebuild with our
-# overrides/ applied, and
-# open an auto-merge PR. CI (build + flicker-audit) is the merge gate;
+# overrides/ applied, and open an auto-merge PR. CI (build + flicker-audit)
+# is the merge gate;
 # overrides win over upstream by construction, so nothing customized can
 # revert. Syntax colors have no upstream: syntax/ is this repository's own
 # source of truth (vendored at v0.1.0, curated under docs/PHILOSOPHY.md).
@@ -13,6 +13,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: write
   contents: write
   pull-requests: write
 
@@ -48,6 +49,16 @@ jobs:
 
             CI validates the build. If a change looks wrong, add or adjust an
             entry in `overrides/` on this branch before merging.
+
+      # A pull_request run for a PR opened by github-actions[bot] lands in
+      # action_required under the first_time_contributors approval policy and
+      # never clears, so the required checks never report. Dispatching CI on
+      # the branch attaches them to the same head SHA without a human.
+      - name: Run CI on the sync branch
+        if: steps.pr.outputs.pull-request-number != ''
+        run: gh workflow run ci.yml --ref chore/upstream-sync
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Enable auto-merge
         if: steps.pr.outputs.pull-request-operation == 'created'
