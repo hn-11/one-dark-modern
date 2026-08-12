@@ -1,0 +1,30 @@
+{
+  "name": "one-dark-modern-fixture",
+  "version": "1.2.3-beta.1",
+  "private": false,
+  "sideEffects": null,
+  "engines": {
+    "node": ">=23.6.0",
+    "vscode": "^1.90.0"
+  },
+  "files": ["dist", "themes", "README.md"],
+  "keywords": ["theme", "color-theme", "one dark"],
+  "counts": [0, 1, -2, 3.5, 1e10, -0.25],
+  "flags": [true, false, null],
+  "contributes": {
+    "themes": [
+      {
+        "label": "One Dark Modern",
+        "uiTheme": "vs-dark",
+        "path": "./themes/one-dark-modern-color-theme.json"
+      }
+    ]
+  },
+  "escapes": {
+    "quote": "a \"quoted\" word",
+    "backslash": "C:\\\\path\\\\to\\\\file",
+    "unicode": "\u00e9\u3042 \t\n",
+    "empty": ""
+  },
+  "nested": { "deep": { "deeper": { "value": 42 } } }
+}

@@ -1,0 +1,33 @@
+// One Dark Modern - example editor settings (JSON with Comments).
+// Line comments and /* block comments */ are the whole point of this fixture.
+{
+  /* Workbench: pick one of the two themes this repository ships. */
+  "workbench.colorTheme": "One Dark Modern",
+  "workbench.preferredDarkColorTheme": "One Dark 2026",
+
+  // Editor
+  "editor.fontFamily": "'JetBrains Mono', Menlo, monospace",
+  "editor.fontSize": 13,
+  "editor.fontLigatures": true,
+  "editor.semanticHighlighting.enabled": true, // matters for the flicker audit
+  "editor.rulers": [80, 100],
+  "editor.tokenColorCustomizations": {
+    "[One Dark Modern]": {
+      "textMateRules": [
+        {
+          "scope": ["comment", "punctuation.definition.comment"],
+          "settings": { "fontStyle": "italic", "foreground": "#7f848e" }
+        }
+      ]
+    }
+  },
+
+  /* Files
+     (a multi-line block comment) */
+  "files.exclude": {
+    "**/.git": true,
+    "**/node_modules": false
+  },
+  "files.eol": "\n",
+  "search.useIgnoreFiles": null
+}

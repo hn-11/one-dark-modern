@@ -1,0 +1,126 @@
+@charset "utf-8";
+@import url("./reset.css") screen;
+
+/* Custom properties (variables) and the theme's base palette. */
+:root {
+  --bg: #282c34;
+  --fg: #abb2bf;
+  --accent: #61afef;
+  --danger: rgb(224 108 117 / 85%);
+  --muted: hsla(220, 10%, 60%, 0.6);
+  --radius: 6px;
+  --gap: 0.75rem;
+  --font-stack: "JetBrains Mono", Menlo, monospace;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0 var(--gap);
+  background-color: var(--bg);
+  color: var(--fg);
+  font: italic bold 14px/1.5 var(--font-stack);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Element, class, id, descendant, child, sibling combinators. */
+main > section .card + .card ~ .card {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: var(--gap) calc(var(--gap) * 2);
+  border: 1px solid darkslategray;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+#app .title {
+  font-size: clamp(1rem, 2.5vw, 2rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: white;
+}
+
+/* Attribute selectors. */
+a[href],
+a[href^="https://"],
+a[href$=".pdf"],
+a[href*="github"],
+input[type="checkbox"],
+[data-theme="dark"] .card,
+[lang|="en"],
+[role~="button"] {
+  color: var(--accent);
+  text-decoration: none !important;
+}
+
+/* Pseudo-classes and pseudo-elements. */
+a:hover,
+a:focus-visible,
+li:nth-child(2n + 1),
+li:not(.disabled):first-child,
+input:checked::before,
+p::first-line,
+.card::after {
+  outline: 2px dashed #e5c07b;
+  opacity: 0.9;
+  content: "";
+}
+
+::selection {
+  background: #3e4451;
+}
+
+/* At-rules: media, supports, keyframes, font-face. */
+@media screen and (min-width: 48em) and (prefers-color-scheme: dark) {
+  body {
+    background: #21252b;
+  }
+
+  .sidebar {
+    position: sticky;
+    top: 0;
+    width: 18rem;
+    transform: translateX(0) rotate(0deg);
+    transition: transform 200ms ease-in-out;
+  }
+}
+
+@media print {
+  .sidebar,
+  .toolbar {
+    display: none;
+  }
+}
+
+@supports (display: grid) and (not (display: ruby)) {
+  .fallback {
+    float: none;
+    z-index: 10;
+  }
+}
+
+@font-face {
+  font-family: "Theme Icons";
+  src: url("icons.woff2") format("woff2");
+  font-display: swap;
+  unicode-range: U+0000-00ff;
+}
+
+@keyframes pulse {
+  from {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.pulse {
+  animation: pulse 1.2s infinite alternate;
+  will-change: opacity;
+}

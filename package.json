@@ -29,6 +29,8 @@
     "package": "vsce package",
     "vscode:prepublish": "npm run build",
     "audit": "node scripts/audit-flicker.ts",
+    "audit:contrast": "node scripts/audit-contrast.ts",
+    "audit:artifacts": "node scripts/audit-artifacts.ts",
     "version": "npm run build && git add themes",
     "postversion": "git push origin main --tags",
     "oracle": "node scripts/oracle.ts"

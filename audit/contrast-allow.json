@@ -1,0 +1,32 @@
+[
+  {
+    "subject": "family/comment-dim",
+    "floor": 2.7,
+    "reason": "inherited One Dark #5C6370; dimness is the point of comment-dim - it paints links inside comments and Markdown blockquotes, text that must read as quieter than the already-quiet comment gray. Raising it would collapse the two comment levels into one. 2.73:1 on Dark Modern's #1F1F1F, 3.08 on 2026's #121314."
+  },
+  {
+    "subject": "family/comment",
+    "floor": 4.3,
+    "reason": "inherited One Dark #7F848E, 4.39:1 on Dark Modern's #1F1F1F (it clears AA at 4.95 on 2026's darker #121314). Comments are deliberately recessive; the color is origin-provenanced and shared by every One Dark port, so it is not ours to retune for 0.11 of a ratio point."
+  },
+  {
+    "subject": "family/embedded-boundary",
+    "floor": 3.4,
+    "reason": "inherited One Dark #BE5046, restored to origin after the 78-assignment reconciliation (docs/PHILOSOPHY.md, 'Embedded boundaries and strings'). It marks punctuation - the ${} and JSX braces around a boundary between worlds - not text to be read, and its darkness is what separates it from variable red. 3.47:1 on #1F1F1F, 3.92 on #121314."
+  },
+  {
+    "subject": "ansi/terminal.ansiBlack",
+    "floor": 1.6,
+    "reason": "ANSI slot 0 from Atom one-dark-ui. Black is a background/box-drawing slot, not a foreground for body text; measuring it against a dark terminal background is measuring the wrong thing. Held at its palette value on identity grounds (PHILOSOPHY §1: the ANSI palette is one third of the three-way blend)."
+  },
+  {
+    "subject": "ansi/terminal.ansiBrightBlack",
+    "floor": 2.2,
+    "reason": "ANSI slot 8, the conventional 'dim' slot - used by pagers, diff tools and prompts precisely to say 'this is secondary'. Same identity argument as ansiBlack: it comes from Atom one-dark-ui and its lowness is its function."
+  },
+  {
+    "subject": "ansi/terminal.ansiRed",
+    "floor": 4.4,
+    "reason": "ANSI slot 1 from Atom one-dark-ui, 4.43:1 on Dark Modern's #1F1F1F fallback background (4.68 on 2026's dedicated terminal background, which clears AA). Programs that need red to shout use the bright slot; the normal slot is inherited verbatim and not ours to alter."
+  }
+]

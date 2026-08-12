@@ -2,7 +2,14 @@
   {
     "lang": "go",
     "type": "namespace",
-    "reason": "TM misreads package references as variables (red) / import paths as strings (green); namespace yellow is the correct meaning and matches ODP's namespace color"
+    "tmColor": "#98c379",
+    "reason": "import paths: the Go TM grammar scopes the quoted path as a string (green). Semantic namespace yellow is the correct meaning and matches ODP's namespace color."
+  },
+  {
+    "lang": "go",
+    "type": "namespace",
+    "tmColor": "#e06c75",
+    "reason": "package references (fmt.Println): the Go TM grammar has no package scope, so the qualifier falls through to variable red. Semantic namespace yellow is the correct meaning and matches ODP's namespace color."
   },
   {
     "lang": "go",
@@ -33,7 +40,8 @@
       "javascriptreact"
     ],
     "type": "enumMember",
-    "reason": "enum members are compile-time constants - orange like variable.readonly (constant/literal merge 2026-07-20); TM has no enum-member awareness"
+    "reason": "enum members are compile-time constants - orange like variable.readonly (constant/literal merge 2026-07-20); TM has no enum-member awareness and paints them variable red.",
+    "tmColor": "#e06c75"
   },
   {
     "lang": [
@@ -43,7 +51,8 @@
       "javascriptreact"
     ],
     "type": "class",
-    "reason": "constructor calls: TM guesses function-call blue; semantic class yellow keeps the type family consistent (approved look since Record<> screenshot)"
+    "reason": "constructor calls and defaultLibrary types: TM guesses function-call blue; semantic class yellow keeps the type family consistent (approved look since Record<> screenshot)",
+    "tmColor": "#61afef"
   },
   {
     "lang": [

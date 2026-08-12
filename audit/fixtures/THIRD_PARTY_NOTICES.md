@@ -46,6 +46,43 @@ VS Code repository file-for-file, so treat the "borrowed" list above as a
 good-faith best effort rather than a guaranteed-exhaustive audit. Corrections
 welcome.
 
+## Vendored TextMate grammars (`audit/grammars/`)
+
+Every `*.tmLanguage.json` under `audit/grammars/` is vendored verbatim from
+microsoft/vscode's bundled language extensions (they are the grammars VS Code
+actually ships, which is the whole point — the audit must tokenize the way the
+editor does). Each file keeps its upstream `information_for_contributors` and
+`version` fields, which name the true origin repository and commit; nothing is
+modified locally.
+
+| File | Upstream path in microsoft/vscode |
+| --- | --- |
+| `go.tmLanguage.json` | `extensions/go/syntaxes/go.tmLanguage.json` |
+| `TypeScript.tmLanguage.json` | `extensions/typescript-basics/syntaxes/TypeScript.tmLanguage.json` |
+| `TypeScriptReact.tmLanguage.json` | `extensions/typescript-basics/syntaxes/TypeScriptReact.tmLanguage.json` |
+| `JavaScript.tmLanguage.json` | `extensions/javascript/syntaxes/JavaScript.tmLanguage.json` |
+| `JavaScriptReact.tmLanguage.json` | `extensions/javascript/syntaxes/JavaScriptReact.tmLanguage.json` |
+| `MagicPython.tmLanguage.json` | `extensions/python/syntaxes/MagicPython.tmLanguage.json` |
+| `shell-unix-bash.tmLanguage.json` | `extensions/shellscript/syntaxes/shell-unix-bash.tmLanguage.json` |
+| `JSON.tmLanguage.json` | `extensions/json/syntaxes/JSON.tmLanguage.json` |
+| `JSONC.tmLanguage.json` | `extensions/json/syntaxes/JSONC.tmLanguage.json` |
+| `yaml.tmLanguage.json` | `extensions/yaml/syntaxes/yaml.tmLanguage.json` |
+| `yaml-1.3.tmLanguage.json` | `extensions/yaml/syntaxes/yaml-1.3.tmLanguage.json` |
+| `yaml-1.2.tmLanguage.json` | `extensions/yaml/syntaxes/yaml-1.2.tmLanguage.json` |
+| `yaml-1.1.tmLanguage.json` | `extensions/yaml/syntaxes/yaml-1.1.tmLanguage.json` |
+| `yaml-1.0.tmLanguage.json` | `extensions/yaml/syntaxes/yaml-1.0.tmLanguage.json` |
+| `yaml-embedded.tmLanguage.json` | `extensions/yaml/syntaxes/yaml-embedded.tmLanguage.json` |
+| `markdown.tmLanguage.json` | `extensions/markdown-basics/syntaxes/markdown.tmLanguage.json` |
+| `css.tmLanguage.json` | `extensions/css/syntaxes/css.tmLanguage.json` |
+
+The five `yaml-*` files are not languages of their own: VS Code's YAML grammar
+is a dispatcher that `include`s a per-spec-version sub-grammar, so all of them
+must be registered for `source.yaml` to tokenize at all.
+
+The JSON/YAML/Markdown/CSS fixtures added alongside them
+(`audit/fixtures/json/`, `yaml/`, `md/`, `css/`) are hand-written for this
+repository and are not attributed to microsoft/vscode.
+
 ## microsoft/vscode license (MIT)
 
 ```

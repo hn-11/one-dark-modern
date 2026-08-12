@@ -38,6 +38,10 @@ jobs:
           node scripts/audit-jetbrains.ts
       - name: Accent-family guard (One Dark 2026)
         run: node scripts/audit-accent.ts
+      # dist/ is generated, not committed, so this has to live in the job
+      # that runs `npm run build` rather than with the other audits.
+      - name: Terminal/Vim artifact checks
+        run: npm run audit:artifacts
 
   # Real-grammar + real-LSP flicker audit (scripts/audit-flicker.ts):
   # flags tokens whose color changes when semantic highlighting lands.
@@ -66,3 +70,10 @@ jobs:
         run: go install golang.org/x/tools/gopls@v0.23.0
       - run: echo "$HOME/go/bin" >> "$GITHUB_PATH"
       - run: npm run audit
+      - name: WCAG contrast guard (syntax + ANSI palettes)
+        run: npm run audit:contrast
+      # Resolution snapshot: fails when a change moves a color anywhere in
+      # the fixtures or the selector table. Regenerate with
+      # `npm run oracle -- --write` and review the diff.
+      - name: Oracle snapshot
+        run: npm run oracle -- --check

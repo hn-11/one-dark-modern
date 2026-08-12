@@ -24,7 +24,9 @@
 //
 // Coverage: Go (gopls) and TypeScript (typescript-language-server).
 // Python/Shell have no open-source semantic token servers (Pylance is
-// closed; bash-ls emits none), so they are TM-only here.
+// closed; bash-ls emits none), so they are TM-only here; the same goes for
+// the data/markup languages JSON, JSONC, YAML, Markdown and CSS, which are
+// carried purely for TextMate selector coverage.
 //
 // Usage: npm run audit [-- --update]   (requires gopls on PATH)
 import { createRequire } from "node:module";
@@ -111,7 +113,22 @@ const GRAMMARS: Record<string, { scope: string; file: string }> = {
   jsx: { scope: "source.js.jsx", file: "JavaScriptReact.tmLanguage.json" },
   py: { scope: "source.python", file: "MagicPython.tmLanguage.json" },
   sh: { scope: "source.shell", file: "shell-unix-bash.tmLanguage.json" },
+  json: { scope: "source.json", file: "JSON.tmLanguage.json" },
+  jsonc: { scope: "source.json.comments", file: "JSONC.tmLanguage.json" },
+  yaml: { scope: "source.yaml", file: "yaml.tmLanguage.json" },
+  md: { scope: "text.html.markdown", file: "markdown.tmLanguage.json" },
+  css: { scope: "source.css", file: "css.tmLanguage.json" },
 };
+// grammars that exist only to satisfy an `include` from one of the above
+// (VS Code's YAML grammar dispatches to a per-spec-version sub-grammar). They
+// are never tokenized directly, so they get no fixtures and no extension.
+const SUPPORT_GRAMMARS: Array<{ scope: string; file: string }> = [
+  { scope: "source.yaml.1.3", file: "yaml-1.3.tmLanguage.json" },
+  { scope: "source.yaml.1.2", file: "yaml-1.2.tmLanguage.json" },
+  { scope: "source.yaml.1.1", file: "yaml-1.1.tmLanguage.json" },
+  { scope: "source.yaml.1.0", file: "yaml-1.0.tmLanguage.json" },
+  { scope: "source.yaml.embedded", file: "yaml-embedded.tmLanguage.json" },
+];
 // file extension -> (grammar key, LSP languageId)
 const EXT_LANG: Record<string, { grammar: string; languageId: string }> = {
   ".ts": { grammar: "ts", languageId: "typescript" },
@@ -129,7 +146,9 @@ const onigLib = oniguruma.loadWASM(wasm.buffer as ArrayBuffer).then(() => ({
 const registry = new tm.Registry({
   onigLib,
   loadGrammar: async (scopeName: string) => {
-    const g = Object.values(GRAMMARS).find((g) => g.scope === scopeName);
+    const g =
+      Object.values(GRAMMARS).find((g) => g.scope === scopeName) ??
+      SUPPORT_GRAMMARS.find((g) => g.scope === scopeName);
     if (!g) return null;
     const p = join(root, "audit/grammars", g.file);
     return tm.parseRawGrammar(readFileSync(p, "utf8"), p);
@@ -635,13 +654,20 @@ for (const sub of ["ts", "js"]) {
   }
 }
 
-// Python / Shell: TM-only (rule coverage still counts)
+// TM-only languages: no open-source semantic token server is wired up for
+// these, so they contribute rule coverage only (Python/Shell as before, plus
+// the data/markup languages — JSON/JSONC/YAML/Markdown/CSS).
 let tmOnlyTokens = 0;
-for (const [lang, ext] of [
-  ["py", ".py"],
-  ["sh", ".sh"],
+for (const [lang, dir, ext] of [
+  ["py", "py", ".py"],
+  ["sh", "sh", ".sh"],
+  ["json", "json", ".json"],
+  ["jsonc", "json", ".jsonc"],
+  ["yaml", "yaml", ".yaml"],
+  ["md", "md", ".md"],
+  ["css", "css", ".css"],
 ] as const) {
-  for (const file of listFiles(join(root, "audit/fixtures", lang), ext)) {
+  for (const file of listFiles(join(root, "audit/fixtures", dir), ext)) {
     const tmLines = await tmTokenize(lang, readFileSync(file, "utf8"));
     recordRuleCoverage(tmLines);
     tmOnlyTokens += tmLines.reduce((n, l) => n + l.scopes.length, 0);
@@ -744,7 +770,7 @@ console.log(
     `(unexercised list -> audit/coverage-tm.json)`
 );
 console.log(`allow.json entries: ${allow.length} (${stale.length} unused)`);
-console.log(`py/sh TM-only tokens: ${tmOnlyTokens}`);
+console.log(`TM-only tokens (py/sh/json/jsonc/yaml/md/css): ${tmOnlyTokens}`);
 console.log(`violations: ${findings.length}`);
 
 if (errors.length) {

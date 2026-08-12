@@ -10,11 +10,36 @@
 //   ...refactor + npm run build...
 //   node scripts/oracle.ts > /tmp/after.txt
 //   diff /tmp/before.txt /tmp/after.txt
+//
+// Two flags turn the same dump into a CI guard against *unintended* color
+// changes (docs/IMPROVEMENT-IDEAS.md item 21):
+//
+//   node scripts/oracle.ts --check   compare against audit/oracle-snapshot.txt
+//   node scripts/oracle.ts --write   regenerate that snapshot
+//
+// A deliberate color change is expected to fail --check; the fix is to run
+// --write and review the diff as part of the change.
 import { createRequire } from "node:module";
-import { readFileSync, readdirSync, statSync } from "node:fs";
+import { readFileSync, writeFileSync, readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 import type * as tmTypes from "vscode-textmate";
 import { readJson, root, type Theme } from "./lib.ts";
+
+const SNAPSHOT = "audit/oracle-snapshot.txt";
+const args = process.argv.slice(2);
+const mode = args.includes("--check") ? "check" : args.includes("--write") ? "write" : "print";
+const unknown = args.filter((a) => a !== "--check" && a !== "--write");
+if (unknown.length > 0) {
+  console.error(`oracle: unknown argument(s): ${unknown.join(", ")}`);
+  process.exit(2);
+}
+// Default mode streams to stdout exactly as before; the snapshot modes
+// buffer the same lines instead.
+const lines: string[] = [];
+const emit = (line: string): void => {
+  if (mode === "print") console.log(line);
+  else lines.push(line);
+};
 
 const require = createRequire(import.meta.url);
 const tm = require("vscode-textmate");
@@ -28,6 +53,22 @@ const GRAMMARS: Record<string, { scope: string; file: string; ext: string[] }> =
   jsx: { scope: "source.js.jsx", file: "JavaScriptReact.tmLanguage.json", ext: [".jsx"] },
   py: { scope: "source.python", file: "MagicPython.tmLanguage.json", ext: [".py"] },
   sh: { scope: "source.shell", file: "shell-unix-bash.tmLanguage.json", ext: [".sh"] },
+  json: { scope: "source.json", file: "JSON.tmLanguage.json", ext: [".json"] },
+  jsonc: { scope: "source.json.comments", file: "JSONC.tmLanguage.json", ext: [".jsonc"] },
+  yaml: { scope: "source.yaml", file: "yaml.tmLanguage.json", ext: [".yaml", ".yml"] },
+  md: { scope: "text.html.markdown", file: "markdown.tmLanguage.json", ext: [".md"] },
+  css: { scope: "source.css", file: "css.tmLanguage.json", ext: [".css"] },
+  // include-only sub-grammars (VS Code's YAML grammar dispatches per spec
+  // version); no extension, so no fixture is ever tokenized with them directly
+  "yaml-1.3": { scope: "source.yaml.1.3", file: "yaml-1.3.tmLanguage.json", ext: [] },
+  "yaml-1.2": { scope: "source.yaml.1.2", file: "yaml-1.2.tmLanguage.json", ext: [] },
+  "yaml-1.1": { scope: "source.yaml.1.1", file: "yaml-1.1.tmLanguage.json", ext: [] },
+  "yaml-1.0": { scope: "source.yaml.1.0", file: "yaml-1.0.tmLanguage.json", ext: [] },
+  "yaml-embedded": {
+    scope: "source.yaml.embedded",
+    file: "yaml-embedded.tmLanguage.json",
+    ext: [],
+  },
 };
 
 const theme = readJson<Theme>("themes/one-dark-modern-color-theme.json");
@@ -87,9 +128,7 @@ for (const f of files.sort()) {
     for (let i = 0; i < d.length; i += 2) {
       const fg = (d[i + 1] & 0b00000000111111111000000000000000) >>> 15;
       const fs = (d[i + 1] & 0b00000000000000000111100000000000) >>> 11;
-      console.log(
-        `${f.slice(root.length)}:${ln}:${d[i]}:${(colorMap[fg] ?? "").toLowerCase()}:${fs}`
-      );
+      emit(`${f.slice(root.length)}:${ln}:${d[i]}:${(colorMap[fg] ?? "").toLowerCase()}:${fs}`);
     }
   }
 }
@@ -131,5 +170,42 @@ const resolveLeaf = (path: string[]): string => {
   return `${(s.foreground ?? "-").toLowerCase()}/${s.fontStyle ?? "-"}`;
 };
 for (const sel of [...new Set(flat.map((f) => f.sel))].sort()) {
-  console.log(`SEL ${sel} -> ${resolveLeaf(["source.x", ...sel.split(/\s+/)])}`);
+  emit(`SEL ${sel} -> ${resolveLeaf(["source.x", ...sel.split(/\s+/)])}`);
+}
+
+// ---- snapshot modes ----
+if (mode !== "print") {
+  const current = lines.join("\n") + "\n";
+  const path = join(root, SNAPSHOT);
+  if (mode === "write") {
+    writeFileSync(path, current);
+    console.log(`oracle: wrote ${SNAPSHOT} (${lines.length} lines)`);
+  } else {
+    let expected: string;
+    try {
+      expected = readFileSync(path, "utf8");
+    } catch {
+      console.log(`oracle: no ${SNAPSHOT} - run \`npm run oracle -- --write\` to create it`);
+      process.exit(1);
+    }
+    if (expected === current) {
+      console.log(`oracle: snapshot matches (${lines.length} lines)`);
+    } else {
+      const exp = expected.split("\n");
+      let shown = 0;
+      for (let i = 0; i < Math.max(exp.length, lines.length); i++) {
+        if (exp[i] === lines[i]) continue;
+        if (shown++ >= 20) {
+          console.log("  ... (further differences suppressed)");
+          break;
+        }
+        console.log(`  -${exp[i] ?? "<eof>"}\n  +${lines[i] ?? "<eof>"}`);
+      }
+      console.log(
+        `oracle: snapshot MISMATCH - resolved colors changed. If intended, ` +
+          `run \`npm run oracle -- --write\` and review the diff.`
+      );
+      process.exit(1);
+    }
+  }
 }
