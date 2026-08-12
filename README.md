@@ -45,6 +45,22 @@ attribute keys, with dedicated mappings for Java, Go, JS/TS, Python and
 Shell). It covers the editor, console ANSI colors and VCS gutters; the IDE
 chrome keeps whatever UI theme you use (Dark works well).
 
+### Ghostty / Windows Terminal / Vim
+
+These are generated from the same theme file as terminal/editor artifacts;
+download them from [Releases](https://github.com/hn-11/one-dark-modern/releases)
+like the `.icls`:
+
+- **Ghostty**: `one-dark-modern` — copy it to `~/.config/ghostty/themes/`
+  and set `theme = one-dark-modern` in your Ghostty config.
+- **Windows Terminal**: `one-dark-modern.json` — paste its contents into
+  the `"schemes"` array of Windows Terminal's `settings.json` (or add it
+  as a fragment), then set `"colorScheme": "One Dark Modern"` on your
+  profile.
+- **Vim / Neovim**: `one-dark-modern.vim` — copy it to `~/.vim/colors/` or
+  `~/.config/nvim/colors/`, then run `:colorscheme one-dark-modern`
+  (requires `termguicolors`).
+
 Design principles and the rulings behind color decisions live in
 [docs/PHILOSOPHY.md](docs/PHILOSOPHY.md).
 
@@ -62,12 +78,12 @@ overrides/colors*.json         (ours)      ─┘
 
 - `syntax/` is the theme's own syntax definition: `families.json` maps the
   ten-color vocabulary to hex values, and `tokens.json` holds 14 TextMate
-  rules (~450 scopes) that reference families by name — plus 34 semantic
+  rules (~450 scopes) that reference families by name — plus 30 semantic
   entries. It has **no upstream** — every rule stands on the provenance
   record in `docs/PHILOSOPHY.md`, and the build fails if any rule or
   semantic entry uses a color outside the vocabulary.
 - `overrides/` holds the UI-layer diffs against Dark Modern / 2026 Dark
-  (41 colors, plus the 2026 accent map). An override with the same key as
+  (43 colors, plus the 2026 accent map). An override with the same key as
   an upstream entry replaces it; everything else flows through.
 
 ```sh
