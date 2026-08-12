@@ -15,6 +15,7 @@ on:
     paths:
       - "scripts/build-jetbrains.ts"
       - "scripts/compare-jetbrains-dump.ts"
+      - "scripts/lib.ts"
       - "audit/jetbrains-expected.json"
       - "audit/fixtures/**"
       - "jetbrains-audit/**"
