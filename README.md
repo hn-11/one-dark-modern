@@ -72,17 +72,22 @@ where the theme goes beyond that.
 - **Audited** — language-specific rules exercised in CI against the real
   TextMate grammars, and (where a server exists) real language servers for
   semantic tokens: Go (gopls), TypeScript/JavaScript/JSX/TSX
-  (typescript-language-server), Rust (rust-analyzer), C/C++ (clangd) and
+  (typescript-language-server), Rust (rust-analyzer), C/C++ (clangd),
   TOML (taplo — the server behind Even Better TOML, and the only one that
   emits the `tomlArrayKey`/`tomlTableKey` token types the theme has a rule
-  for), plus TextMate-only audits for Python, Shell, JSON/JSONC, YAML,
-  Markdown, CSS and HTML. HTML is TextMate-only for a concrete reason
-  rather than for lack of trying: VS Code's own
-  `vscode-html-language-server` advertises no `semanticTokensProvider`
-  capability at all, so there is no semantic layer to audit — its embedded
-  `<style>`/`<script>` blocks are still tokenized with the real CSS and
-  JavaScript grammars. Java and Python are additionally verified inside the
-  real JetBrains IDEs by the headless audit.
+  for) and Python (basedpyright — pyright itself has no semantic tokens;
+  the open-source fork added them), plus TextMate-only audits for Shell,
+  JSON/JSONC, YAML, Markdown, CSS and HTML. The TM-only list is an
+  empirical result, not an assumption: every candidate server was
+  installed and probed, and none of them advertises a
+  `semanticTokensProvider` capability (bash-language-server, the
+  vscode-langservers-extracted JSON/CSS/HTML servers, yaml-language-server
+  — versions recorded in `scripts/audit-flicker.ts`). Markdown's marksman
+  does advertise one, but it paints class-only labels for a server VS
+  Code never runs, so it was rejected with the evidence on record. HTML's
+  embedded `<style>`/`<script>` blocks are still tokenized with the real
+  CSS and JavaScript grammars. Java and Python are additionally verified
+  inside the real JetBrains IDEs by the headless audit.
 - **Dedicated rules, not yet audited** — the ruleset carries
   language-specific selectors (inherited from One Dark Pro and curated by
   provenance) for PHP, Ruby, Java, C#, Swift, Elixir, Clojure, Haskell,
@@ -132,14 +137,14 @@ Requires Node.js >= 23.6 (scripts run as native TypeScript).
 
 `npm run audit` (also run in CI) tokenizes `audit/fixtures/` with the real
 TextMate grammars and queries real language servers (gopls,
-typescript-language-server, rust-analyzer, clangd, taplo) for semantic
-tokens, then reports every token whose color would visibly change when
-semantic highlighting lands. The rule: semantic may *correct* tokens
-TextMate left at the plain foreground, but must not repaint a color
+typescript-language-server, rust-analyzer, clangd, taplo, basedpyright)
+for semantic tokens, then reports every token whose color would visibly
+change when semantic highlighting lands. The rule: semantic may *correct*
+tokens TextMate left at the plain foreground, but must not repaint a color
 TextMate set deliberately — intentional exceptions live in
 `audit/allow.json` with reasons (optionally scoped to an exact TM color via
-`tmColor`). Python, Shell, JSON, YAML, Markdown, CSS and HTML are TM-only
-(Pylance is closed-source; the rest have no semantic-token server — see
+`tmColor`). Shell, JSON, YAML, Markdown, CSS and HTML are TM-only because
+no usable server advertises semantic tokens — probed, not assumed (see
 Language support). Unmapped semantic tokens are resolved through VS Code's
 default scope-map fallback, fontStyle changes count as flickers, and both
 themes' syntax layers are asserted identical before the run.

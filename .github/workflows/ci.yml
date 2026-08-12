@@ -116,6 +116,12 @@ jobs:
           curl -sSLf https://github.com/tamasfe/taplo/releases/download/0.9.3/taplo-full-linux-x86_64.gz \
             | gunzip > "$HOME/.local/bin/taplo"
           chmod +x "$HOME/.local/bin/taplo"
+      # basedpyright is the Python semantic-token server: pyright itself
+      # advertises no semanticTokensProvider (Pylance-only feature upstream);
+      # the open-source fork added one, which is what makes Python auditable
+      # at all. Pinned so a release cannot silently change the combo set.
+      - name: Install basedpyright
+        run: pip install --quiet basedpyright==1.39.9
       - run: |
           echo "$HOME/go/bin" >> "$GITHUB_PATH"
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
@@ -123,7 +129,7 @@ jobs:
       # rust-analyzer needs a cargo toolchain to load audit/fixtures/rust; the
       # runner image ships one, so this only proves it before the audit runs.
       - name: Check cargo is available
-        run: cargo --version && rust-analyzer --version && clangd --version && taplo --version
+        run: cargo --version && rust-analyzer --version && clangd --version && taplo --version && basedpyright-langserver --version
       - run: npm run audit
       - name: WCAG contrast guard (syntax + ANSI palettes)
         run: npm run audit:contrast

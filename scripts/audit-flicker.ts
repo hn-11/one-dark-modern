@@ -23,28 +23,39 @@
 //     growth of that list fails the audit
 //
 // Coverage: Go (gopls), TypeScript (typescript-language-server), Rust
-// (rust-analyzer), C++ (clangd) and TOML (taplo). Rust and C++ are what reach
+// (rust-analyzer), C++ (clangd), TOML (taplo) and Python (basedpyright).
+// Rust and C++ are what reach
 // the semantic entries no other language emits — `macro`, `typeParameter`, `enum`, `struct`,
 // `variable.constant` (docs/IMPROVEMENT-IDEAS.md item 12).
 // TOML is what reaches `tomlArrayKey`/`tomlTableKey`, the taplo-specific token
 // types the theme's `tomlArrayKey` entry exists for.
-// Python/Shell have no open-source semantic token servers (Pylance is
-// closed; bash-ls emits none), so they are TM-only here; the same goes for
-// the data/markup languages JSON, JSONC, YAML, Markdown, CSS and HTML, which
-// are carried purely for TextMate selector coverage. (HTML is TM-only for a
-// concrete reason: vscode-html-language-server returns no
-// semanticTokensProvider capability - see the TM-only loop below.)
 //
-// gopls and typescript-language-server are mandatory. rust-analyzer, clangd and
-// taplo are OPTIONAL locally: a missing one prints a warning and skips that
-// language's *semantic* pass (its TextMate pass always runs, so TM coverage
-// never depends on a toolchain being installed). CI installs all three, so the
-// skip can never hide a regression on main.
+// Which languages are TM-only is an EMPIRICAL result, not an assumption. Every
+// candidate below was installed and sent a real `initialize` over stdio; the
+// verdict is whatever `capabilities.semanticTokensProvider` came back as:
+//   Shell     bash-language-server 5.6.0            -> absent  (TM-only)
+//   JSON/JSONC vscode-json-language-server 4.10.0   -> absent  (TM-only)
+//   YAML      yaml-language-server 1.24.0           -> absent  (TM-only)
+//   CSS       vscode-css-language-server 4.10.0     -> absent  (TM-only)
+//   HTML      vscode-html-language-server 4.10.0    -> absent  (TM-only)
+//   Python    basedpyright 1.39.9                   -> PRESENT (audited)
+//   Markdown  marksman 2024-12-18                   -> PRESENT but rejected
+// Pyright itself famously has no semantic tokens; basedpyright, the
+// open-source fork, added them, which is why it (and not pyright) is wired up.
+// marksman's tokens are class-only labels for a server VS Code never runs -
+// see the TM-only loop below for the full rejection rationale.
+//
+// gopls and typescript-language-server are mandatory. rust-analyzer, clangd,
+// taplo and basedpyright are OPTIONAL locally: a missing one prints a
+// warning and skips that language's *semantic* pass (its TextMate pass always
+// runs, so TM coverage never depends on a toolchain being installed). CI
+// installs all of them, so the skip can never hide a regression on main.
 //
 // Usage: npm run audit [-- --update]
 //   requires: gopls on PATH; optionally rust-analyzer (`rustup component add
-//   rust-analyzer rust-src`), clangd (`apt-get install clangd`) and taplo (the
-//   "full" prebuilt release binary, which is the one with the `lsp` subcommand).
+//   rust-analyzer rust-src`), clangd (`apt-get install clangd`), taplo (the
+//   "full" prebuilt release binary, which is the one with the `lsp`
+//   subcommand) and basedpyright (`pip install basedpyright`).
 import { createRequire } from "node:module";
 import { readFileSync, writeFileSync, readdirSync, statSync, mkdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -821,17 +832,59 @@ for (const sub of ["ts", "js"]) {
   }
 }
 
-// TM-only languages: no open-source semantic token server is wired up for
-// these, so they contribute rule coverage only (Python/Shell as before, plus
-// the data/markup languages — JSON/JSONC/YAML/Markdown/CSS/HTML).
+// Python: basedpyright. Plain pyright advertises no semanticTokensProvider at
+// all; basedpyright (the open-source fork) added one, with a legend that
+// extends the standard set with `selfParameter` / `clsParameter` and the
+// `builtin` modifier. The fixtures are stdlib-only scripts, so the server needs
+// no virtualenv and no third-party stubs - the default environment resolves
+// everything it reports.
+{
+  const dir = join(root, "audit/fixtures/py");
+  const server = findServer(["basedpyright-langserver"]);
+  if (!server)
+    skipLang(
+      ["python"],
+      ["basedpyright-langserver"],
+      "install it with `pip install basedpyright` (pyright itself has NO " +
+        "semanticTokensProvider; the fork is the one that added it)."
+    );
+  const session = server ? new SemanticSession(server, ["--stdio"], dir, {}, {}) : null;
+  try {
+    for (const file of listFiles(dir, ".py")) {
+      const text = readFileSync(file, "utf8");
+      const tmLines = await tmTokenize("py", text);
+      recordRuleCoverage(tmLines);
+      if (!session) continue;
+      const sem = await session.tokens(file, "python", text);
+      checkNonEmpty(file, sem.length);
+      semTotal += sem.length;
+      const r = compare("python", relative(root, file), text, tmLines, sem);
+      findings.push(...r.findings);
+      corrections += r.corrections;
+    }
+  } finally {
+    session?.kill();
+  }
+}
+
+// TM-only languages: every candidate open-source server for these was installed
+// and probed; none that matters advertises a semanticTokensProvider (see the
+// table at the top of this file), so they contribute rule coverage only.
+//
+// Markdown deserves its footnote: marksman (2024-12-18) DOES advertise the
+// capability, but its legend is just class/enumMember (every internal kind
+// mapped to `class`) and it paints link-reference labels and footnote anchors -
+// tokens the TM layer deliberately colors per element. Auditing against it
+// would force allow entries for a server VS Code's markdown experience never
+// runs (marksman targets Neovim/Helix; VS Code's builtin markdown support has
+// no semantic tokens at all). Rejected as evidence-backed noise, not skipped.
 let tmOnlyTokens = 0;
 for (const [lang, dir, ext] of [
-  ["py", "py", ".py"],
   ["sh", "sh", ".sh"],
+  ["md", "md", ".md"],
   ["json", "json", ".json"],
   ["jsonc", "json", ".jsonc"],
   ["yaml", "yaml", ".yaml"],
-  ["md", "md", ".md"],
   ["css", "css", ".css"],
   // HTML: vscode-html-language-server (vscode-langservers-extracted 4.10.0, the
   // server VS Code itself ships) advertises NO semanticTokensProvider at all -
@@ -955,7 +1008,7 @@ console.log(
     `(unexercised list -> audit/coverage-tm.json)`
 );
 console.log(`allow.json entries: ${allow.length} (${stale.length} unused)`);
-console.log(`TM-only tokens (py/sh/json/jsonc/yaml/md/css/html): ${tmOnlyTokens}`);
+console.log(`TM-only tokens (sh/md/json/jsonc/yaml/css/html): ${tmOnlyTokens}`);
 if (skippedLangs.size)
   console.log(
     `semantic pass SKIPPED for: ${[...skippedLangs.keys()].join(", ")} ` +

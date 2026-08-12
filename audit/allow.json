@@ -250,5 +250,41 @@
     "type": "macro",
     "tmColor": "#e06c75",
     "reason": "macro *usages* have no scope of their own in the C++ grammar and fall through to variable red; the theme's `macro` entry (blue) is the deliberate colour for the family, and only clangd can tell a macro from a variable."
+  },
+  {
+    "lang": "python",
+    "type": "namespace",
+    "tmColor": "#61afef",
+    "reason": "imported module names: the Python TM grammar has no module scope, so `import functools` leaves the name at whatever surrounding rule catches it (callable blue here). Semantic namespace yellow is the correct meaning and matches ODP's namespace color - same ruling as the two Go namespace entries."
+  },
+  {
+    "lang": "python",
+    "type": "class",
+    "tmColor": "#56b6c2",
+    "reason": "builtin type names (str/int/range) are support.function.builtin.python in the TM grammar and therefore platform cyan. Ruling on record: 'a type is yellow because it is a type, not because of how it is spelled' (docs/PHILOSOPHY.md §6 'Types', same entry class as the C++ auto/size_t allowance)."
+  },
+  {
+    "lang": "python",
+    "type": "class",
+    "tmColor": "#61afef",
+    "reason": "constructor calls (Server(...)): the TM grammar sees a call expression and paints it callable blue; semantic knows it is the class and paints it type yellow - same ruling as the ts-family class entry."
+  },
+  {
+    "lang": "python",
+    "type": "method",
+    "tmColor": "#56b6c2",
+    "reason": "dunder declarations (__init__/__call__): support.function.magic.python is deliberately platform cyan in TM (ODP's magic-method signature), but basedpyright reports them as plain classMember methods with no distinguishing modifier, so no semantic entry can preserve the cyan. Recorded as a known collapse: with a semantic server active, dunders take the ordinary method blue."
+  },
+  {
+    "lang": "python",
+    "type": "property",
+    "tmColor": "#61afef",
+    "reason": "callable-valued attributes (self.fn(...)): the TM grammar sees a call and guesses callable blue; semantic knows the receiver is a property and paints variable-and-key red. Semantic corrects a TM guess - the §4 charter case."
+  },
+  {
+    "lang": "python",
+    "type": "variable",
+    "tmColor": "#d19a66",
+    "reason": "SCREAMING_CASE module globals are constant.other.caps.python and deliberately constant orange in TM (§6 named-constant merge), but Python has no const and basedpyright reports a plain mutable variable with no readonly modifier, so no semantic entry can preserve the orange. Recorded as a known collapse, mirroring the dunder entry above."
   }
 ]

@@ -909,6 +909,7 @@
       "italic": true
     },
     "string.format": "#D19A66",
+    "function.builtin:python": "#56B6C2",
     "operator:c": "#56B6C2",
     "operator:cpp": "#56B6C2",
     "type.defaultLibrary.string:go": "#E5C07B",

@@ -88,6 +88,9 @@
   "string.format": {
     "family": "value-constant"
   },
+  "function.builtin:python": {
+    "family": "platform-and-operator"
+  },
   "operator:c": {
     "family": "platform-and-operator"
   },
