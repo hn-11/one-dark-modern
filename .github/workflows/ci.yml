@@ -62,6 +62,6 @@ jobs:
           key: gopls-${{ runner.os }}-${{ steps.date.outputs.month }}
       - name: Install gopls
         if: steps.gopls-cache.outputs.cache-hit != 'true'
-        run: go install golang.org/x/tools/gopls@latest
+        run: go install golang.org/x/tools/gopls@v0.23.0
       - run: echo "$HOME/go/bin" >> "$GITHUB_PATH"
       - run: npm run audit

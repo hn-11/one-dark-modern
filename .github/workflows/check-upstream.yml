@@ -12,15 +12,17 @@ on:
     - cron: "0 6 * * 1" # weekly (Mon 06:00 UTC) while 2026 Dark churns as the new default; drop back to monthly ("0 6 1 * *") once it stabilizes
   workflow_dispatch:
 
-permissions:
-  actions: write
-  contents: write
-  pull-requests: write
-
 jobs:
   sync:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    permissions:
+      # open the auto-merge PR and enable auto-merge on it
+      contents: write
+      pull-requests: write
+      # approve the action_required run left behind on the bot-authored PR
+      # (see the "Approve the gated run" step below)
+      actions: write
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/setup-node-project
@@ -32,12 +34,26 @@ jobs:
           curl -sSfL -o upstream/2026-dark.json \
             https://raw.githubusercontent.com/microsoft/vscode/main/extensions/theme-defaults/themes/2026-dark.json
 
+      - name: Sanity-check fetched upstream files
+        run: |
+          for f in upstream/dark_modern.json upstream/2026-dark.json; do
+            node -e '
+              const fs = require("fs");
+              const f = process.argv[1];
+              const s = fs.readFileSync(f, "utf8");
+              if (!s.trim() || !s.includes("\"colors\"")) {
+                console.error(`upstream file looks malformed or empty: ${f}`);
+                process.exit(1);
+              }
+            ' "$f"
+          done
+
       - name: Rebuild theme from new snapshots
         run: npm run build
 
       - name: Open PR if anything changed
         id: pr
-        uses: peter-evans/create-pull-request@v8
+        uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8.1.1
         with:
           branch: chore/upstream-sync
           commit-message: "chore: sync upstream themes (Dark Modern / 2026 Dark)"
@@ -62,9 +78,10 @@ jobs:
 
       - name: Enable auto-merge
         if: steps.pr.outputs.pull-request-operation == 'created'
-        run: gh pr merge --auto --squash "${{ steps.pr.outputs.pull-request-number }}"
+        run: gh pr merge --auto --squash "$PR_NUMBER"
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.pr.outputs.pull-request-number }}
 
       - name: Approve the gated run
         if: steps.pr.outputs.pull-request-number != ''
