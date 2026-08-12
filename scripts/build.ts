@@ -18,42 +18,31 @@
 // Run: npm run build
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { readJson as read, root, type Theme } from "./lib.ts";
+import {
+  readJson as read,
+  recolor,
+  root,
+  validateColorMap,
+  validateSemanticSource,
+  validateSyntaxRules,
+  type SemanticEntryShape,
+  type SyntaxRuleShape,
+  type Theme,
+} from "./lib.ts";
 
-type SyntaxRule = { family: string; scope: string[]; settings?: Record<string, string> };
+type SyntaxRule = SyntaxRuleShape;
 
 const darkModern = read<Theme>("upstream/dark_modern.json");
 const dark2026 = read<Theme>("upstream/2026-dark.json");
-const ovColors = read<Record<string, string>>("overrides/colors.json");
-const ovColors2026 = read<Record<string, string>>("overrides/colors-2026.json");
-const accent2026 = read<Record<string, string>>("overrides/accent-2026.json");
-
-// value-level recolor: replace the RGB part, keep any alpha suffix
-const recolor = (colors: Record<string, string>, map: Record<string, string>): Record<string, string> => {
-  const rules = Object.entries(map).map(([from, to]) => ({
-    from: from.toLowerCase(),
-    to: to.toLowerCase(),
-  }));
-  for (const { from } of rules) {
-    if (!/^#[0-9a-f]{6}$/.test(from)) {
-      throw new Error(`accent map key must be a full #rrggbb color: ${from}`);
-    }
-  }
-  return Object.fromEntries(
-    Object.entries(colors).map(([k, v]) => {
-      const lower = v.toLowerCase();
-      for (const { from, to } of rules) {
-        // match the RGB part exactly - either the whole value, or #rrggbb
-        // followed by a 2-digit alpha (never a longer/other-length value)
-        const rest = lower.slice(from.length);
-        if (lower.slice(0, from.length) === from && /^(|[0-9a-f]{2})$/.test(rest)) {
-          return [k, to + rest];
-        }
-      }
-      return [k, v];
-    })
-  );
-};
+const ovColors = validateColorMap("overrides/colors.json", read<unknown>("overrides/colors.json"));
+const ovColors2026 = validateColorMap(
+  "overrides/colors-2026.json",
+  read<unknown>("overrides/colors-2026.json")
+);
+const accent2026 = validateColorMap(
+  "overrides/accent-2026.json",
+  read<unknown>("overrides/accent-2026.json")
+);
 
 // ---- syntax: the theme's own source of truth (shared by both variants) ----
 // syntax/families.json is the color vocabulary (docs/PHILOSOPHY.md section 2);
@@ -61,8 +50,8 @@ const recolor = (colors: Record<string, string>, map: Record<string, string>): R
 // exactly one place and a rule cannot use a color outside the vocabulary.
 // Rule order is significant (VS Code resolves equal-specificity scopes with
 // last-rule-wins).
-const families = read<Record<string, string>>("syntax/families.json");
-const syntaxRules = read<SyntaxRule[]>("syntax/tokens.json");
+const families = validateColorMap("syntax/families.json", read<unknown>("syntax/families.json"));
+const syntaxRules = validateSyntaxRules(read<unknown>("syntax/tokens.json"), families);
 // a scope may appear exactly once across all rules: a repeat is either dead
 // weight (same rule) or an invisible last-rule-wins conflict (different rule)
 const seenScopes = new Map<string, string>();
@@ -89,8 +78,8 @@ const tokenColors = syntaxRules.map(({ family, scope, settings }) => {
 });
 // semantic rules also reference families by name; the build resolves them,
 // so hex values exist in exactly one file: syntax/families.json
-type SemanticSource = { family: string; italic?: boolean };
-const semanticSource = read<Record<string, SemanticSource>>("syntax/semantic.json");
+type SemanticSource = SemanticEntryShape;
+const semanticSource = validateSemanticSource(read<unknown>("syntax/semantic.json"), families);
 const semanticTokenColors = Object.fromEntries(
   Object.entries(semanticSource).map(([key, { family, ...styles }]) => {
     if (!(family in families)) {
