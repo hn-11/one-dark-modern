@@ -63,19 +63,23 @@ jobs:
       - name: Approve the gated run
         if: steps.pr.outputs.pull-request-number != ''
         run: |
-          for _ in $(seq 1 12); do
-            id=$(gh run list --branch chore/upstream-sync --limit 10 \
-                   --json databaseId,conclusion \
-                   --jq '[.[] | select(.conclusion == "action_required")][0].databaseId')
+          sha=$(gh pr view "$PR" --json headRefOid --jq .headRefOid)
+          for _ in $(seq 1 18); do
+            id=$(gh run list --branch chore/upstream-sync --limit 20 \
+                   --json databaseId,headSha,conclusion \
+                   --jq --arg sha "$sha" \
+                   '[.[] | select(.headSha == $sha and .conclusion == "action_required")][0].databaseId')
             if [ -n "$id" ] && [ "$id" != "null" ]; then
               gh api -X POST "repos/${{ github.repository }}/actions/runs/$id/approve"
               exit 0
             fi
             sleep 10
           done
-          echo "no gated run appeared" >&2
+          echo "no gated run appeared for $sha" >&2
+          exit 1
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR: ${{ steps.pr.outputs.pull-request-number }}
 
       - name: Enable auto-merge
         if: steps.pr.outputs.pull-request-operation == 'created'
