@@ -21,6 +21,8 @@
   "editorError.foreground": "#f85149",
   "editorIndentGuide.activeBackground1": "#707070",
   "editorIndentGuide.background1": "#404040",
+  "textPreformat.background": "#98c37915",
+  "textPreformat.foreground": "#98c379",
   "terminal.ansiBlack": "#3f4451",
   "terminal.ansiBlue": "#4aa5f0",
   "terminal.ansiBrightBlack": "#4f5666",
