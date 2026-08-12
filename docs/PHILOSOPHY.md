@@ -264,16 +264,15 @@ several rulings supersede earlier ones.
 
 ### Workbench icons
 
-- **Icon colors stay on VS Code defaults** (2026-08-12). Symbol icons
-  (`symbolIcon.*`) render the same classification as tokens, and a
-  vocabulary mapping was built and shipped briefly — then removed the same
-  day. The doctrine that decided it: this is a syntax theme; the UI layer
-  is touched only when something is genuinely hard to see, and VS Code's
-  icon palette (`#EE9D28`/`#B180D7`/`#75BEFF`) is perfectly legible on the
-  dark workbench. Consistency with the token vocabulary alone does not
-  clear that bar. The same reasoning already keeps `scmGraph`'s
-  color-blind-safe palette, charts, and merge/diff state colors on
-  defaults.
+- **Icon colors stay on VS Code defaults** (2026-08-12). This is a syntax
+  theme: the UI layer is touched only when something is genuinely hard to
+  see or confusable, never for consistency with the token vocabulary
+  alone. VS Code's icon palette is legible on the dark workbench, so
+  `symbolIcon.*` and the other icon keys are not themed — even though the
+  icons render the same classification as tokens. The same bar keeps
+  `scmGraph`'s color-blind-safe palette, charts, and merge/diff state
+  colors on defaults; the 2026 accent remap clears it because upstream's
+  teal collides with syntax cyan `#56B6C2`.
 
 ### Corrections record
 
