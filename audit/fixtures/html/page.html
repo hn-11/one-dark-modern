@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<!-- a top-level comment before the root element -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>One Dark Modern &mdash; HTML fixture</title>
+    <link rel="stylesheet" href="./site.css">
+    <style>
+      /* real CSS, tokenized by the embedded source.css grammar */
+      :root {
+        --accent: #61afef;
+        --fg: rgb(171 178 191 / 90%);
+      }
+
+      body#page.theme-dark > main .card:not(.is-hidden)::after {
+        color: var(--fg);
+        background: linear-gradient(180deg, #282c34 0%, transparent 100%);
+        margin: 0 auto !important;
+        font-family: "Fira Code", monospace;
+        transition: opacity 150ms ease-in-out;
+      }
+
+      @media (prefers-color-scheme: light) {
+        body { background-color: #fafafa; }
+      }
+    </style>
+  </head>
+
+  <body id="page" class="theme-dark layout--wide">
+    <!--
+      A multi-line comment.
+      Entities: &amp; &lt; &gt; &quot; &#169; &#x1F600;
+    -->
+    <header class="site-header" data-testid="header" data-analytics-id="hdr-1">
+      <h1 style="color: #e06c75; font-weight: 600; letter-spacing: .02em">Title &amp; subtitle</h1>
+      <img src="logo.svg" alt="logo" width="32" height="32">
+      <hr>
+      <br />
+    </header>
+
+    <main>
+      <p>Void elements above; below a boolean attribute and a data-* attribute.</p>
+
+      <form action="/subscribe" method="post" novalidate>
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" placeholder="you@example.com"
+               required disabled readonly data-validate="email">
+        <select name="plan" multiple>
+          <option value="free" selected>Free</option>
+          <option value="pro">Pro &rarr; &euro;9</option>
+        </select>
+        <textarea name="notes" rows="3" cols="40" wrap="soft"></textarea>
+        <button type="submit" class="btn btn--primary" autofocus>Send</button>
+      </form>
+
+      <table class="data">
+        <thead>
+          <tr><th scope="col">Key</th><th scope="col">Value</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>&lt;div&gt;</code></td><td>a &copy; b</td></tr>
+        </tbody>
+      </table>
+
+      <ul class="list">
+        <li><a href="https://example.com/?a=1&amp;b=2" target="_blank" rel="noopener">Link</a></li>
+        <li><em>emphasis</em> and <strong>strong</strong> and <span class="x">span</span></li>
+      </ul>
+
+      <input type="checkbox" checked>
+      <svg width="10" height="10"><circle cx="5" cy="5" r="4"></circle></svg>
+    </main>
+
+    <script>
+      // real JavaScript, tokenized by the embedded source.js grammar
+      "use strict";
+
+      const ENDPOINT = "/api/v1/items";
+      let counter = 0;
+
+      class ItemStore {
+        #cache = new Map();
+
+        constructor(endpoint = ENDPOINT) {
+          this.endpoint = endpoint;
+        }
+
+        async fetchAll({ limit = 20, offset = 0 } = {}) {
+          const url = `${this.endpoint}?limit=${limit}&offset=${offset}`;
+          try {
+            const res = await fetch(url, { headers: { Accept: "application/json" } });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const items = await res.json();
+            return items.filter((it) => /^[a-z0-9_-]+$/i.test(it.id));
+          } catch (err) {
+            console.error("fetchAll failed", err);
+            return [];
+          } finally {
+            counter += 1;
+          }
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        const store = new ItemStore();
+        store.fetchAll({ limit: 5 }).then((items) => {
+          for (const { id, name } of items) {
+            console.log(`${id}: ${name ?? "(unnamed)"}`);
+          }
+        });
+      });
+    </script>
+
+    <script type="module" src="./app.js" defer></script>
+  </body>
+</html>

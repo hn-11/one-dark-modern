@@ -48,7 +48,8 @@ welcome.
 
 ## Vendored TextMate grammars (`audit/grammars/`)
 
-Every `*.tmLanguage.json` under `audit/grammars/` is vendored verbatim from
+Every `*.tmLanguage.json` under `audit/grammars/` except
+`toml.tmLanguage.json` (see below) is vendored verbatim from
 microsoft/vscode's bundled language extensions (they are the grammars VS Code
 actually ships, which is the whole point — the audit must tokenize the way the
 editor does). Each file keeps its upstream `information_for_contributors` and
@@ -77,6 +78,24 @@ modified locally.
 | `rust.tmLanguage.json` | `extensions/rust/syntaxes/rust.tmLanguage.json` |
 | `cpp.tmLanguage.json` | `extensions/cpp/syntaxes/cpp.tmLanguage.json` |
 | `cpp.embedded.macro.tmLanguage.json` | `extensions/cpp/syntaxes/cpp.embedded.macro.tmLanguage.json` |
+| `html.tmLanguage.json` | `extensions/html/syntaxes/html.tmLanguage.json` |
+
+`html.tmLanguage.json` is VS Code's `text.html.basic`. It `include`s only
+`source.css` and `source.js` (the `<style>` and `<script>` bodies) besides
+itself, and both of those grammars were already vendored here, so the HTML
+fixture's embedded blocks are tokenized by the same CSS/JavaScript grammars
+VS Code uses — no extra sub-grammar had to be vendored for it.
+
+`toml.tmLanguage.json` is the one grammar here that does **not** come from
+microsoft/vscode: VS Code ships no TOML extension (there is no
+`extensions/toml/` in the repository — verified, the path 404s). It is
+vendored verbatim from
+[`tamasfe/taplo`](https://github.com/tamasfe/taplo)'s VS Code extension
+(`editors/vscode/toml.tmLanguage.json`, scope `source.toml`), i.e. the
+Even Better TOML extension — deliberately the same project as the `taplo`
+language server the audit runs for TOML semantic tokens, and the origin of
+the theme's `tomlArrayKey` semantic rule. taplo is MIT-licensed, Copyright
+(c) 2020 Ferenc Tamás; its license text is reproduced at the end of this file.
 
 `cpp.embedded.macro.tmLanguage.json` is likewise not a language of its own:
 VS Code's C++ grammar hands the body of a `#define` to it, so `source.cpp`
@@ -93,7 +112,10 @@ The JSON/YAML/Markdown/CSS fixtures added alongside them
 (`audit/fixtures/json/`, `yaml/`, `md/`, `css/`) are hand-written for this
 repository and are not attributed to microsoft/vscode. The same goes for the
 Rust and C++ fixtures added for the semantic-coverage work
-(`audit/fixtures/rust/base/` — a minimal cargo project so rust-analyzer has a
+The HTML and TOML fixtures (`audit/fixtures/html/page.html`,
+`audit/fixtures/toml/config.toml`) are likewise hand-written for this
+repository. The same goes for the Rust and C++ fixtures added for the
+semantic-coverage work (`audit/fixtures/rust/base/` — a minimal cargo project so rust-analyzer has a
 workspace to load — and `audit/fixtures/cpp/`, whose `.clangd` file gives
 clangd its compile flags without a machine-specific compilation database).
 
@@ -101,6 +123,35 @@ clangd its compile flags without a machine-specific compilation database).
 
 ```
 Copyright (c) Microsoft Corporation.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```
+
+
+## tamasfe/taplo license (MIT)
+
+Applies to `audit/grammars/toml.tmLanguage.json` only.
+
+```
+MIT License
+
+Copyright (c) 2020 Ferenc Tamás
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -1,0 +1,101 @@
+# A configuration file exercising every TOML construct the grammar knows about.
+# Written for this repository as a TextMate/LSP fixture.
+
+title = "TOML fixture"      # basic string + trailing comment
+enabled = true
+disabled = false
+
+[package]
+name = "one-dark-modern"
+version = "0.1.3"
+description = 'literal string: no \escapes\ here'
+edition = "2021"
+readme = """
+multi-line basic string
+with an escaped quote \" and a line \
+continuation
+"""
+license-text = '''
+multi-line literal string
+\no escapes processed
+'''
+
+# dotted keys
+owner.name = "hn-11"
+owner.contact.email = "nobody@example.com"
+"quoted key" = "quoted"
+'literal key' = 'value'
+site."google.com" = true
+
+[numbers]
+decimal = 42
+negative = -17
+positive = +99
+underscored = 1_000_000
+hex = 0xDEADBEEF
+octal = 0o755
+binary = 0b1101_0110
+float = 3.1415
+exponent = 5e+22
+neg_exponent = -2E-4
+float_underscored = 9_224_617.445_991_228_313
+infinite = inf
+neg_infinite = -inf
+not_a_number = nan
+
+[dates]
+offset_date_time = 1979-05-27T07:32:00Z
+offset_with_zone = 1979-05-27T00:32:00.999999-07:00
+local_date_time = 1979-05-27T07:32:00
+local_date = 1979-05-27
+local_time = 07:32:00
+local_time_frac = 00:32:00.999999
+
+[arrays]
+integers = [1, 2, 3]
+strings = ["alpha", "beta", "gamma"]
+mixed_nested = [[1, 2], ["a", "b"]]
+trailing = [
+  "one",
+  "two",   # comment inside an array
+  "three",
+]
+empty = []
+
+[inline]
+point = { x = 1, y = 2 }
+server = { host = "localhost", port = 8080, secure = false }
+nested = { outer = { inner = "deep" }, list = [1, 2] }
+
+[servers.alpha]
+ip = "10.0.0.1"
+role = "frontend"
+
+[servers.beta]
+ip = "10.0.0.2"
+role = "backend"
+
+# array of tables
+[[products]]
+name = "Hammer"
+sku = 738_594_937
+
+[[products]]  # an empty entry is legal too
+
+[[products]]
+name = "Nail"
+sku = 284758393
+color = "gray"
+
+[[fruit]]
+name = "apple"
+
+[fruit.physical]
+color = "red"
+shape = "round"
+
+[[fruit.variety]]
+name = "red delicious"
+
+[[fruit.variety]]
+name = "granny smith"

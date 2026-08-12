@@ -23,23 +23,28 @@
 //     growth of that list fails the audit
 //
 // Coverage: Go (gopls), TypeScript (typescript-language-server), Rust
-// (rust-analyzer) and C++ (clangd). Rust and C++ are what reach the semantic
-// entries no other language emits — `macro`, `typeParameter`, `enum`, `struct`,
+// (rust-analyzer), C++ (clangd) and TOML (taplo). Rust and C++ are what reach
+// the semantic entries no other language emits — `macro`, `typeParameter`, `enum`, `struct`,
 // `variable.constant` (docs/IMPROVEMENT-IDEAS.md item 12).
+// TOML is what reaches `tomlArrayKey`/`tomlTableKey`, the taplo-specific token
+// types the theme's `tomlArrayKey` entry exists for.
 // Python/Shell have no open-source semantic token servers (Pylance is
 // closed; bash-ls emits none), so they are TM-only here; the same goes for
-// the data/markup languages JSON, JSONC, YAML, Markdown and CSS, which are
-// carried purely for TextMate selector coverage.
+// the data/markup languages JSON, JSONC, YAML, Markdown, CSS and HTML, which
+// are carried purely for TextMate selector coverage. (HTML is TM-only for a
+// concrete reason: vscode-html-language-server returns no
+// semanticTokensProvider capability - see the TM-only loop below.)
 //
-// gopls and typescript-language-server are mandatory. rust-analyzer and clangd
-// are OPTIONAL locally: a missing one prints a warning and skips that language's
-// *semantic* pass (its TextMate pass always runs, so TM coverage never depends
-// on a toolchain being installed). CI installs both, so the skip can never hide
-// a regression on main.
+// gopls and typescript-language-server are mandatory. rust-analyzer, clangd and
+// taplo are OPTIONAL locally: a missing one prints a warning and skips that
+// language's *semantic* pass (its TextMate pass always runs, so TM coverage
+// never depends on a toolchain being installed). CI installs all three, so the
+// skip can never hide a regression on main.
 //
 // Usage: npm run audit [-- --update]
 //   requires: gopls on PATH; optionally rust-analyzer (`rustup component add
-//   rust-analyzer rust-src`) and clangd (`apt-get install clangd`).
+//   rust-analyzer rust-src`), clangd (`apt-get install clangd`) and taplo (the
+//   "full" prebuilt release binary, which is the one with the `lsp` subcommand).
 import { createRequire } from "node:module";
 import { readFileSync, writeFileSync, readdirSync, statSync, mkdirSync } from "node:fs";
 import { execFileSync } from "node:child_process";
@@ -132,6 +137,8 @@ const GRAMMARS: Record<string, { scope: string; file: string }> = {
   css: { scope: "source.css", file: "css.tmLanguage.json" },
   rs: { scope: "source.rust", file: "rust.tmLanguage.json" },
   cpp: { scope: "source.cpp", file: "cpp.tmLanguage.json" },
+  html: { scope: "text.html.basic", file: "html.tmLanguage.json" },
+  toml: { scope: "source.toml", file: "toml.tmLanguage.json" },
 };
 // grammars that exist only to satisfy an `include` from one of the above
 // (VS Code's YAML grammar dispatches to a per-spec-version sub-grammar). They
@@ -145,6 +152,10 @@ const SUPPORT_GRAMMARS: Array<{ scope: string; file: string }> = [
   // VS Code's C++ grammar hands the body of a #define over to this sub-grammar
   { scope: "source.cpp.embedded.macro", file: "cpp.embedded.macro.tmLanguage.json" },
 ];
+// text.html.basic embeds `source.css` (<style>) and `source.js` (<script>);
+// both are already registered above as first-class grammars, so the HTML
+// fixture's embedded blocks tokenize with the real CSS/JS grammars and need
+// no extra support entry here.
 // file extension -> (grammar key, LSP languageId)
 const EXT_LANG: Record<string, { grammar: string; languageId: string }> = {
   ".ts": { grammar: "ts", languageId: "typescript" },
@@ -775,9 +786,44 @@ for (const sub of ["ts", "js"]) {
   }
 }
 
+// TOML: taplo's language server (`taplo lsp stdio`, the "full" release build)
+// is the server behind the Even Better TOML extension, and it is the only thing
+// that emits the `tomlArrayKey` / `tomlTableKey` token types the theme's
+// `tomlArrayKey` semanticTokenColors entry was written for. Optional locally
+// like rust-analyzer/clangd; CI installs a pinned prebuilt binary.
+{
+  const dir = join(root, "audit/fixtures/toml");
+  const server = findServer(["taplo"]);
+  if (!server)
+    skipLang(
+      ["toml"],
+      ["taplo"],
+      "install the *full* build (the plain one has no `lsp` subcommand): " +
+        "curl -sSL https://github.com/tamasfe/taplo/releases/download/0.9.3/" +
+        "taplo-full-linux-x86_64.gz | gunzip > ~/.local/bin/taplo && chmod +x ~/.local/bin/taplo"
+    );
+  const session = server ? new SemanticSession(server, ["lsp", "stdio"], dir, {}, {}) : null;
+  try {
+    for (const file of listFiles(dir, ".toml")) {
+      const text = readFileSync(file, "utf8");
+      const tmLines = await tmTokenize("toml", text);
+      recordRuleCoverage(tmLines);
+      if (!session) continue;
+      const sem = await session.tokens(file, "toml", text);
+      checkNonEmpty(file, sem.length);
+      semTotal += sem.length;
+      const r = compare("toml", relative(root, file), text, tmLines, sem);
+      findings.push(...r.findings);
+      corrections += r.corrections;
+    }
+  } finally {
+    session?.kill();
+  }
+}
+
 // TM-only languages: no open-source semantic token server is wired up for
 // these, so they contribute rule coverage only (Python/Shell as before, plus
-// the data/markup languages — JSON/JSONC/YAML/Markdown/CSS).
+// the data/markup languages — JSON/JSONC/YAML/Markdown/CSS/HTML).
 let tmOnlyTokens = 0;
 for (const [lang, dir, ext] of [
   ["py", "py", ".py"],
@@ -787,6 +833,12 @@ for (const [lang, dir, ext] of [
   ["yaml", "yaml", ".yaml"],
   ["md", "md", ".md"],
   ["css", "css", ".css"],
+  // HTML: vscode-html-language-server (vscode-langservers-extracted 4.10.0, the
+  // server VS Code itself ships) advertises NO semanticTokensProvider at all -
+  // its initialize result has no such capability, so there is nothing to audit
+  // semantically and no honest way to wire a SemanticSession for it. HTML is
+  // therefore TM-only, which still exercises the embedded CSS/JS grammars.
+  ["html", "html", ".html"],
 ] as const) {
   for (const file of listFiles(join(root, "audit/fixtures", dir), ext)) {
     const tmLines = await tmTokenize(lang, readFileSync(file, "utf8"));
@@ -903,7 +955,7 @@ console.log(
     `(unexercised list -> audit/coverage-tm.json)`
 );
 console.log(`allow.json entries: ${allow.length} (${stale.length} unused)`);
-console.log(`TM-only tokens (py/sh/json/jsonc/yaml/md/css): ${tmOnlyTokens}`);
+console.log(`TM-only tokens (py/sh/json/jsonc/yaml/md/css/html): ${tmOnlyTokens}`);
 if (skippedLangs.size)
   console.log(
     `semantic pass SKIPPED for: ${[...skippedLangs.keys()].join(", ")} ` +

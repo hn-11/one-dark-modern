@@ -72,15 +72,22 @@ where the theme goes beyond that.
 - **Audited** — language-specific rules exercised in CI against the real
   TextMate grammars, and (where a server exists) real language servers for
   semantic tokens: Go (gopls), TypeScript/JavaScript/JSX/TSX
-  (typescript-language-server), Rust (rust-analyzer), C/C++ (clangd), plus
-  TextMate-only audits for Python, Shell, JSON/JSONC, YAML, Markdown and
-  CSS. Java and Python are additionally verified inside the real JetBrains
-  IDEs by the headless audit.
+  (typescript-language-server), Rust (rust-analyzer), C/C++ (clangd) and
+  TOML (taplo — the server behind Even Better TOML, and the only one that
+  emits the `tomlArrayKey`/`tomlTableKey` token types the theme has a rule
+  for), plus TextMate-only audits for Python, Shell, JSON/JSONC, YAML,
+  Markdown, CSS and HTML. HTML is TextMate-only for a concrete reason
+  rather than for lack of trying: VS Code's own
+  `vscode-html-language-server` advertises no `semanticTokensProvider`
+  capability at all, so there is no semantic layer to audit — its embedded
+  `<style>`/`<script>` blocks are still tokenized with the real CSS and
+  JavaScript grammars. Java and Python are additionally verified inside the
+  real JetBrains IDEs by the headless audit.
 - **Dedicated rules, not yet audited** — the ruleset carries
   language-specific selectors (inherited from One Dark Pro and curated by
   provenance) for PHP, Ruby, Java, C#, Swift, Elixir, Clojure, Haskell,
-  Groovy, Elm, CoffeeScript, HTML, TOML, INI, Makefile, diff, LaTeX,
-  AsciiDoc, HLSL and Unison, among others. They follow the same vocabulary
+  Groovy, Elm, CoffeeScript, INI, Makefile, diff, LaTeX, AsciiDoc, HLSL
+  and Unison, among others. They follow the same vocabulary
   but no fixture exercises them yet (`audit/coverage-tm.json` tracks the
   gap).
 - **Deliberately dropped** — SCSS/LESS/Sass-specific rules were removed by
@@ -104,7 +111,7 @@ overrides/colors*.json         (ours)      ─┘
 
 - `syntax/` is the theme's own syntax definition: `families.json` maps the
   ten-color vocabulary to hex values, and `tokens.json` holds 14 TextMate
-  rules (~450 scopes) that reference families by name — plus 30 semantic
+  rules (~420 scopes) that reference families by name — plus 34 semantic
   entries. It has **no upstream** — every rule stands on the provenance
   record in `docs/PHILOSOPHY.md`, and the build fails if any rule or
   semantic entry uses a color outside the vocabulary.
@@ -125,13 +132,17 @@ Requires Node.js >= 23.6 (scripts run as native TypeScript).
 
 `npm run audit` (also run in CI) tokenizes `audit/fixtures/` with the real
 TextMate grammars and queries real language servers (gopls,
-typescript-language-server) for semantic tokens, then reports every token
-whose color would visibly change when semantic highlighting lands. The rule:
-semantic may *correct* tokens TextMate left at the plain foreground, but must
-not repaint a color TextMate set deliberately — intentional exceptions live in
+typescript-language-server, rust-analyzer, clangd, taplo) for semantic
+tokens, then reports every token whose color would visibly change when
+semantic highlighting lands. The rule: semantic may *correct* tokens
+TextMate left at the plain foreground, but must not repaint a color
+TextMate set deliberately — intentional exceptions live in
 `audit/allow.json` with reasons (optionally scoped to an exact TM color via
-`tmColor`). Python/Shell are TM-only (Pylance is closed-source; shell has no
-semantic server).
+`tmColor`). Python, Shell, JSON, YAML, Markdown, CSS and HTML are TM-only
+(Pylance is closed-source; the rest have no semantic-token server — see
+Language support). Unmapped semantic tokens are resolved through VS Code's
+default scope-map fallback, fontStyle changes count as flickers, and both
+themes' syntax layers are asserted identical before the run.
 
 ### JetBrains headless audit
 

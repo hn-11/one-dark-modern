@@ -226,6 +226,8 @@
   "rust|variable.macro.mutable",
   "rust|variable.mutable",
   "rust|variable.reference",
+  "toml|tomlArrayKey",
+  "toml|tomlTableKey",
   "typescriptreact|class.defaultLibrary",
   "typescriptreact|interface.declaration",
   "typescriptreact|interface.defaultLibrary",

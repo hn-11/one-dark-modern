@@ -60,6 +60,9 @@ const GRAMMARS: Record<string, { scope: string; file: string; ext: string[] }> =
   css: { scope: "source.css", file: "css.tmLanguage.json", ext: [".css"] },
   rs: { scope: "source.rust", file: "rust.tmLanguage.json", ext: [".rs"] },
   cpp: { scope: "source.cpp", file: "cpp.tmLanguage.json", ext: [".cpp"] },
+  // text.html.basic embeds source.css / source.js, both registered above
+  html: { scope: "text.html.basic", file: "html.tmLanguage.json", ext: [".html"] },
+  toml: { scope: "source.toml", file: "toml.tmLanguage.json", ext: [".toml"] },
   "cpp-embedded-macro": {
     scope: "source.cpp.embedded.macro",
     file: "cpp.embedded.macro.tmLanguage.json",

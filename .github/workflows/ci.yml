@@ -97,13 +97,33 @@ jobs:
       # would still be missing its resource directory).
       - name: Install clangd
         run: sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends clangd >/dev/null
+      # taplo is the TOML language server (the one behind the Even Better TOML
+      # extension) and the only server that emits the tomlArrayKey/tomlTableKey
+      # token types the theme has a semanticTokenColors entry for. The plain
+      # `taplo-linux-*` asset is the CLI only - the `-full-` build is the one
+      # with the `lsp` subcommand. Pinned, so a taplo release cannot silently
+      # change the observed combo set; single binary, so it caches trivially.
+      - name: Cache taplo
+        id: taplo-cache
+        uses: actions/cache@v6
+        with:
+          path: ~/.local/bin/taplo
+          key: taplo-0.9.3-${{ runner.os }}
+      - name: Install taplo
+        if: steps.taplo-cache.outputs.cache-hit != 'true'
+        run: |
+          mkdir -p "$HOME/.local/bin"
+          curl -sSLf https://github.com/tamasfe/taplo/releases/download/0.9.3/taplo-full-linux-x86_64.gz \
+            | gunzip > "$HOME/.local/bin/taplo"
+          chmod +x "$HOME/.local/bin/taplo"
       - run: |
           echo "$HOME/go/bin" >> "$GITHUB_PATH"
           echo "$HOME/.cargo/bin" >> "$GITHUB_PATH"
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
       # rust-analyzer needs a cargo toolchain to load audit/fixtures/rust; the
       # runner image ships one, so this only proves it before the audit runs.
       - name: Check cargo is available
-        run: cargo --version && rust-analyzer --version && clangd --version
+        run: cargo --version && rust-analyzer --version && clangd --version && taplo --version
       - run: npm run audit
       - name: WCAG contrast guard (syntax + ANSI palettes)
         run: npm run audit:contrast
