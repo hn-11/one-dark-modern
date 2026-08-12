@@ -5,7 +5,7 @@
 // into a fragment), then set "colorScheme": "One Dark Modern".
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { blend, loadBuiltTheme, root, uiColor } from "./lib.ts";
+import { ANSI_NAMES, blend, loadBuiltTheme, root, uiColor } from "./lib.ts";
 
 const theme = loadBuiltTheme();
 const ui = (key: string, fallback: string): string => uiColor(theme, key, fallback);
@@ -13,28 +13,24 @@ const ui = (key: string, fallback: string): string => uiColor(theme, key, fallba
 const background = ui("panel.background", "#181818");
 const ansi = (k: string) => ui(`terminal.ansi${k}`, "#000000");
 
+// Windows Terminal spells the palette its own way ("purple", not "magenta")
+// and keeps its own key order; only the VS Code key names are shared.
+const WT_KEYS = [
+  "black", "red", "green", "yellow", "blue", "purple", "cyan", "white",
+  "brightBlack", "brightRed", "brightGreen", "brightYellow", "brightBlue",
+  "brightPurple", "brightCyan", "brightWhite",
+];
+const ansiPalette = Object.fromEntries(
+  ANSI_NAMES.map((name, i) => [WT_KEYS[i], ansi(name)])
+);
+
 const scheme = {
   name: "One Dark Modern",
   background,
   foreground: ui("terminal.foreground", "#abb2bf"),
   cursorColor: ui("editorCursor.foreground", "#528bff"),
   selectionBackground: blend(ui("terminal.selectionBackground", "#abb2bf30"), background),
-  black: ansi("Black"),
-  red: ansi("Red"),
-  green: ansi("Green"),
-  yellow: ansi("Yellow"),
-  blue: ansi("Blue"),
-  purple: ansi("Magenta"),
-  cyan: ansi("Cyan"),
-  white: ansi("White"),
-  brightBlack: ansi("BrightBlack"),
-  brightRed: ansi("BrightRed"),
-  brightGreen: ansi("BrightGreen"),
-  brightYellow: ansi("BrightYellow"),
-  brightBlue: ansi("BrightBlue"),
-  brightPurple: ansi("BrightMagenta"),
-  brightCyan: ansi("BrightCyan"),
-  brightWhite: ansi("BrightWhite"),
+  ...ansiPalette,
 };
 
 mkdirSync(join(root, "dist/windows-terminal"), { recursive: true });

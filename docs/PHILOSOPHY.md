@@ -273,6 +273,14 @@ several rulings supersede earlier ones.
   `scmGraph`'s color-blind-safe palette, charts, and merge/diff state
   colors on defaults; the 2026 accent remap clears it because upstream's
   teal collides with syntax cyan `#56B6C2`.
+- **`editor.selectionHighlightBorder` is comment gray `#7F848E`**
+  (2026-08-12). It shipped as `#DDDDDD` — a color from no family, with no
+  provenance behind it, brighter than anything else the workbench draws on
+  the editor surface. Neither Dark Modern nor 2026 Dark sets the key, so
+  the choice is ours; the same "other occurrences of this word" job is
+  already done by `editor.wordHighlightBorder`/`wordHighlightStrongBorder`,
+  both `#7F848E`. Matching them makes the occurrence-marking borders one
+  color drawn from the vocabulary instead of two, one of them an orphan.
 
 ### Corrections record
 
@@ -374,7 +382,10 @@ other witness's position does — through a ruling.
 2026 Dark, which remain live upstreams. The test for keeping an entry:
 *"if this were deleted, would the theme's concept be damaged?"* If not,
 defer to upstream — the smaller the overrides, the more the weekly
-auto-sync pays off.
+auto-sync pays off. `overrides/colors-2026.json` is empty on purpose, and
+that emptiness is the test's result, not an omission: 2026 Dark's new
+surfaces (agents, gauge, chat) carry nothing the syntax concept depends on,
+so they stay on upstream's own values.
 
 ## 11. Decisions are data
 

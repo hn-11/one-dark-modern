@@ -16,7 +16,7 @@
 //
 // The theme files are generated - edit syntax/ and overrides/ instead.
 // Run: npm run build
-import { writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { readJson as read, root, type Theme } from "./lib.ts";
 
@@ -34,11 +34,21 @@ const recolor = (colors: Record<string, string>, map: Record<string, string>): R
     from: from.toLowerCase(),
     to: to.toLowerCase(),
   }));
+  for (const { from } of rules) {
+    if (!/^#[0-9a-f]{6}$/.test(from)) {
+      throw new Error(`accent map key must be a full #rrggbb color: ${from}`);
+    }
+  }
   return Object.fromEntries(
     Object.entries(colors).map(([k, v]) => {
       const lower = v.toLowerCase();
       for (const { from, to } of rules) {
-        if (lower.startsWith(from)) return [k, to + lower.slice(from.length)];
+        // match the RGB part exactly - either the whole value, or #rrggbb
+        // followed by a 2-digit alpha (never a longer/other-length value)
+        const rest = lower.slice(from.length);
+        if (lower.slice(0, from.length) === from && /^(|[0-9a-f]{2})$/.test(rest)) {
+          return [k, to + rest];
+        }
       }
       return [k, v];
     })
@@ -53,6 +63,20 @@ const recolor = (colors: Record<string, string>, map: Record<string, string>): R
 // last-rule-wins).
 const families = read<Record<string, string>>("syntax/families.json");
 const syntaxRules = read<SyntaxRule[]>("syntax/tokens.json");
+// a scope may appear exactly once across all rules: a repeat is either dead
+// weight (same rule) or an invisible last-rule-wins conflict (different rule)
+const seenScopes = new Map<string, string>();
+for (const rule of syntaxRules) {
+  for (const scope of rule.scope) {
+    const prev = seenScopes.get(scope);
+    if (prev !== undefined) {
+      throw new Error(
+        `duplicate scope "${scope}" (families: ${prev}, ${rule.family})`
+      );
+    }
+    seenScopes.set(scope, rule.family);
+  }
+}
 const tokenColors = syntaxRules.map(({ family, scope, settings }) => {
   if (family !== "style-only" && !(family in families)) {
     throw new Error(`unknown family "${family}" for scope ${scope[0]}`);
@@ -96,6 +120,7 @@ const buildVariant = (
     tokenColors,
     semanticTokenColors,
   };
+  mkdirSync(join(root, "themes"), { recursive: true });
   writeFileSync(join(root, "themes", file), JSON.stringify(theme, null, 2) + "\n");
   console.log(`built ${name}: ${Object.keys(colors).length} colors`);
 };

@@ -60,6 +60,9 @@
   "property": {
     "family": "variable-and-key"
   },
+  "property.readonly": {
+    "family": "value-constant"
+  },
   "event": {
     "family": "variable-and-key"
   },

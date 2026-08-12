@@ -45,9 +45,23 @@ export const uiColor = (theme: Theme, key: string, fallback: string): string =>
   theme.colors[key] ?? fallback;
 
 
+// the 16 ANSI slots, in palette order, as they are spelled in the
+// `terminal.ansi*` VS Code color keys (shared by the terminal-side builders)
+export const ANSI_NAMES = [
+  "Black", "Red", "Green", "Yellow", "Blue", "Magenta", "Cyan", "White",
+  "BrightBlack", "BrightRed", "BrightGreen", "BrightYellow", "BrightBlue",
+  "BrightMagenta", "BrightCyan", "BrightWhite",
+] as const;
+
 // blend #rrggbbaa over an opaque base; passthrough for #rrggbb
 export const blend = (color: string, base: string): string => {
+  if (!/^#?[0-9a-fA-F]{6}$/.test(base)) {
+    throw new Error(`blend: base must be an opaque #rrggbb color, got "${base}"`);
+  }
   const c = color.replace("#", "");
+  if (c.length !== 6 && c.length !== 8) {
+    throw new Error(`blend: color must be #rrggbb or #rrggbbaa, got "${color}"`);
+  }
   if (c.length !== 8) return "#" + c;
   const a = parseInt(c.slice(6, 8), 16) / 255;
   const mix = (i: number) =>
@@ -60,4 +74,14 @@ export const blend = (color: string, base: string): string => {
   return "#" + mix(0) + mix(2) + mix(4);
 };
 
-export const raw = (hex: string): string => hex.replace("#", "").toLowerCase();
+// .icls hex: exactly 6 digits, no "#", no alpha. Any alpha still present at
+// this point is dropped (opaque approximation) rather than emitted as an
+// invalid 8-digit value; call blend() first where the alpha matters visually.
+export const raw = (hex: string): string => {
+  const c = hex.replace("#", "").toLowerCase();
+  if (c === "") return c; // deliberate "unset" (e.g. SELECTION_FOREGROUND)
+  if (!/^[0-9a-f]{6}([0-9a-f]{2})?$/.test(c)) {
+    throw new Error(`raw: expected #rrggbb or #rrggbbaa, got "${hex}"`);
+  }
+  return c.slice(0, 6);
+};

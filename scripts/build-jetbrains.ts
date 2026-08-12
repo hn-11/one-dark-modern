@@ -10,14 +10,23 @@ import { blend, familyColor, loadBuiltTheme, loadFamilies, raw, root, uiColor } 
 const theme = loadBuiltTheme();
 
 const families = loadFamilies();
-const ui = (key: string, fallback: string): string => uiColor(theme, key, fallback);
 const fam = (name: string): string => familyColor(families, name);
 
+// .icls has no alpha channel: every value must be an opaque #rrggbb. VS Code
+// colors may carry an 8-digit alpha, so each one is flattened onto the
+// surface it sits on before it reaches attr()/colorOptions/raw().
+const uiRaw = (key: string, fallback: string): string => uiColor(theme, key, fallback);
+
 // ---- palette (all values come from the built VS Code theme) --------------
-const editorBg = ui("editor.background", "#1f1f1f");
+const editorBg = blend(uiRaw("editor.background", "#1f1f1f"), "#1f1f1f");
+const panelBg = blend(uiRaw("sideBar.background", "#181818"), "#181818");
+
+// default surface is the editor background; pass a base for panel-side colors
+const ui = (key: string, fallback: string, base: string = editorBg): string =>
+  blend(uiColor(theme, key, fallback), base);
+
 const editorFg = ui("editor.foreground", "#abb2bf");
-const panelBg = ui("sideBar.background", "#181818");
-const border = blend(ui("sideBar.border", "#2b2b2b"), panelBg);
+const border = blend(ui("sideBar.border", "#2b2b2b", panelBg), panelBg);
 
 const keyword = fam("keyword");
 const str = fam("string");
@@ -39,10 +48,10 @@ const namespace = fam("type");
 const decorator = fam("callable");
 const invalid = fam("invalid");
 
-const selectionBg = blend(ui("editor.selectionBackground", "#67769660"), editorBg);
-const caretRow = blend(ui("editor.lineHighlightBackground", "#2c313c"), editorBg);
-const searchBg = blend(ui("editor.findMatchBackground", "#d19a6644"), editorBg);
-const wordHl = blend(ui("editor.wordHighlightBackground", "#d2e0ff2f"), editorBg);
+const selectionBg = ui("editor.selectionBackground", "#67769660");
+const caretRow = ui("editor.lineHighlightBackground", "#2c313c");
+const searchBg = ui("editor.findMatchBackground", "#d19a6644");
+const wordHl = ui("editor.wordHighlightBackground", "#d2e0ff2f");
 
 // ---- .icls editor scheme -------------------------------------------------
 type Attr = { fg?: string; bg?: string; font?: 1 | 2 | 3; effect?: string; effectType?: number };
@@ -56,7 +65,7 @@ const attr = (name: string, a: Attr): string => {
   return `    <option name="${name}">\n      <value>\n        ${opts.join("\n        ")}\n      </value>\n    </option>`;
 };
 
-const ansi = (k: string) => ui(`terminal.ansi${k}`, "#000000");
+const ansi = (k: string) => ui(`terminal.ansi${k}`, "#000000", panelBg);
 const colorOptions: Record<string, string> = {
   ADDED_LINES_COLOR: ui("editorGutter.addedBackground", "#2ea043"),
   ANNOTATIONS_COLOR: ui("editorLineNumber.foreground", "#6e7681"),
@@ -219,10 +228,10 @@ const attributes: Array<[string, Attr]> = [
   ["BASH.FUNCTION_CALL", { fg: fam("string") }],
 
   // console (terminal palette)
-  ["CONSOLE_NORMAL_OUTPUT", { fg: ui("terminal.foreground", "#abb2bf") }],
+  ["CONSOLE_NORMAL_OUTPUT", { fg: ui("terminal.foreground", "#abb2bf", panelBg) }],
   ["CONSOLE_ERROR_OUTPUT", { fg: ansi("Red") }],
   ["CONSOLE_USER_INPUT", { fg: str }],
-  ["CONSOLE_SYSTEM_OUTPUT", { fg: ui("terminal.foreground", "#abb2bf") }],
+  ["CONSOLE_SYSTEM_OUTPUT", { fg: ui("terminal.foreground", "#abb2bf", panelBg) }],
   ["CONSOLE_BLACK_OUTPUT", { fg: ansi("Black") }],
   ["CONSOLE_RED_OUTPUT", { fg: ansi("Red") }],
   ["CONSOLE_GREEN_OUTPUT", { fg: ansi("Green") }],
@@ -242,7 +251,7 @@ const attributes: Array<[string, Attr]> = [
 
   // editor highlights
   ["IDENTIFIER_UNDER_CARET_ATTRIBUTES", { bg: wordHl }],
-  ["WRITE_IDENTIFIER_UNDER_CARET_ATTRIBUTES", { bg: blend(ui("editor.wordHighlightStrongBackground", "#abb2bf26"), editorBg) }],
+  ["WRITE_IDENTIFIER_UNDER_CARET_ATTRIBUTES", { bg: ui("editor.wordHighlightStrongBackground", "#abb2bf26") }],
   ["SEARCH_RESULT_ATTRIBUTES", { bg: searchBg }],
   ["TEXT_SEARCH_RESULT_ATTRIBUTES", { bg: searchBg }],
   ["WRONG_REFERENCES_ATTRIBUTES", { fg: ui("errorForeground", "#f85149") }],

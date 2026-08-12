@@ -5,7 +5,7 @@
 // (requires termguicolors).
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { blend, familyColor, loadBuiltTheme, loadFamilies, root, uiColor } from "./lib.ts";
+import { ANSI_NAMES, blend, familyColor, loadBuiltTheme, loadFamilies, root, uiColor } from "./lib.ts";
 
 const theme = loadBuiltTheme();
 const families = loadFamilies();
@@ -196,12 +196,7 @@ const lines: string[] = [
 ];
 
 // terminal palette
-const ansiKeys = [
-  "Black", "Red", "Green", "Yellow", "Blue", "Magenta", "Cyan", "White",
-  "BrightBlack", "BrightRed", "BrightGreen", "BrightYellow", "BrightBlue",
-  "BrightMagenta", "BrightCyan", "BrightWhite",
-];
-const ansiColors = ansiKeys.map((k) => ui(`terminal.ansi${k}`, "#000000"));
+const ansiColors = ANSI_NAMES.map((k) => ui(`terminal.ansi${k}`, "#000000"));
 lines.push("if has('nvim')");
 ansiColors.forEach((c, i) => lines.push(`  let g:terminal_color_${i} = '${c}'`));
 lines.push("else");

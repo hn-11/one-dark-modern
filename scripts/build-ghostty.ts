@@ -4,17 +4,15 @@
 // ~/.config/ghostty/themes/ and setting `theme = one-dark-modern`.
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { blend, loadBuiltTheme, root, uiColor } from "./lib.ts";
+import { ANSI_NAMES, blend, loadBuiltTheme, root, uiColor } from "./lib.ts";
 
 const theme = loadBuiltTheme();
 const ui = (key: string, fallback: string): string => uiColor(theme, key, fallback);
 
 const background = ui("panel.background", "#181818");
-const ansi = [
-  "Black", "Red", "Green", "Yellow", "Blue", "Magenta", "Cyan", "White",
-  "BrightBlack", "BrightRed", "BrightGreen", "BrightYellow", "BrightBlue",
-  "BrightMagenta", "BrightCyan", "BrightWhite",
-].map((k, i) => `palette = ${i}=${ui(`terminal.ansi${k}`, "#000000")}`);
+const ansi = ANSI_NAMES.map(
+  (k, i) => `palette = ${i}=${ui(`terminal.ansi${k}`, "#000000")}`
+);
 
 const out = [
   ...ansi,
