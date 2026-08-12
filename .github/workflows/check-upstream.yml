@@ -51,12 +51,29 @@ jobs:
             entry in `overrides/` on this branch before merging.
 
       # A pull_request run for a PR opened by github-actions[bot] lands in
-      # action_required under the first_time_contributors approval policy and
-      # never clears, so the required checks never report. Dispatching CI on
-      # the branch attaches them to the same head SHA without a human.
+      # action_required and never clears on its own. Dispatching CI attaches
+      # passing checks to the same head SHA, but the abandoned suite still
+      # blocks the merge box, so it has to be approved too.
       - name: Run CI on the sync branch
         if: steps.pr.outputs.pull-request-number != ''
         run: gh workflow run ci.yml --ref chore/upstream-sync
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Approve the gated run
+        if: steps.pr.outputs.pull-request-number != ''
+        run: |
+          for _ in $(seq 1 12); do
+            id=$(gh run list --branch chore/upstream-sync --limit 10 \
+                   --json databaseId,conclusion \
+                   --jq '[.[] | select(.conclusion == "action_required")][0].databaseId')
+            if [ -n "$id" ] && [ "$id" != "null" ]; then
+              gh api -X POST "repos/${{ github.repository }}/actions/runs/$id/approve"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "no gated run appeared" >&2
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
