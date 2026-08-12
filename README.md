@@ -64,6 +64,32 @@ like the `.icls`:
 Design principles and the rulings behind color decisions live in
 [docs/PHILOSOPHY.md](docs/PHILOSOPHY.md).
 
+## Language support
+
+Any language gets One Dark's generic scope colors; these tiers describe
+where the theme goes beyond that.
+
+- **Audited** — language-specific rules exercised in CI against the real
+  TextMate grammars, and (where a server exists) real language servers for
+  semantic tokens: Go (gopls), TypeScript/JavaScript/JSX/TSX
+  (typescript-language-server), Rust (rust-analyzer), C/C++ (clangd), plus
+  TextMate-only audits for Python, Shell, JSON/JSONC, YAML, Markdown and
+  CSS. Java and Python are additionally verified inside the real JetBrains
+  IDEs by the headless audit.
+- **Dedicated rules, not yet audited** — the ruleset carries
+  language-specific selectors (inherited from One Dark Pro and curated by
+  provenance) for PHP, Ruby, Java, C#, Swift, Elixir, Clojure, Haskell,
+  Groovy, Elm, CoffeeScript, HTML, TOML, INI, Makefile, diff, LaTeX,
+  AsciiDoc, HLSL and Unison, among others. They follow the same vocabulary
+  but no fixture exercises them yet (`audit/coverage-tm.json` tracks the
+  gap).
+- **Deliberately dropped** — SCSS/LESS/Sass-specific rules were removed by
+  ruling (2026-08-12); those files fall back to generic scopes. Zed-editor
+  variants were retired in 0.1.0.
+
+Beyond VS Code, the same source generates artifacts for JetBrains IDEs,
+Ghostty, Windows Terminal and Vim/Neovim (see Installation).
+
 ## How it works
 
 The theme is **generated**. Syntax colors come from this repository's own
