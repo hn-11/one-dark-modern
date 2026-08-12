@@ -16,7 +16,7 @@ const fam = (name: string): string => familyColor(families, name);
 const bg = ui("editor.background", "#1f1f1f");
 const fg = ui("editor.foreground", "#abb2bf");
 const panelBg = ui("sideBar.background", "#181818");
-const border = ui("sideBar.border", "#2b2b2b");
+const border = blend(ui("sideBar.border", "#2b2b2b"), panelBg);
 const keyword = fam("keyword");
 const str = fam("string");
 const num = fam("value-constant");
@@ -59,7 +59,10 @@ const lines: string[] = [
   // UI
   hi("Normal", { fg, bg }),
   hi("NormalFloat", { fg, bg: ui("editorWidget.background", "#202020") }),
-  hi("FloatBorder", { fg: ui("menu.border", "#454545"), bg: ui("editorWidget.background", "#202020") }),
+  hi("FloatBorder", {
+    fg: blend(ui("menu.border", "#454545"), ui("editorWidget.background", "#202020")),
+    bg: ui("editorWidget.background", "#202020"),
+  }),
   hi("Cursor", { fg: bg, bg: ui("editorCursor.foreground", "#528bff") }),
   hi("CursorLine", { bg: cursorLine }),
   hi("CursorColumn", { bg: cursorLine }),

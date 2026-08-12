@@ -17,7 +17,7 @@ const fam = (name: string): string => familyColor(families, name);
 const editorBg = ui("editor.background", "#1f1f1f");
 const editorFg = ui("editor.foreground", "#abb2bf");
 const panelBg = ui("sideBar.background", "#181818");
-const border = ui("sideBar.border", "#2b2b2b");
+const border = blend(ui("sideBar.border", "#2b2b2b"), panelBg);
 
 const keyword = fam("keyword");
 const str = fam("string");
