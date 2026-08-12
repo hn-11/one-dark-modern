@@ -60,15 +60,19 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Enable auto-merge
+        if: steps.pr.outputs.pull-request-operation == 'created'
+        run: gh pr merge --auto --squash "${{ steps.pr.outputs.pull-request-number }}"
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Approve the gated run
         if: steps.pr.outputs.pull-request-number != ''
         run: |
           sha=$(gh pr view "$PR" --json headRefOid --jq .headRefOid)
           for _ in $(seq 1 18); do
-            id=$(gh run list --branch chore/upstream-sync --limit 20 \
-                   --json databaseId,headSha,conclusion \
-                   --jq --arg sha "$sha" \
-                   '[.[] | select(.headSha == $sha and .conclusion == "action_required")][0].databaseId')
+            id=$(gh run list --commit "$sha" --status action_required \
+                   --limit 5 --json databaseId --jq '.[0].databaseId')
             if [ -n "$id" ] && [ "$id" != "null" ]; then
               gh api -X POST "repos/${{ github.repository }}/actions/runs/$id/approve"
               exit 0
@@ -80,9 +84,3 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR: ${{ steps.pr.outputs.pull-request-number }}
-
-      - name: Enable auto-merge
-        if: steps.pr.outputs.pull-request-operation == 'created'
-        run: gh pr merge --auto --squash "${{ steps.pr.outputs.pull-request-number }}"
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
