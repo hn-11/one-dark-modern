@@ -11189,7 +11189,6 @@ SEL keyword.operator.increment -> #56b6c2/-
 SEL keyword.operator.increment.c -> #c678dd/-
 SEL keyword.operator.increment.cpp -> #c678dd/-
 SEL keyword.operator.instanceof.java -> #c678dd/-
-SEL keyword.operator.less -> #d19a66/-
 SEL keyword.operator.logical -> #56b6c2/-
 SEL keyword.operator.logical.go -> #56b6c2/-
 SEL keyword.operator.logical.php -> #56b6c2/-
@@ -11202,7 +11201,6 @@ SEL keyword.operator.optional -> #abb2bf/-
 SEL keyword.operator.quantifier.regexp -> #d19a66/-
 SEL keyword.operator.regexp.php -> #c678dd/-
 SEL keyword.operator.relational -> #56b6c2/-
-SEL keyword.operator.scss -> #56b6c2/-
 SEL keyword.operator.sigil.rust -> #c678dd/-
 SEL keyword.operator.sizeof.c -> #c678dd/-
 SEL keyword.operator.sizeof.cpp -> #c678dd/-
@@ -11219,7 +11217,6 @@ SEL keyword.other.template.begin -> #98c379/-
 SEL keyword.other.template.end -> #98c379/-
 SEL keyword.other.type.php -> #e5c07b/-
 SEL keyword.other.unit -> #d19a66/-
-SEL less rgb-value -> #d19a66/-
 SEL log.error -> #e06c75/-
 SEL log.info -> #98c379/-
 SEL log.warning -> #e5c07b/-
@@ -11374,7 +11371,6 @@ SEL punctuation.terminator.expression.php -> #abb2bf/-
 SEL punctuation.terminator.java -> #abb2bf/-
 SEL punctuation.terminator.statement.c -> #abb2bf/-
 SEL rgb-value -> #56b6c2/-
-SEL selector.sass -> #e06c75/-
 SEL source.ini -> #98c379/-
 SEL source.java -> #e06c75/-
 SEL source.json meta.structure.array.json > constant.language.json -> #d19a66/-
@@ -11408,7 +11404,6 @@ SEL string.unquoted.asciidoc -> #61afef/-
 SEL support.class -> #e5c07b/-
 SEL support.class.math.block.environment.latex -> #61afef/-
 SEL support.constant.color.w3c-standard-color-name.css -> #d19a66/-
-SEL support.constant.color.w3c-standard-color-name.scss -> #d19a66/-
 SEL support.constant.core.php -> #d19a66/-
 SEL support.constant.core.rust -> #d19a66/-
 SEL support.constant.edge -> #c678dd/-
@@ -11419,7 +11414,6 @@ SEL support.constant.math -> #d19a66/-
 SEL support.constant.parser-token.php -> #d19a66/-
 SEL support.constant.property-value -> #abb2bf/-
 SEL support.constant.property-value.css -> #d19a66/-
-SEL support.constant.property-value.scss -> #d19a66/-
 SEL support.constant.property.math -> #d19a66/-
 SEL support.constant.std.php -> #d19a66/-
 SEL support.function -> #56b6c2/-

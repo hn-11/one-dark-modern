@@ -327,6 +327,42 @@ several rulings supersede earlier ones.
   is the proof — regenerating it after the deletion shows only the selector
   strings disappearing and not a single token color moving.
 
+### Preprocessor stylesheets
+
+- **SCSS / LESS / Sass coverage is dropped** (2026-08-12). Owner's ruling:
+  these preprocessors are no longer part of the work this theme is tuned
+  for, so carrying selectors for them is unpaid surface. Six inherited
+  scope strings are deleted:
+  - `support.constant.property-value.scss` and
+    `support.constant.color.w3c-standard-color-name.scss` (value-constant)
+  - `keyword.operator.less` and `less rgb-value` (value-constant)
+  - `keyword.operator.scss` (platform-and-operator)
+  - `selector.sass` (variable-and-key)
+
+  No rule lost its last scope, so the family structure is unchanged.
+
+  **Plain CSS is untouched and remains fully supported.** The css twins of
+  the deleted pairs stay: `support.constant.property-value.css`,
+  `support.constant.color.w3c-standard-color-name.css`,
+  `entity.other.attribute-name.class.css`,
+  `support.type.vendored.property-name.css`,
+  `punctuation.separator.list.comma.css`. No selector covered both css and
+  a preprocessor in one string, so nothing had to be split. The css
+  grammar and its fixtures stay in `audit/`.
+
+  `.scss` / `.less` / `.sass` files are not left unstyled — their grammars
+  emit generic scopes (`entity.name.tag`, `string`, `comment`,
+  `constant.numeric`, `variable`, …) which the language-agnostic families
+  already cover. What is given up is the preprocessor-specific *nuance*,
+  not color.
+
+  Like the dead-selector purge above, this is invisible to the oracle:
+  these selectors were never exercised by any fixture, so the snapshot
+  shows only the SEL lines disappearing and not one token color moving.
+  Unlike that purge, this is a scope decision rather than a correctness
+  one — the selectors were live, just out of scope — so it is **reversible
+  by reverting this commit** should the owner's languages change.
+
 ### Corrections record
 
 Verdicts this project got wrong and later fixed in public — kept here
