@@ -123,20 +123,28 @@ colorize-tests suite (MIT), plus hand-written samples.
 
 ## Upstream sync (automated)
 
-A [scheduled workflow](.github/workflows/check-upstream.yml) (weekly while
+A [scheduled workflow](.github/workflows/upstream-sync.yml) (weekly while
 2026 Dark still churns as the new default; monthly once it settles)
-re-fetches the Microsoft workbench
-themes, rebuilds, and opens an auto-merge PR. CI guards the result
-(typecheck, reproducible build, packaging). Upstream changes flow in
-automatically unless they collide with an override — in that case the
-override wins by construction, so nothing customized can be silently
-reverted. Syntax colors have no upstream and never change via sync.
+re-fetches the Microsoft workbench themes, rebuilds, and carries the change
+all the way to a release: it opens a PR, waits for the required checks
+(`build`, `flicker-audit`), squash-merges, and dispatches the release with
+the next patch version. Upstream changes flow in automatically unless they
+collide with an override — in that case the override wins by construction,
+so nothing customized can be silently reverted. Syntax colors have no
+upstream and never change via sync.
+
+To stop a sync, close its PR: `upstream/` stays where it is and the next
+scheduled run opens a fresh one.
 
 ## Releasing
+
+Upstream syncs release themselves. To cut one by hand:
 
 ```sh
 npm version patch   # builds, stages themes/, commits, tags, and pushes
 ```
 
 The [release workflow](.github/workflows/release.yml) checks the tag against
-`package.json`, builds the `.vsix`, and attaches it to a GitHub Release.
+`package.json`, builds the `.vsix`, and attaches it to a GitHub Release. It
+also accepts a `tag` input via `workflow_dispatch`, which is how the sync
+ships (a tag pushed with `GITHUB_TOKEN` would not start the workflow).

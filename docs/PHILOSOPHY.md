@@ -424,9 +424,10 @@ to check).
 
 ## Operations
 
-- The UI upstreams (Dark Modern, 2026 Dark) sync weekly via an auto-merge
-  PR gated by CI. Syntax has no upstream and never changes via sync.
+- The UI upstreams (Dark Modern, 2026 Dark) sync weekly via a PR gated by
+  CI, which then merges and releases itself. Syntax has no upstream and
+  never changes via sync. Stopping a sync means closing its PR.
 - The maintenance loop is: (a) screenshot a mismatch, (b) adjust `syntax/`
   or `overrides/`, (c) record the ruling here.
-- Releasing is `npm version patch` — five platform artifacts ship
-  automatically.
+- Releasing by hand is `npm version patch` — five platform artifacts ship
+  automatically either way.

@@ -1,0 +1,192 @@
+# Weekly upstream follow-through, end to end: re-fetch the Microsoft workbench
+# themes, prove the rebuild is clean, merge it, and ship it.
+#
+#   detect  -> re-fetch Dark Modern and 2026 Dark (VS Code's default dark theme
+#              since 1.113) into upstream/, rebuild with overrides/ applied
+#   ingest  -> PR on chore/upstream-sync, gated by CI
+#   release -> squash-merge, then dispatch release.yml with the next patch tag
+#
+# shoyu-code-pro-jp runs the same phases under the same step names; the only
+# repo-specific parts are REQUIRED_CHECKS and the "Refresh upstream" step.
+# Keep the two in sync when editing either.
+#
+# overrides/ win over upstream by construction, so nothing customized can
+# revert. Syntax colors have no upstream: syntax/ is this repository's own
+# source of truth (vendored at v0.1.0, curated under docs/PHILOSOPHY.md).
+name: Upstream sync
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # weekly (Mon 06:00 UTC) while 2026 Dark churns as the new default; drop back to monthly ("0 6 1 * *") once it stabilizes
+  workflow_dispatch:
+
+permissions:
+  actions: write # dispatch ci.yml / release.yml, approve gated runs
+  contents: write # push the sync branch, merge it
+  pull-requests: write
+
+concurrency:
+  group: upstream-sync
+  cancel-in-progress: false
+
+env:
+  # Job names from ci.yml that must be green on the PR head before it merges.
+  # Same two contexts the "main protection" ruleset requires.
+  REQUIRED_CHECKS: '["build","flicker-audit"]'
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    # Generous: most of the wall clock is spent waiting on flicker-audit.
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0 # tags, for the next-version computation below
+      - uses: ./.github/actions/setup-node-project
+
+      # The release this run cuts if the sync lands. Computed up front because
+      # package.json has to carry it into the PR - release.yml refuses to
+      # publish a tag that disagrees with package.json.
+      - name: Compute next version
+        id: version
+        run: |
+          latest=$(git tag -l 'v*' --sort=-v:refname | head -1)
+          if [ -z "$latest" ]; then
+            echo "no v* tag to bump from" >&2
+            exit 1
+          fi
+          next=$(echo "${latest#v}" | awk -F. '{printf "v%d.%d.%d", $1, $2, $3 + 1}')
+          echo "next=$next" >> "$GITHUB_OUTPUT"
+          echo "$latest -> $next"
+
+      # --- repo-specific ---
+      - name: Refresh upstream
+        id: refresh
+        env:
+          NEXT: ${{ steps.version.outputs.next }}
+        run: |
+          curl -sSfL -o upstream/dark_modern.json \
+            https://raw.githubusercontent.com/microsoft/vscode/main/extensions/theme-defaults/themes/dark_modern.json
+          curl -sSfL -o upstream/2026-dark.json \
+            https://raw.githubusercontent.com/microsoft/vscode/main/extensions/theme-defaults/themes/2026-dark.json
+          npm run build
+          if git diff --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "upstream unchanged"
+            exit 0
+          fi
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          git --no-pager diff --stat -- upstream/ themes/ > /tmp/summary.txt
+          # --ignore-scripts: this repo's `postversion` pushes to main, which
+          # must not happen here. Only package.json / package-lock.json move.
+          npm version --no-git-tag-version --ignore-scripts "${NEXT#v}"
+
+      - name: Compose PR body
+        if: steps.refresh.outputs.changed == 'true'
+        run: |
+          {
+            echo "Automated upstream sync."
+            echo
+            echo '```'
+            cat /tmp/summary.txt
+            echo '```'
+            echo
+            echo "The diff of \`upstream/\` shows what changed in the sources;"
+            echo "\`themes/\` is the rebuilt result with our \`overrides/\`"
+            echo "applied on top. On merge this workflow cuts"
+            echo "\`${{ steps.version.outputs.next }}\`."
+            echo
+            echo "If a change looks wrong, add or adjust an entry in"
+            echo "\`overrides/\` on this branch before it merges."
+          } > /tmp/pr-body.md
+      # --- /repo-specific ---
+
+      - name: Open PR
+        id: pr
+        if: steps.refresh.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v8
+        with:
+          branch: chore/upstream-sync
+          commit-message: "chore: sync upstream themes (Dark Modern / 2026 Dark)"
+          title: "Sync upstream themes (Dark Modern / 2026 Dark)"
+          body-path: /tmp/pr-body.md
+
+      # A pull_request run for a PR opened by github-actions[bot] lands in
+      # action_required and never clears on its own. Dispatching CI attaches
+      # passing checks to the same head SHA; the abandoned suite still sits on
+      # the merge box, so it gets approved below too.
+      - name: Run CI on the sync branch
+        if: steps.pr.outputs.pull-request-number != ''
+        run: gh workflow run ci.yml --ref chore/upstream-sync
+
+      - name: Approve the gated run
+        if: steps.pr.outputs.pull-request-number != ''
+        env:
+          PR: ${{ steps.pr.outputs.pull-request-number }}
+        run: |
+          sha=$(gh pr view "$PR" --json headRefOid --jq .headRefOid)
+          for _ in $(seq 1 18); do
+            id=$(gh run list --commit "$sha" --status action_required \
+                   --limit 5 --json databaseId --jq '.[0].databaseId')
+            if [ -n "$id" ] && [ "$id" != "null" ]; then
+              gh api -X POST "repos/${{ github.repository }}/actions/runs/$id/approve"
+              exit 0
+            fi
+            sleep 10
+          done
+          # Not fatal: if nothing was gated there is nothing to unblock, and
+          # the merge step below reports the real reason if one is left.
+          echo "::notice::no gated run appeared for $sha"
+
+      # Wait for every REQUIRED_CHECKS context to go green on the PR head.
+      # Two suites can attach the same job name to one SHA (the dispatched run
+      # and the pull_request run), so a name counts as passed if *any* of its
+      # runs succeeded, and as failed only once every run for it is terminal.
+      - name: Wait for required checks
+        if: steps.pr.outputs.pull-request-number != ''
+        env:
+          PR: ${{ steps.pr.outputs.pull-request-number }}
+        run: |
+          for _ in $(seq 1 60); do
+            gh pr view "$PR" --json statusCheckRollup -q '.statusCheckRollup // []' > /tmp/roll.json
+            state=$(jq -r --argjson req "$REQUIRED_CHECKS" '
+              def outcomes($n):
+                [ .[]
+                  | select((.name // .context) == $n)
+                  | (.conclusion // .state)
+                  | if . == "PENDING" or . == "" then null else . end ];
+              [ $req[] as $n
+                | outcomes($n) as $o
+                | if   ($o | any(. == "SUCCESS"))                    then "pass"
+                  elif ($o | length) > 0 and ($o | any(. == null) | not) then "fail"
+                  else "pending" end ]
+              | if all(. == "pass") then "pass"
+                elif any(. == "fail") then "fail"
+                else "pending" end' /tmp/roll.json)
+            echo "checks: $state"
+            case "$state" in
+              pass) exit 0 ;;
+              fail) jq -r '.[] | "\(.name // .context): \(.conclusion // .state)"' /tmp/roll.json
+                    echo "::error::CI failed on the sync branch; not merging" ; exit 1 ;;
+            esac
+            sleep 30
+          done
+          echo "::error::required checks did not conclude in 30 minutes" >&2
+          exit 1
+
+      - name: Merge
+        if: steps.pr.outputs.pull-request-number != ''
+        # -R keeps gh in API-only mode: without it, --delete-branch also tries to
+        # delete the local branch and check out main inside the runner checkout.
+        run: gh pr merge -R "${{ github.repository }}" --squash --delete-branch "${{ steps.pr.outputs.pull-request-number }}"
+
+      # A tag pushed with GITHUB_TOKEN would not start release.yml (GitHub
+      # suppresses workflow triggers from the default token), so the release is
+      # dispatched instead - release.yml creates the tag itself on dispatch.
+      - name: Release
+        if: steps.pr.outputs.pull-request-number != ''
+        run: |
+          gh workflow run release.yml --ref main -f tag="${{ steps.version.outputs.next }}"
+          echo "dispatched release ${{ steps.version.outputs.next }}"
