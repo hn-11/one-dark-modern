@@ -105,7 +105,7 @@
 		"commandCenter.background": "#191A1B",
 		"commandCenter.activeBackground": "#FFFFFF0F",
 		"commandCenter.border": "#2E3031",
-		"editor.background": "#121314",
+		"editor.background": "#000000",
 		"editor.foreground": "#BBBEBF",
 		"editorStickyScroll.background": "#121314",
 		"editorStickyScrollHover.background": "#202122",
