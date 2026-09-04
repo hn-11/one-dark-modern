@@ -17,9 +17,9 @@ It is organized in four parts:
 - **Part IV — Architecture and operations** (§18–21): where the colors live,
   how they are generated and verified, and how the repository is maintained.
 
-Two appendices hold the Zed episode (A) and a glossary (B). Abbreviations
-used throughout — ODP, TM, LSP, base16, flicker — are defined in the
-glossary.
+Two appendices hold the Zed episode (A) and a glossary (B). Terms used
+throughout — One Dark Pro, TextMate, semantic tokens, base16, flicker — are
+defined in the glossary.
 
 ---
 
@@ -122,13 +122,13 @@ Provenance scoring recognizes five strata of the One Dark family:
 
 Scoring is not mechanical vote-counting. Observed regularities:
 
-- A lone deviation by any single witness is suspect (Zed's blue markup
-  tags, ODP's logical-operator cyan carve-out).
-- Two-generation agreement (TextMate-Atom + Zed) against ODP usually means
-  ODP drifted; such colors were restored to origin.
-- When witnesses split cleanly by era (types: yellow in the TextMate
-  stratum, cyan in the tree-sitter stratum), both positions are legitimate
-  lineage; the theme follows the stratum its own stack descends from.
+- A lone deviation by any single witness is suspect (Zed's blue markup tags,
+  One Dark Pro's logical-operator cyan carve-out).
+- Two-generation agreement (TextMate-Atom + Zed) against One Dark Pro usually
+  means One Dark Pro drifted; such colors were restored to origin.
+- When witnesses split cleanly by era (types: yellow in the TextMate stratum,
+  cyan in the tree-sitter stratum), both positions are legitimate lineage; the
+  theme follows the stratum its own stack descends from.
 - A *split no witness makes* is weaker than any witness's position: schemes
   that paint all symbol operators one color are positions; a scheme that
   splits logical operators from the rest is an invention.
@@ -149,14 +149,14 @@ Atom-faithful port.
 
 - **What cannot be misclassified** (keywords, strings, numbers, comments,
   operators, punctuation) belongs to TextMate. Regexes are sufficient there,
-  and TM keeps working before the LSP starts and inside Markdown fences.
+  and TextMate keeps working before the LSP starts and inside Markdown fences.
 - **What can be misclassified** (the role of an identifier: variable? type?
   function?) is corrected by semantic tokens.
-- Therefore: **a semantic rule that repaints a color TextMate set
-  deliberately is a violation.** Semantic may only fill in tokens TM left at
-  the plain foreground, or fix places where TM's own guess is wrong.
-- `npm run audit` (real grammars + real LSPs) enforces this mechanically:
-  a TM↔semantic disagreement is a *flicker* violation. Exceptions exist
+- Therefore: **a semantic rule that repaints a color TextMate set deliberately
+  is a violation.** Semantic may only fill in tokens TextMate left at the
+  plain foreground, or fix places where TextMate's own guess is wrong.
+- `npm run audit` (real grammars + real LSPs) enforces this mechanically: a
+  TextMate↔semantic disagreement is a *flicker* violation. Exceptions exist
   only in `audit/allow.json`, each with a reason.
 
 Rulings argued from this principle: the removal of the semantic `operator`
@@ -177,18 +177,18 @@ This principle outranks upstream fidelity (§6) when they collide.
 ### 6. Upstream pragmatism (no purism)
 
 A faithful rebuild from `atom/one-dark-syntax` was tried once and rejected:
-gray parameters, foreground operators and dark comments did not survive
-daily use. One Dark Pro's ~150 language-specific rules are a decade of
-tuning against real grammars — valuable, but **ODP is a reviewed
-dependency, not canon**. Its rules stood only until provenance review found
-one with a weak pedigree (§3, Part III). ODP thereby completed a demotion
-arc: canon → reviewed dependency → reference. Since v0.1.0 its changes are
-not synced (§19); anything worth importing arrives the same way any other
+gray parameters, foreground operators and dark comments did not survive daily
+use. One Dark Pro's ~150 language-specific rules are a decade of tuning
+against real grammars — valuable, but **One Dark Pro is a reviewed dependency,
+not canon**. Its rules stood only until provenance review found one with a
+weak pedigree (§3, Part III). One Dark Pro thereby completed a demotion arc:
+canon → reviewed dependency → reference. Since v0.1.0 its changes are not
+synced (§19); anything worth importing arrives the same way any other
 witness's position does — through a ruling.
 
 The yardstick for taste calls is eyes calibrated by years of daily use of
 this lineage. Two consequences are recorded honestly: the theme keeps two
-ODP signatures on taste (parameter italic, §12; and it inherited the
+One Dark Pro signatures on taste (parameter italic, §12; and it inherited the
 constants-yellow signature for a long time before evidence retired it,
 §10), and it once rejected a doctrinally-correct scheme (all-plain
 operators, §9) because it looked wrong in practice. **Provenance proposes;
@@ -199,7 +199,7 @@ daily use disposes.**
 The *why* behind a color lives in machine-readable places with reasons,
 not in chat logs or commit messages:
 
-- `audit/allow.json` — where semantic may override TM, and why
+- `audit/allow.json` — where semantic may override TextMate, and why
 - `audit/jetbrains-expected.json` — colors guaranteed in the real IDEs,
   and documented divergences
 - this document — principles and rulings
@@ -242,21 +242,22 @@ ones.
 
 **Symbol operators are cyan `#56B6C2`, in every language** (2026-07-20).
 
-- *Evidence:* no witness splits the operator family. TextMate-era Atom
-  purpled all operators; late Atom left all plain; Zed cyans all; base16
-  files operators under base05 (foreground). The ecosystem survey later
-  showed cyan is one of three viable camps (plain/cyan/purple), shared with
-  akamud and One Dark Pro.nvim.
-- *History:* ODP shipped a mix (logical operators cyan, ternary/optional
-  purple via a word-operator group, arrow purple, rest plain). The mixes
-  failed provenance review and were shed in one sweep. A doctrinally-pure
-  all-plain remedy shipped first and was overruled on sight the same day:
-  washed-out operators failed the living-with-it test, and the all-cyan
-  Zed position was adopted instead.
+- *Evidence:* no witness splits the operator family. TextMate-era Atom purpled
+  all operators; late Atom left all plain; Zed cyans all; base16 files
+  operators under base05 (foreground). The ecosystem survey later showed cyan
+  is one of three viable camps (plain/cyan/purple), shared with akamud and One
+  Dark Pro.nvim.
+- *History:* One Dark Pro shipped a mix (logical operators cyan,
+  ternary/optional purple via a word-operator group, arrow purple, rest
+  plain). The mixes failed provenance review and were shed in one sweep. A
+  doctrinally-pure all-plain remedy shipped first and was overruled on sight
+  the same day: washed-out operators failed the living-with-it test, and the
+  all-cyan Zed position was adopted instead.
 
 **`=>` is an operator, not a keyword** (2026-07-20). The purple arrow
-(TextMate-Atom + ODP) lost to the modern witnesses: official tree-sitter
-lists `"=>"` in the same `@operator` capture as every other symbol.
+(TextMate-Atom + One Dark Pro) lost to the modern witnesses: official
+tree-sitter lists `"=>"` in the same `@operator` capture as every other
+symbol.
 
 **Word operators stay purple**: `new`, `typeof`, `instanceof`, `in`, `of`,
 `delete`, `void`, Python's `and/or/not`. Words are keywords, symbols are
@@ -266,14 +267,14 @@ operators; each family is internally uniform.
 Zed paints these dark red (`punctuation.special`) — a lone Zed invention,
 not imported.
 
-**Go's operators are one cyan family** (`:=` `+` `*` `&` `&&` `==`). ODP's
-Go quirks (`:=` yellow from a 2018 no-reason commit, pointer-purple from a
-2020 bug-report patch) were shed; when the generic operator ruling later
-threatened to strand Go's `&&` on plain, a `.go`-scoped entry kept the
-family whole.
+**Go's operators are one cyan family** (`:=` `+` `*` `&` `&&` `==`). One Dark
+Pro's Go quirks (`:=` yellow from a 2018 no-reason commit, pointer-purple from
+a 2020 bug-report patch) were shed; when the generic operator ruling later
+threatened to strand Go's `&&` on plain, a `.go`-scoped entry kept the family
+whole.
 
 **No semantic `operator` entry.** rust-analyzer and other servers were
-flattening TM's per-language operator colors; the entry was removed under
+flattening TextMate's per-language operator colors; the entry was removed under
 the layering principle (§4).
 
 ### 10. Constants and literals
@@ -283,7 +284,7 @@ the layering principle (§4).
 (`Math.PI`, `JSON`) all wear `#D19A66`, same as numbers and booleans. After
 this merge, yellow means exactly one thing: the type family.
 
-- *Evidence:* the previous yellow split was an ODP-lineage signature no
+- *Evidence:* the previous yellow split was an One Dark Pro-lineage signature no
   other One Dark family shares (the ecosystem's few splitters use cyan or
   violet); base16 files constants and literals together under base09.
 - *History:* the merge initially left `variable.defaultLibrary` yellow.
@@ -297,8 +298,8 @@ query splits `nil` from `true`/`false` — a split the official tree-sitter
 query explicitly contradicts (it groups `true`/`false`/`nil`/`iota` in one
 `@constant.builtin` capture).
 
-**JSON booleans orange** — restores TextMate-Atom + Zed agreement over an
-ODP per-language exception (found in the 2026-07 self-consistency purge,
+**JSON booleans orange** — restores TextMate-Atom + Zed agreement over an One
+Dark Pro per-language exception (found in the 2026-07 self-consistency purge,
 §17).
 
 ### 11. Types
@@ -330,23 +331,22 @@ the 2026-07 purge, §17.)
 Pro paints dot-receivers yellow (`variable.other.object`), so the same
 variable changes color depending on whether it precedes a dot. This was
 rejected under the identity principle (§5); `b` in `a.b.c` falls under the
-same ruling. What ODP wanted from that rule — "container-like things look
-yellow" — is achieved honestly by semantic namespace/class rules. The
-corresponding TM↔semantic disagreements are permanent `allow.json` entries.
+same ruling. What One Dark Pro wanted from that rule — "container-like things
+look yellow" — is achieved honestly by semantic namespace/class rules. The
+corresponding TextMate↔semantic disagreements are permanent `allow.json`
+entries.
 
-**The key family is red across formats**: JSON keys, YAML keys, CSS
-property names (the CSS entry closed a hole in the family, with Zed as
-witness), and TOML array keys (an ODP leftover painted them type-yellow;
-the fossil surfaced the moment semantic rules became family-named —
-"tomlArrayKey: type" reads as wrong in a way "#e5c07b" never did).
-Vendor-prefixed CSS properties (`-webkit-*`) stay cyan: vendor prefixes are
-platform magic.
+**The key family is red across formats**: JSON keys, YAML keys, CSS property
+names (the CSS entry closed a hole in the family, with Zed as witness), and
+TOML array keys (an One Dark Pro leftover painted them type-yellow; the fossil
+surfaced the moment semantic rules became family-named — "tomlArrayKey: type"
+reads as wrong in a way "#e5c07b" never did). Vendor-prefixed CSS properties
+(`-webkit-*`) stay cyan: vendor prefixes are platform magic.
 
-**Parameters are red italic.** The ecosystem survey isolated this as an ODP
-signature (red is common; the italic is not). Kept deliberately as a
-signature — recorded as taste, not provenance (§6). A Python-only
-parameter color was an exception to the family and was purged in 2026-07
-(§17).
+**Parameters are red italic.** The ecosystem survey isolated this as an One
+Dark Pro signature (red is common; the italic is not). Kept deliberately as a
+signature — recorded as taste, not provenance (§6). A Python-only parameter
+color was an exception to the family and was purged in 2026-07 (§17).
 
 ### 13. Embedded boundaries and strings
 
@@ -357,15 +357,15 @@ assignments.
 - *Evidence:* origin + base16's 0F slot ("embedded language tags") + every
   Atom-faithful port (akamud, joshdick, Sublime) agree.
 - *History:* tree-sitter-era Atom *lost* this color (the migration had no
-  brace mapping — translation loss, not a decision), and ODP never carried
-  it.
-- JSX expression braces carry the same scope and the same meaning: a
-  boundary between worlds, deliberately exempt from the workbench's
-  bracket-depth cycling.
+  brace mapping — translation loss, not a decision), and One Dark Pro never
+  carried it.
+- JSX expression braces carry the same scope and the same meaning: a boundary
+  between worlds, deliberately exempt from the workbench's bracket-depth
+  cycling.
 
 **`variable.interpolation` dark red** — same family.
 
-**Regexps are cyan.** ODP's red was a deliberate 2022 change mimicking
+**Regexps are cyan.** One Dark Pro's red was a deliberate 2022 change mimicking
 VS Code Dark+ (issue #678) — mimicking Dark+ is not one of this theme's
 principles. The five-witness score was a thin 3-2 (the modern strata read
 regexps as "special strings", orange); the ecosystem survey (JetBrains,
@@ -375,10 +375,10 @@ akamud, Sublime all cyan) widened the margin and closed the question.
 `${}`).
 
 **HTML entities orange** (Atom+Zed two-generation agreement over an
-unexplained 2017 ODP edit).
+unexplained 2017 One Dark Pro edit).
 
-**CSS units orange** (ODP's red traced to an external 2018 bulk PR baked in
-by a generator rewrite — not even the author's design).
+**CSS units orange** (One Dark Pro's red traced to an external 2018 bulk PR
+baked in by a generator rewrite — not even the author's design).
 
 ### 14. Markup
 
@@ -426,8 +426,8 @@ very document found five self-violations:
 4. A per-language exception color for JSON booleans — fixed (§10).
 5. Shell command names green — reviewed and kept (§15).
 
-A late echo: four Dart-only semantic exceptions (ODP leftovers) were purged
-once family-naming made them visible — the same decision as the
+A late echo: four Dart-only semantic exceptions (One Dark Pro leftovers) were
+purged once family-naming made them visible — the same decision as the
 Python-parameter purge. Lesson: layer consistency (what the flicker audit
 checks) is not family consistency — the former can be satisfied while
 canonizing the latter's violation.
@@ -435,18 +435,18 @@ canonizing the latter's violation.
 **Individual corrections:**
 
 - "Zed doesn't support LSP semantic highlighting" — outdated; it landed
-  2026-02, opt-in. The Zed variants modeled the `"combined"` mode
-  (Appendix A).
+  2026-02, opt-in. The Zed variants modeled the `"combined"` mode (Appendix
+  A).
 - "Type-cyan is a base16 template artifact" — half wrong; see §11.
-- "ODP's regexp red was an accident" — it was a deliberate Dark+ mimicry,
-  which changes the reason it was rejected, not the outcome (§13).
+- "One Dark Pro's regexp red was an accident" — it was a deliberate Dark+
+  mimicry, which changes the reason it was rejected, not the outcome (§13).
 - "Zed's regexp orange is an orphan" — it sides with the modern tree-sitter
   ontology; the cyan ruling stands on other grounds (§13).
-- A `function.defaultLibrary` cyan "fix" shipped briefly and was reverted:
-  the flicker harness showed it *introduced* flicker rather than removing
-  it (§4, §8).
-- An all-plain operator scheme shipped briefly and was reverted when daily
-  use falsified it (§9).
+- A `function.defaultLibrary` cyan "fix" shipped briefly and was reverted: the
+  flicker harness showed it *introduced* flicker rather than removing it (§4,
+  §8).
+- An all-plain operator scheme shipped briefly and was reverted when daily use
+  falsified it (§9).
 
 ---
 
@@ -535,25 +535,25 @@ reproducing another editor's judgment is a research tool, not a product.
 
 ## Appendix B. Glossary
 
-- **ODP** — One Dark Pro, the VS Code theme whose language rules this
-  repository absorbed and then reviewed rule by rule (§6).
-- **TM / TextMate** — the regex-based grammar layer VS Code uses for
-  lexical highlighting; works without a language server (§4).
+- **One Dark Pro** — the VS Code theme whose language rules this repository
+  absorbed and then reviewed rule by rule (§6).
+- **TextMate** — the regex-based grammar layer VS Code uses for lexical
+  highlighting; works without a language server (§4).
 - **Semantic tokens / LSP** — role information (variable, type, function)
-  supplied by a language server, layered on top of TM (§4).
-- **Flicker** — a token whose TM color and semantic color disagree, so it
-  visibly changes color when the language server starts; the unit of the
+  supplied by a language server, layered on top of TextMate (§4).
+- **Flicker** — a token whose TextMate color and semantic color disagree, so
+  it visibly changes color when the language server starts; the unit of the
   `npm run audit` layering check (§4).
 - **base16** — Kempson's 16-slot color-scheme standard; its documented slot
   roles make it the dictionary of record for meaning disputes (§3).
 - **Witness** — one of the five One Dark strata consulted in provenance
   scoring (§3).
-- **Family** — a named meaning group in `syntax/families.json`, the unit
-  in which colors are assigned (§2).
-- **`allow.json`** — the list of sanctioned TM↔semantic disagreements, each
-  with a reason (§7).
+- **Family** — a named meaning group in `syntax/families.json`, the unit in
+  which colors are assigned (§2).
+- **`allow.json`** — the list of sanctioned TextMate↔semantic disagreements,
+  each with a reason (§7).
 - **Dark+ / Dark Modern / 2026 Dark** — VS Code's own default dark themes;
-  Dark Modern and 2026 Dark supply this theme's workbench UI, Dark+ is
-  only relevant as the thing ODP once mimicked (§13).
-- **Workbench** — VS Code's UI chrome (sidebars, tabs, terminal), as
-  opposed to the editor's syntax colors (§1, §16).
+  Dark Modern and 2026 Dark supply this theme's workbench UI, Dark+ is only
+  relevant as the thing One Dark Pro once mimicked (§13).
+- **Workbench** — VS Code's UI chrome (sidebars, tabs, terminal), as opposed
+  to the editor's syntax colors (§1, §16).

@@ -88,8 +88,8 @@ typescript-language-server) for semantic tokens, then reports every token
 whose color would visibly change when semantic highlighting lands. The rule:
 semantic may *correct* tokens TextMate left at the plain foreground, but must
 not repaint a color TextMate set deliberately — intentional exceptions live in
-`audit/allow.json` with reasons (optionally scoped to an exact TM color via
-`tmColor`). Python/Shell are TM-only (Pylance is closed-source; shell has no
+`audit/allow.json` with reasons (optionally scoped to an exact TextMate color via
+`tmColor`). Python/Shell are TextMate-only (Pylance is closed-source; shell has no
 semantic server).
 
 ### JetBrains headless audit
