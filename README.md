@@ -7,7 +7,8 @@ workbench UI.
 - **Syntax**: this repository's own One Dark ruleset (`syntax/`) —
   vendored from a decade of [One Dark Pro](https://github.com/Binaryify/OneDark-Pro)
   grammar tuning at v0.1.0 and curated by provenance against the wider One
-  Dark family since (see [docs/PHILOSOPHY.md](docs/PHILOSOPHY.md)).
+  Dark family since (see [docs/PHILOSOPHY.md](docs/PHILOSOPHY.md) and
+  [docs/DECISIONS.md](docs/DECISIONS.md)).
 - **UI**: Dark Modern's `#181818`/`#1f1f1f` workbench with the `#0078d4` accent.
 - **Terminal / brackets**: One Dark ANSI palette and bracket-pair colors.
 
@@ -45,9 +46,11 @@ attribute keys, with dedicated mappings for Java, Go, JS/TS, Python and
 Shell). It covers the editor, console ANSI colors and VCS gutters; the IDE
 chrome keeps whatever UI theme you use (Dark works well).
 
-Design principles and the rulings behind color decisions live in
-[docs/PHILOSOPHY.md](docs/PHILOSOPHY.md)
-(日本語版: [docs/PHILOSOPHY.ja.md](docs/PHILOSOPHY.ja.md)).
+The design principles live in [docs/PHILOSOPHY.md](docs/PHILOSOPHY.md) and
+the individual color decisions, with their evidence and history, in
+[docs/DECISIONS.md](docs/DECISIONS.md)
+(日本語版: [PHILOSOPHY.ja.md](docs/PHILOSOPHY.ja.md) /
+[DECISIONS.ja.md](docs/DECISIONS.ja.md)).
 
 ## How it works
 
@@ -64,12 +67,31 @@ overrides/colors*.json         (ours)      ─┘
 - `syntax/` is the theme's own syntax definition: `families.json` maps the
   ten-color vocabulary to hex values, and `tokens.json` holds 14 TextMate
   rules (~450 scopes) that reference families by name — plus 34 semantic
-  entries. It has **no upstream** — every rule stands on the provenance
-  record in `docs/PHILOSOPHY.md`, and the build fails if any rule or
-  semantic entry uses a color outside the vocabulary.
+  entries. It has **no upstream** — every rule stands on the decision
+  record in `docs/DECISIONS.md`, and the build fails if any rule or
+  semantic entry uses a color outside the vocabulary. The rules were
+  vendored from the built theme at v0.1.0 (byte-identical output,
+  machine-verified) once every contested One Dark Pro rule had been either
+  confirmed or dropped; the v0.1.1 refactor then collapsed them from 288 to
+  14 by merging same-family rules, with every step verified against the
+  real TextMate engine (identical resolution for all 6,762 fixture tokens
+  and all 464 selectors).
 - `overrides/` holds the UI-layer diffs against Dark Modern / 2026 Dark
   (41 colors, plus the 2026 accent map). An override with the same key as
-  an upstream entry replaces it; everything else flows through.
+  an upstream entry replaces it; everything else flows through. The test
+  for keeping an override: if this were deleted, would the theme's concept
+  be damaged? If not, defer to upstream — the smaller the overrides, the
+  more the auto-sync pays off.
+- `themes/` and `dist/` are generated; never hand-edit them (CI verifies
+  reproducibility). The hand-edited surfaces are `syntax/`, `overrides/`
+  and the records under `audit/`.
+- The built `themes/*.json` is the source of truth for every other
+  platform: the JetBrains `.icls`, Ghostty, Windows Terminal and Vim
+  artifacts are generated from One Dark 2026 (`loadBuiltTheme` in
+  `scripts/lib.ts`), so hex parity holds by construction. They keep the
+  "One Dark Modern" scheme name, which is the extension's identity rather
+  than a variant label. Releasing by hand is `npm version patch` (see
+  Releasing below).
 
 ```sh
 npm ci
@@ -115,12 +137,19 @@ snapshotted in `audit/coverage-semantic.json` (new combos fail the audit until
 reviewed and accepted with `npm run audit -- --update`), and individual scope
 selectors that no fixture exercises are listed in `audit/coverage-tm.json`.
 JetBrains expectations in `audit/jetbrains-expected.json` name vocabulary
-*families*, not hex values, so they track doctrine changes automatically.
+*families*, not hex values, so they track vocabulary changes automatically.
 `npm run oracle` dumps the real engine's resolution of every fixture token
 and every selector — snapshot before and after a `syntax/` restructure and
 diff to prove the restructure is invisible. Fixtures under
 `audit/fixtures/` include files borrowed from microsoft/vscode's
 colorize-tests suite (MIT), plus hand-written samples.
+
+### Maintenance loop
+
+1. Screenshot a mismatch.
+2. Adjust `syntax/` or `overrides/`; run `npm run build` and `npm run audit`.
+3. Record the decision in `docs/DECISIONS.md` (or the reason in
+   `audit/allow.json` when semantic must override TextMate).
 
 ## Upstream sync (automated)
 
