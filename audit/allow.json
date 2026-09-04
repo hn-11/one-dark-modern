@@ -2,7 +2,7 @@
   {
     "lang": "go",
     "type": "namespace",
-    "reason": "TM misreads package references as variables (red) / import paths as strings (green); namespace yellow is the correct meaning and matches ODP's namespace color"
+    "reason": "TextMate misreads package references as variables (red) / import paths as strings (green); namespace yellow is the correct meaning and matches One Dark Pro's namespace color"
   },
   {
     "lang": "go",
@@ -10,7 +10,7 @@
     "modifiers": [
       "readonly"
     ],
-    "reason": "consts are orange by design (constants merged into the literal family, ecosystem-majority ruling 2026-07-20); the Go TM grammar cannot see constness"
+    "reason": "consts are orange by design (constants merged into the literal family, ecosystem-majority ruling 2026-07-20); the Go TextMate grammar cannot see constness"
   },
   {
     "lang": [
@@ -23,7 +23,7 @@
     "modifiers": [
       "readonly"
     ],
-    "reason": "const locals are orange by design (constants merged into the literal family, 2026-07-20); TM only marks some declaration sites"
+    "reason": "const locals are orange by design (constants merged into the literal family, 2026-07-20); TextMate only marks some declaration sites"
   },
   {
     "lang": [
@@ -33,7 +33,7 @@
       "javascriptreact"
     ],
     "type": "enumMember",
-    "reason": "enum members are compile-time constants - orange like variable.readonly (constant/literal merge 2026-07-20); TM has no enum-member awareness"
+    "reason": "enum members are compile-time constants - orange like variable.readonly (constant/literal merge 2026-07-20); TextMate has no enum-member awareness"
   },
   {
     "lang": [
@@ -43,7 +43,7 @@
       "javascriptreact"
     ],
     "type": "class",
-    "reason": "constructor calls: TM guesses function-call blue; semantic class yellow keeps the type family consistent (approved look since Record<> screenshot)"
+    "reason": "constructor calls: TextMate guesses function-call blue; semantic class yellow keeps the type family consistent (approved look since Record<> screenshot)"
   },
   {
     "lang": [
@@ -54,7 +54,7 @@
     ],
     "type": "variable",
     "tmColor": "#e5c07b",
-    "reason": "ODP paints object receivers (variable.other.object) yellow; semantic cannot opt out per-language, and uniform red has been the shipped look since v0.0.2"
+    "reason": "One Dark Pro paints object receivers (variable.other.object) yellow; semantic cannot opt out per-language, and uniform red has been the shipped look since v0.0.2"
   },
   {
     "lang": [
@@ -65,7 +65,7 @@
     ],
     "type": "parameter",
     "tmColor": "#e5c07b",
-    "reason": "same as variable: parameters used as object receivers get TM receiver-yellow"
+    "reason": "same as variable: parameters used as object receivers get TextMate receiver-yellow"
   },
   {
     "lang": [
@@ -76,6 +76,6 @@
     ],
     "type": "property",
     "tmColor": "#e5c07b",
-    "reason": "mid-chain properties (a.b.c) get ODP receiver-yellow via variable.other.object.property; same decision as variable receivers: identity-consistent red wins"
+    "reason": "mid-chain properties (a.b.c) get One Dark Pro receiver-yellow via variable.other.object.property; same decision as variable receivers: identity-consistent red wins"
   }
 ]
