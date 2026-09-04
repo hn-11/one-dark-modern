@@ -104,8 +104,9 @@ Requires Node.js >= 23.6 (scripts run as native TypeScript).
 
 ### Flicker audit
 
-`npm run audit` (also run in CI) tokenizes `audit/fixtures/` with the real
-TextMate grammars and queries real language servers (gopls,
+Colors are verified against real engines, not against mapping tables or
+theme corpora. `npm run audit` (also run in CI) tokenizes `audit/fixtures/` with the real
+TextMate grammars (through `vscode-textmate`) and queries real language servers (gopls,
 typescript-language-server) for semantic tokens, then reports every token
 whose color would visibly change when semantic highlighting lands. The rule:
 semantic may *correct* tokens TextMate left at the plain foreground, but must
@@ -130,7 +131,10 @@ cd .. && node scripts/compare-jetbrains-dump.ts GO
 ```
 
 Known vocabulary limits found this way: IntelliJ has no const/readonly key
-for TS and no parameter key for Python beyond `DEFAULT_PARAMETER`.
+for TS and no parameter key for Python beyond `DEFAULT_PARAMETER`. How much
+verification a platform gets follows how much intelligence sits between the
+theme and the pixels: IntelliJ most, then VS Code, then Vim; terminals are
+passive palettes, so generation correctness is all there is to check.
 
 Coverage is tracked two ways: observed semantic `type.modifier` combos are
 snapshotted in `audit/coverage-semantic.json` (new combos fail the audit until
@@ -148,8 +152,11 @@ colorize-tests suite (MIT), plus hand-written samples.
 
 1. Screenshot a mismatch.
 2. Adjust `syntax/` or `overrides/`; run `npm run build` and `npm run audit`.
-3. Record the decision in `docs/DECISIONS.md` (or the reason in
-   `audit/allow.json` when semantic must override TextMate).
+3. Record the decision in `docs/DECISIONS.md`, the reason in
+   `audit/allow.json` when semantic must override TextMate, or the
+   divergence in `audit/jetbrains-expected.json` when an IDE cannot express
+   it. Check those three records before changing a color; together they are
+   the precedent.
 
 ## Upstream sync (automated)
 

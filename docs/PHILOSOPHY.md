@@ -189,10 +189,9 @@ So a semantic rule that repaints a color TextMate set deliberately is a bug.
 Semantic rules may fill in tokens that TextMate left at the plain foreground
 and fix places where TextMate's own guess is wrong, and nothing else.
 
-`npm run audit` enforces this mechanically, using real grammars and real
-language servers. A TextMate/semantic disagreement is a *flicker*
-violation, and exceptions exist only in `audit/allow.json`, each with a
-reason.
+The flicker audit described in the README enforces this against real
+grammars and real language servers, and the sanctioned exceptions live in
+`audit/allow.json`, each with a reason.
 
 Three decisions follow from this principle: the semantic `operator` entry
 was removed (Decisions §1), the `function.defaultLibrary` fix was reverted
@@ -221,9 +220,8 @@ decade of tuning against real grammars, and that is worth a lot. But One
 Dark Pro is a dependency we review rather than an authority we follow, and
 each of its rules stood only until provenance review found one with a weak
 history. It started as the reference, became a dependency reviewed rule by
-rule, and is now one source among several. Since v0.1.0 its changes are no
-longer synced; anything worth importing arrives the way any other source's
-position does, through a decision.
+rule, and is now one source among several. Anything worth importing from
+it arrives the way any other source's position does, through a decision.
 
 For taste calls the yardstick is eyes calibrated by years of daily use of
 this family of themes. That has had two consequences, and we record both
@@ -233,46 +231,6 @@ before the evidence retired it. Decisions §4 and §2 tell both stories. Second,
 rejected a scheme that was correct on paper — the all-plain operators of
 Decisions §1 — because it looked wrong in practice. History proposes a
 color; daily use has the final say.
-
-### 8. Decisions are written down with reasons
-
-The reason behind a color lives somewhere machine-readable, not in chat
-logs or commit messages.
-
-- `audit/allow.json` says where semantic may override TextMate, and why.
-- `audit/jetbrains-expected.json` says which colors are guaranteed in the
-  real IDEs and documents the divergences.
-- `DECISIONS.md` holds the contested decisions with their evidence and
-  history.
-- This document holds the principles.
-
-Together these form the record of earlier decisions. Check a change against
-that record first, and when a change settles a new question, add it to
-DECISIONS.md.
-
-### 9. Measure, don't assume
-
-Colors are verified against real engines; knowledge, mapping tables and
-corpora do not count.
-
-- VS Code: `vscode-textmate` plus gopls and typescript-language-server,
-  through `npm run audit`.
-- JetBrains: headless GoLand and WebStorm dumping actual token attribute
-  keys with their fallback chains, under `jetbrains-audit/`.
-- The 2026 accent: a hue-band scan guards the 13-color accent family remap.
-
-The repository's own history shows why. A careful manual audit misjudged the
-builtin color, and a theme-corpus check missed the real key
-`GO_LOCAL_VARIABLE`. A plausible semantic "fix" was falsified by the harness
-before it shipped, and a principle change tripped three flicker violations,
-which located the one rule the sweep had missed. Both are in DECISIONS.md,
-under §9 and §2. Every bug class that has happened once gets a machine
-guard.
-
-How much verification a platform gets depends on how much intelligence sits
-between the theme and the pixels: IntelliJ gets the most, then VS Code,
-then Vim. Terminals are passive palettes, so generation correctness is all
-there is to check.
 
 ## Glossary
 
@@ -293,7 +251,7 @@ there is to check.
 - Family: a named meaning group in `syntax/families.json`, the unit in which
   colors are assigned (§2).
 - `allow.json`: the list of accepted TextMate/semantic disagreements, each
-  with a reason (§8).
+  with a reason (§5).
 - Dark+, Dark Modern, 2026 Dark: VS Code's own default dark themes. Dark
   Modern and 2026 Dark supply this theme's workbench UI; Dark+ matters only
   as the theme One Dark Pro once imitated (Decisions §5).

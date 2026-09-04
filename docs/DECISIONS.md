@@ -60,8 +60,7 @@ branch of the family shares; the few ecosystem themes that split at all use
 cyan or violet, and base16 files constants and literals together under
 base09. The merge initially left `variable.defaultLibrary` yellow. Three
 new flicker violations on `JSON` caught it, and the audit forced the fix
-before release. In other words, the principle change located the one rule
-the sweep had missed.
+before release.
 
 `nil`, `null` and `None` are orange, because they are literals. Zed's
 yellow `nil` is isolated twice over: no other implementation uses yellow,
@@ -174,10 +173,10 @@ cleanup and kept.
 
 ## 8. Workbench (UI layer)
 
-Icon colors stay on VS Code defaults. Decided 2026-08-12. This is a syntax
-theme, and we touch the UI layer only when something is genuinely hard to
-see or easy to confuse, never for consistency with the token vocabulary
-alone; Philosophy §3 states the non-goal. VS Code's icon palette is legible
+Icon colors stay on VS Code defaults. Decided 2026-08-12. Per the non-goal
+in Philosophy §3, the UI layer is touched only when something is genuinely
+hard to see or easy to confuse, never for consistency with the token
+vocabulary alone. VS Code's icon palette is legible
 on the dark workbench, so `symbolIcon.*` and the other icon keys are not
 themed, even though the icons render the same classification as the tokens
 do.
@@ -187,7 +186,7 @@ the merge and diff state colors on their defaults.
 
 The 2026 accent remap clears the bar. Upstream's teal collides with the
 syntax cyan `#56B6C2`, so the 13-color accent family is recolored to
-`#528BFF`, guarded by the hue-band scan of Philosophy §9.
+`#528BFF`, guarded by a hue-band scan in CI.
 
 ## 9. Mistakes we corrected
 
@@ -225,27 +224,28 @@ Individual corrections:
   grounds.
 - A `function.defaultLibrary` cyan "fix" shipped briefly and was reverted
   when the flicker harness showed that it introduced flicker instead of
-  removing it (Philosophy §5 and §9).
+  removing it (Philosophy §5).
 - An all-plain operator scheme shipped briefly and was reverted once daily
   use showed it was wrong. §1 has the story.
+- A careful manual audit misjudged the builtin color, and a theme-corpus
+  check missed the real JetBrains key `GO_LOCAL_VARIABLE`. Both are why
+  colors are now verified against real engines (see the README's audit
+  sections) rather than by reading.
 
 ## Appendix. The Zed episode: fidelity as an instrument
 
 For a stretch of v0.0.x this repository also shipped two themes that
 reproduced Zed's One Dark interpretation verbatim, including the parts the
-decisions above reject: blue markup, cyan types, yellow `nil`. Their
-contract was fidelity rather than judgment. They were a mechanical
-translation of Zed's theme slots and semantic rule files, verified token by
-token against real tree-sitter parses with Zed's own vendored queries (more
-than 5,000 captures, zero mismatches), with a "gap-fills yes, bugs no" rule
-for whatever Zed left unspecified. Once it became clear that Zed does
-support opt-in LSP semantic highlighting, they modeled Zed's `"combined"`
-mode, which is one of the corrections in §9.
+decisions above reject: blue markup, cyan types, yellow `nil`. They were a
+mechanical translation of Zed's theme slots and semantic rule files,
+verified token by token against real tree-sitter parses with Zed's own
+vendored queries (more than 5,000 captures, zero mismatches), with a
+"gap-fills yes, bugs no" rule for whatever Zed left unspecified, and they
+modeled Zed's `"combined"` mode once §9's correction about LSP support
+landed.
 
-The variants were retired at v0.1.0, but the episode shaped the principles.
-Living inside Zed's interpretation surfaced most of the operator, markup and
-type-family questions decided above, and the faithful reproduction worked
-as a measuring instrument: several "is our color or Zed's correct?"
-disputes were settled by putting both renderings side by side. Anyone who
-wants Zed's interpretation should use Zed's theme in Zed. Reproducing
-another editor's judgment is a research tool, not a product.
+They were retired at v0.1.0. Several decisions above cite them, because
+putting both renderings side by side settled a number of "is our color or
+Zed's correct?" disputes, and living inside Zed's interpretation is what
+surfaced most of the operator, markup and type-family questions in the
+first place.
