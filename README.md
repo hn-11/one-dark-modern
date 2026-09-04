@@ -46,7 +46,8 @@ Shell). It covers the editor, console ANSI colors and VCS gutters; the IDE
 chrome keeps whatever UI theme you use (Dark works well).
 
 Design principles and the rulings behind color decisions live in
-[docs/PHILOSOPHY.md](docs/PHILOSOPHY.md).
+[docs/PHILOSOPHY.md](docs/PHILOSOPHY.md)
+(日本語版: [docs/PHILOSOPHY.ja.md](docs/PHILOSOPHY.ja.md)).
 
 ## How it works
 

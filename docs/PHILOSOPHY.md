@@ -1,5 +1,7 @@
 # Design Philosophy
 
+> 日本語版: [PHILOSOPHY.ja.md](PHILOSOPHY.ja.md)
+
 This document explains, to a reader with no prior context, why this theme
 colors what it colors — the principles, the evidence system behind them, and
 the complete record of contested rulings. Every color decision in the
