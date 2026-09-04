@@ -73,6 +73,8 @@ Modern、ターミナルのパレットは Atom の one-dark-ui にあった 16 
 ```ts
 import { readFile } from "node:fs/promises";
 
+const MAX_RETRIES = 3;
+
 export async function load(path: string, retries = MAX_RETRIES) {
   const text = await readFile(path);
   return `${text.length} bytes`;
@@ -84,12 +86,16 @@ export async function load(path: string, retries = MAX_RETRIES) {
 | `import` `from` `export` `async` `function` `const` `await` `return` | `keyword`（紫） |
 | `readFile` `load` | `callable`（青） |
 | `"node:fs/promises"` とテンプレート文字列の本文 | `string`（緑） |
-| `path`（パラメータ、イタリック）、`length` | `variable-and-key`（赤） |
+| `path` と `retries`（パラメータ、イタリック）、`length` | `variable-and-key`（赤） |
 | `string` | `type`（黄） |
-| `MAX_RETRIES`、`text`（`const` のローカル変数は定数扱い。決定 §2） | `value-constant`（オレンジ） |
+| `3`、`MAX_RETRIES`、`text`（`const` のローカル変数は定数扱い。決定 §2） | `value-constant`（オレンジ） |
 | `=` | `platform-and-operator`（シアン） |
 | `${` `}` | `embedded-boundary`（暗赤） |
 | `:` `{` `}` `(` `)` `,` `;` `.` | `plain`（前景色） |
+
+これは TypeScript の言語サーバが動いているときの色である。TextMate 単体だと
+ドットの前の `text` と import 内の `readFile` は別の色になるが、その差は決定 §4 で
+認めている例外にあたる。
 
 ### 3. やらないこと
 

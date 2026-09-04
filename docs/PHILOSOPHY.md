@@ -78,6 +78,8 @@ the details.
 ```ts
 import { readFile } from "node:fs/promises";
 
+const MAX_RETRIES = 3;
+
 export async function load(path: string, retries = MAX_RETRIES) {
   const text = await readFile(path);
   return `${text.length} bytes`;
@@ -89,12 +91,16 @@ export async function load(path: string, retries = MAX_RETRIES) {
 | `import` `from` `export` `async` `function` `const` `await` `return` | `keyword` (purple) |
 | `readFile` `load` | `callable` (blue) |
 | `"node:fs/promises"` and the template string text | `string` (green) |
-| `path` (parameter, italic), `length` | `variable-and-key` (red) |
+| `path` and `retries` (parameters, italic), `length` | `variable-and-key` (red) |
 | `string` | `type` (yellow) |
-| `MAX_RETRIES`, `text` (a `const` local is a constant; Decisions §2) | `value-constant` (orange) |
+| `3`, `MAX_RETRIES`, `text` (a `const` local is a constant; Decisions §2) | `value-constant` (orange) |
 | `=` | `platform-and-operator` (cyan) |
 | `${` `}` | `embedded-boundary` (dark red) |
 | `:` `{` `}` `(` `)` `,` `;` `.` | `plain` (foreground) |
+
+These are the colors with the TypeScript language server running. TextMate
+alone paints `text` before the dot and the imported `readFile` differently;
+that gap is the sanctioned exception described in Decisions §4.
 
 ### 3. Non-goals
 

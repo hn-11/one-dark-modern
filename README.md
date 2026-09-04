@@ -65,9 +65,9 @@ overrides/colors*.json         (ours)      ─┘
 ```
 
 - `syntax/` is the theme's own syntax definition: `families.json` maps the
-  ten-color vocabulary to hex values, and `tokens.json` holds 14 TextMate
-  rules (~450 scopes) that reference families by name — plus 34 semantic
-  entries. It has **no upstream** — every rule stands on the decision
+  twelve-family color vocabulary to hex values, and `tokens.json` holds 14
+  TextMate rules (~450 scopes) that reference families by name — plus 30
+  semantic entries. It has **no upstream** — every rule stands on the decision
   record in `docs/DECISIONS.md`, and the build fails if any rule or
   semantic entry uses a color outside the vocabulary. The rules were
   vendored from the built theme at v0.1.0 (byte-identical output,
