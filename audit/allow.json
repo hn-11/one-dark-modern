@@ -109,6 +109,6 @@
     ],
     "type": "function",
     "tmColor": "#e06c75",
-    "reason": "function-valued bindings (var assign = require('object-assign')): TextMate sees a variable declaration (red); semantic function blue matches how the same binding is colored in TypeScript files. TypeScript 7 infers these in plain JavaScript where the old server did not"
+    "reason": "function-valued bindings (var assign = require('object-assign')): TextMate sees a variable declaration (red); semantic function blue matches how the same binding is colored in TypeScript files. The binding only gets a function type when TypeScript 7's server has acquired @types for the module (automatic type acquisition), so the token is function or unclassified depending on the environment; both outcomes pass"
   }
 ]
