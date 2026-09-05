@@ -10,3 +10,7 @@ package-lock.json
 .gitignore
 dist/**
 jetbrains-audit/**
+tools/**
+audit/**
+syntax/**
+docs/**

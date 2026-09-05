@@ -14,7 +14,10 @@ updates:
         patterns: ["*"]
 
   - package-ecosystem: npm
-    directory: /
+    # tools/vsce holds the locked @vscode/vsce install used by `npm run package`
+    directories:
+      - /
+      - /tools/vsce
     schedule:
       interval: monthly
     commit-message:

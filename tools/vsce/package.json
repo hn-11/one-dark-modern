@@ -1,0 +1,8 @@
+{
+  "name": "one-dark-modern-vsce",
+  "private": true,
+  "description": "Locked install of @vscode/vsce for `npm run package`, kept out of the root install so the audit and build tooling stays small.",
+  "devDependencies": {
+    "@vscode/vsce": "^3.9.2"
+  }
+}

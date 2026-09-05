@@ -100,6 +100,10 @@ npm run typecheck
 npm run package    # build the .vsix
 ```
 
+`npm run package` installs `@vscode/vsce` from its own lockfile under
+`tools/vsce/` (about 290 transitive packages) so that the root install used
+by the build and the audits stays small.
+
 Requires Node.js >= 23.6 (scripts run as native TypeScript).
 
 ### Flicker audit
