@@ -1,5 +1,22 @@
 # Change Log
 
+## [0.1.6] - 2026-09-05
+
+### Changed
+
+- The `.vsix` now contains only what VS Code needs at runtime (the two
+  theme files, `package.json` and the README): 6 files instead of 58.
+- Design documentation is split into `docs/PHILOSOPHY.md` (principles) and
+  `docs/DECISIONS.md` (the per-family decision record), each with a
+  Japanese version. The upstream workbench theme is called by its VS Code
+  name, Dark 2026.
+- The flicker audit runs against TypeScript 7's built-in language server;
+  three TextMate/semantic disagreements that follow from TypeScript 7
+  classifying by declared type are recorded in `audit/allow.json`.
+- Tooling dependencies pruned: `typescript-language-server` and the unused
+  tree-sitter packages are gone, and `@vscode/vsce` lives in its own locked
+  install under `tools/vsce/`. Theme colors are unchanged.
+
 ## [0.1.3] - 2026-08-12
 
 ### Changed
