@@ -21,7 +21,7 @@ One Dark Pro、TextMate、セマンティックトークン、base16、flicker �
 | テーマ | ワークベンチ |
 |---|---|
 | One Dark Modern | VS Code Dark Modern |
-| One Dark 2026 | VS Code 2026 Dark（アクセントを `#528BFF` に再着色） |
+| One Dark 2026 | VS Code Dark 2026（アクセントを `#528BFF` に再着色） |
 
 背景色は必ずワークベンチ側の世代から取り、シンタックス層が背景色を決めることは
 ない。
@@ -100,7 +100,7 @@ export async function load(path: string, retries = MAX_RETRIES) {
 ### 3. やらないこと
 
 - UI 層はデザインの対象にしない。よほど見づらいか紛らわしい箇所を除いて、Dark
-  Modern や 2026 Dark のままにしておく。決定 §8 を参照。
+  Modern や Dark 2026 のままにしておく。決定 §8 を参照。
 - VS Code Dark+ や他のテーマを、それ自体を目的として真似ることはしない。決定 §5
   に一例がある。
 - 他のエディタの解釈を再現したものは製品として出さない。研究の道具としては役に
@@ -234,8 +234,8 @@ Pro の 150 ほどの言語別ルールは実際の文法に対する 10 年分�
   割り当てる（§2）。
 - `allow.json`: §5 で触れた、認めた TextMate とセマンティックの食い違いの
   一覧。それぞれに理由が付く。
-- Dark+、Dark Modern、2026 Dark: VS Code 標準のダークテーマ。Dark Modern と
-  2026 Dark はこのテーマのワークベンチ UI を供給し、Dark+ はかつて One Dark Pro
+- Dark+、Dark Modern、Dark 2026: VS Code 標準のダークテーマ。Dark Modern と
+  Dark 2026 はこのテーマのワークベンチ UI を供給し、Dark+ はかつて One Dark Pro
   が真似した相手として出てくるだけ（決定 §5）。
 - ワークベンチ: VS Code の UI クローム（サイドバー、タブ、ターミナルなど）で、
   エディタのシンタックス色と対になる言葉（§1、決定 §8）。

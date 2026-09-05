@@ -1,7 +1,7 @@
 # Weekly upstream follow-through, end to end: re-fetch the Microsoft workbench
 # themes, prove the rebuild is clean, merge it, and ship it.
 #
-#   detect  -> re-fetch Dark Modern and 2026 Dark (VS Code's default dark theme
+#   detect  -> re-fetch Dark Modern and Dark 2026 (VS Code's default dark theme
 #              since 1.113) into upstream/, rebuild with overrides/ applied
 #   ingest  -> PR on chore/upstream-sync, gated by CI
 #   release -> squash-merge, then dispatch release.yml with the next patch tag
@@ -17,7 +17,7 @@ name: Upstream sync
 
 on:
   schedule:
-    - cron: "0 6 * * 1" # weekly (Mon 06:00 UTC) while 2026 Dark churns as the new default; drop back to monthly ("0 6 1 * *") once it stabilizes
+    - cron: "0 6 * * 1" # weekly (Mon 06:00 UTC) while Dark 2026 churns as the new default; drop back to monthly ("0 6 1 * *") once it stabilizes
   workflow_dispatch:
 
 permissions:
@@ -109,8 +109,8 @@ jobs:
         uses: peter-evans/create-pull-request@v8
         with:
           branch: chore/upstream-sync
-          commit-message: "chore: sync upstream themes (Dark Modern / 2026 Dark)"
-          title: "Sync upstream themes (Dark Modern / 2026 Dark)"
+          commit-message: "chore: sync upstream themes (Dark Modern / Dark 2026)"
+          title: "Sync upstream themes (Dark Modern / Dark 2026)"
           body-path: /tmp/pr-body.md
 
       # A pull_request run for a PR opened by github-actions[bot] lands in
