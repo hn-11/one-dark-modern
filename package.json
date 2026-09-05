@@ -20,7 +20,7 @@
     "oracle": "node scripts/oracle.ts"
   },
   "devDependencies": {
-    "@types/node": "^26.2.0",
+    "@types/node": "^26.4.0",
     "@vscode/vsce": "^3.9.2",
     "tree-sitter-go": "^0.25.0",
     "tree-sitter-typescript": "^0.23.2",
@@ -28,7 +28,7 @@
     "typescript-language-server": "^5.3.0",
     "vscode-oniguruma": "^2.0.1",
     "vscode-textmate": "^9.3.2",
-    "web-tree-sitter": "^0.26.12"
+    "web-tree-sitter": "^0.26.13"
   },
   "engines": {
     "vscode": "^1.90.0",
