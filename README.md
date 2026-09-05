@@ -107,7 +107,7 @@ Requires Node.js >= 23.6 (scripts run as native TypeScript).
 Colors are verified against real engines, not against mapping tables or
 theme corpora. `npm run audit` (also run in CI) tokenizes `audit/fixtures/` with the real
 TextMate grammars (through `vscode-textmate`) and queries real language servers (gopls,
-typescript-language-server) for semantic tokens, then reports every token
+and TypeScript 7's built-in server via `tsc --lsp`) for semantic tokens, then reports every token
 whose color would visibly change when semantic highlighting lands. The rule:
 semantic may *correct* tokens TextMate left at the plain foreground, but must
 not repaint a color TextMate set deliberately — intentional exceptions live in

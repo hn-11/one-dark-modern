@@ -14,6 +14,23 @@ export interface Legend {
   tokenModifiers: string[];
 }
 
+// What VS Code's TypeScript client declares: the LSP specification's token
+// types and modifiers plus the extension's own `local` modifier. TypeScript
+// 7's built-in server only emits what the client declares, so a session for
+// it must advertise these.
+export const TYPESCRIPT_CLIENT_LEGEND: Legend = {
+  tokenTypes: [
+    "namespace", "type", "class", "enum", "interface", "struct", "typeParameter",
+    "parameter", "variable", "property", "enumMember", "event", "function",
+    "method", "macro", "keyword", "modifier", "comment", "string", "number",
+    "regexp", "operator", "decorator",
+  ],
+  tokenModifiers: [
+    "declaration", "definition", "readonly", "static", "deprecated", "abstract",
+    "async", "modification", "documentation", "defaultLibrary", "local",
+  ],
+};
+
 class Lsp {
   private proc: ChildProcess;
   private buf = Buffer.alloc(0);
@@ -73,7 +90,14 @@ export class SemanticSession {
   private lsp: Lsp;
   private legend: Legend | undefined;
   private ready: Promise<void>;
-  constructor(cmd: string, args: string[], cwd: string, initOptions: unknown, configResponse: unknown) {
+  constructor(
+    cmd: string,
+    args: string[],
+    cwd: string,
+    initOptions: unknown,
+    configResponse: unknown,
+    clientLegend: Legend = { tokenTypes: [], tokenModifiers: [] }
+  ) {
     this.lsp = new Lsp(cmd, args, cwd, configResponse);
     this.ready = this.lsp
       .request<{ capabilities: { semanticTokensProvider?: { legend: Legend } } }>("initialize", {
@@ -86,8 +110,8 @@ export class SemanticSession {
           textDocument: {
             semanticTokens: {
               requests: { full: true },
-              tokenTypes: [],
-              tokenModifiers: [],
+              tokenTypes: clientLegend.tokenTypes,
+              tokenModifiers: clientLegend.tokenModifiers,
               formats: ["relative"],
             },
           },
