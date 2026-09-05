@@ -22,7 +22,7 @@ differ only in the workbench generation underneath.
 | Theme | Workbench |
 |---|---|
 | One Dark Modern | VS Code Dark Modern |
-| One Dark 2026 | VS Code 2026 Dark (accent recolored to `#528BFF`) |
+| One Dark 2026 | VS Code Dark 2026 (accent recolored to `#528BFF`) |
 
 Backgrounds always come from the workbench generation; the syntax layer
 never sets them.
@@ -258,8 +258,8 @@ color; daily use has the final say.
   colors are assigned (§2).
 - `allow.json`: the list of accepted TextMate/semantic disagreements, each
   with a reason (§5).
-- Dark+, Dark Modern, 2026 Dark: VS Code's own default dark themes. Dark
-  Modern and 2026 Dark supply this theme's workbench UI; Dark+ matters only
+- Dark+, Dark Modern, Dark 2026: VS Code's own default dark themes. Dark
+  Modern and Dark 2026 supply this theme's workbench UI; Dark+ matters only
   as the theme One Dark Pro once imitated (Decisions §5).
 - Workbench: VS Code's UI chrome (sidebars, tabs, the terminal), as opposed
   to the editor's syntax colors (§1, Decisions §8).

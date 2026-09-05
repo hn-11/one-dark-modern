@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Accent-family guard for One Dark 2026.
 //
-// Upstream 2026 Dark styles its accent as a family of teal hues; we remap
+// Upstream Dark 2026 styles its accent as a family of teal hues; we remap
 // them all to One Dark blue via overrides/accent-2026.json. When upstream
 // adds a NEW teal, it would silently ship un-remapped - this scan fails CI
 // instead. Any color in the built One Dark 2026 theme whose hue falls in

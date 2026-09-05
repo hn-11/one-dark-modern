@@ -2,7 +2,7 @@
 // Build the VS Code themes from upstream UI snapshots + our own syntax source.
 //
 //   upstream/dark_modern.json   Dark Modern (microsoft/vscode)  -> UI base of "One Dark Modern"
-//   upstream/2026-dark.json     2026 Dark (includes dark_modern) -> UI base of "One Dark 2026"
+//   upstream/2026-dark.json     Dark 2026 (includes dark_modern) -> UI base of "One Dark 2026"
 //   syntax/tokens.json          the theme's own TextMate rules (family-annotated;
 //                               vendored from a decade of One Dark Pro tuning at
 //                               v0.1.0, curated under docs/PHILOSOPHY.md since)
@@ -105,7 +105,7 @@ buildVariant("One Dark Modern", "one-dark-modern-color-theme.json", [
   darkModern.colors,
   ovColors,
 ]);
-// One Dark 2026: 2026 Dark includes dark_modern upstream, so resolve the
+// One Dark 2026: Dark 2026 includes dark_modern upstream, so resolve the
 // include chain the same way VS Code does, recolor the upstream accent to
 // One Dark's (#528BFF, Atom's accent - already our cursor color), then
 // apply our overrides.
