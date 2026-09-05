@@ -14,7 +14,8 @@
 //   - TextMate: which theme tokenColors rules matched at least one fixture
 //     token (unexercised rules -> audit/coverage-tm.json, informational)
 //
-// Coverage: Go (gopls) and TypeScript (typescript-language-server).
+// Coverage: Go (gopls) and TypeScript/JavaScript (TypeScript 7's built-in
+// language server, `tsc --lsp`).
 // Python/Shell have no open-source semantic token servers (Pylance is
 // closed; bash-ls emits none), so they are TM-only here.
 //
@@ -24,7 +25,7 @@ import { readFileSync, writeFileSync, readdirSync, statSync } from "node:fs";
 import { dirname, join } from "node:path";
 import type * as tmTypes from "vscode-textmate";
 import { loadBuiltTheme, root } from "./lib.ts";
-import { SemanticSession, type SemToken } from "./lsp.ts";
+import { TYPESCRIPT_CLIENT_LEGEND, SemanticSession, type SemToken } from "./lsp.ts";
 
 const require = createRequire(import.meta.url);
 // both packages are CJS; require() them for reliable interop
@@ -277,12 +278,15 @@ for (const sub of readdirSync(goRoot)) {
 // TS/TSX/JS/JSX: one server per fixture dir, languageId by extension
 for (const sub of ["ts", "js"]) {
   const dir = join(root, "audit/fixtures", sub);
+  // TypeScript 7 ships its language server inside the compiler binary. It
+  // only emits token types the client declares, so advertise the standard set.
   const session = new SemanticSession(
-    join(root, "node_modules/.bin/typescript-language-server"),
-    ["--stdio"],
+    join(root, "node_modules/.bin/tsc"),
+    ["--lsp", "--stdio"],
     dir,
     {},
-    {}
+    {},
+    TYPESCRIPT_CLIENT_LEGEND
   );
   const files = readdirSync(dir)
     .map((f) => join(dir, f))

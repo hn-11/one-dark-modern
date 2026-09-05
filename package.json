@@ -12,7 +12,7 @@
   "scripts": {
     "build": "node scripts/build.ts && node scripts/build-jetbrains.ts && node scripts/build-ghostty.ts && node scripts/build-windows-terminal.ts && node scripts/build-vim.ts",
     "typecheck": "tsc --noEmit",
-    "package": "vsce package",
+    "package": "npx --yes @vscode/vsce@3.9.2 package",
     "vscode:prepublish": "npm run build",
     "audit": "node scripts/audit-flicker.ts",
     "version": "npm run build && git add themes",
@@ -21,14 +21,9 @@
   },
   "devDependencies": {
     "@types/node": "^26.4.0",
-    "@vscode/vsce": "^3.9.2",
-    "tree-sitter-go": "^0.25.0",
-    "tree-sitter-typescript": "^0.23.2",
-    "typescript": "^6.0.3",
-    "typescript-language-server": "^6.0.0",
+    "typescript": "^7.0.2",
     "vscode-oniguruma": "^2.0.1",
-    "vscode-textmate": "^9.3.2",
-    "web-tree-sitter": "^0.26.13"
+    "vscode-textmate": "^9.3.2"
   },
   "engines": {
     "vscode": "^1.90.0",

@@ -77,5 +77,38 @@
     "type": "property",
     "tmColor": "#e5c07b",
     "reason": "mid-chain properties (a.b.c) get One Dark Pro receiver-yellow via variable.other.object.property; same decision as variable receivers: identity-consistent red wins"
+  },
+  {
+    "lang": [
+      "typescript",
+      "typescriptreact",
+      "javascript",
+      "javascriptreact"
+    ],
+    "type": "parameter",
+    "tmColor": "#61afef",
+    "reason": "callable parameters invoked directly (callback(x)): TextMate guesses function-call blue; semantic parameter red keeps the variable family (identity principle). TypeScript 7's server classifies by declared type, where the old tsserver reclassified anything in call position as a function"
+  },
+  {
+    "lang": [
+      "typescript",
+      "typescriptreact",
+      "javascript",
+      "javascriptreact"
+    ],
+    "type": "variable",
+    "tmColor": "#61afef",
+    "reason": "callable variables invoked directly (compilation()): TextMate guesses function-call blue; semantic variable red keeps the variable family. Same TypeScript 7 change as the parameter entry above"
+  },
+  {
+    "lang": [
+      "typescript",
+      "typescriptreact",
+      "javascript",
+      "javascriptreact"
+    ],
+    "type": "function",
+    "tmColor": "#e06c75",
+    "reason": "function-valued bindings (var assign = require('object-assign')): TextMate sees a variable declaration (red); semantic function blue matches how the same binding is colored in TypeScript files. TypeScript 7 infers these in plain JavaScript where the old server did not"
   }
 ]
