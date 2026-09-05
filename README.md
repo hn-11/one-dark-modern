@@ -23,7 +23,7 @@ code --install-extension one-dark-modern-<version>.vsix
 Then select **One Dark Modern** via `Cmd+K Cmd+T`.
 
 The extension also ships **One Dark 2026** — the same One Dark syntax on
-VS Code's [2026 Dark](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/2026-dark.json)
+VS Code's [Dark 2026](https://github.com/microsoft/vscode/blob/main/extensions/theme-defaults/themes/2026-dark.json)
 workbench (darker `#121314` background), which as of VS Code 1.113 is the
 editor's default dark theme, with the accent recolored to One
 Dark's `#528BFF` (Atom's accent, same as the cursor) via
@@ -33,7 +33,7 @@ variant-specific tweaks go in `overrides/colors-2026.json`. The
 JetBrains/terminal/Vim artifacts are generated from One Dark 2026.
 
 Across both themes the policy is: **backgrounds belong to the UI
-generation** (Dark Modern `#1F1F1F` / 2026 Dark `#121314`); the syntax layer
+generation** (Dark Modern `#1F1F1F` / Dark 2026 `#121314`); the syntax layer
 contributes only text colors, terminal palette, selection and accent.
 
 ### JetBrains IDEs (IDEA / GoLand / WebStorm / PyCharm)
@@ -76,7 +76,7 @@ overrides/colors*.json         (ours)      ─┘
   14 by merging same-family rules, with every step verified against the
   real TextMate engine (identical resolution for all 6,762 fixture tokens
   and all 464 selectors).
-- `overrides/` holds the UI-layer diffs against Dark Modern / 2026 Dark
+- `overrides/` holds the UI-layer diffs against Dark Modern / Dark 2026
   (41 colors, plus the 2026 accent map). An override with the same key as
   an upstream entry replaces it; everything else flows through. The test
   for keeping an override: if this were deleted, would the theme's concept
@@ -161,7 +161,7 @@ colorize-tests suite (MIT), plus hand-written samples.
 ## Upstream sync (automated)
 
 A [scheduled workflow](.github/workflows/upstream-sync.yml) (weekly while
-2026 Dark still churns as the new default; monthly once it settles)
+Dark 2026 still churns as the new default; monthly once it settles)
 re-fetches the Microsoft workbench themes, rebuilds, and carries the change
 all the way to a release: it opens a PR, waits for the required checks
 (`build`, `flicker-audit`), squash-merges, and dispatches the release with
