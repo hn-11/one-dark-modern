@@ -11,3 +11,6 @@ package-lock.json
 dist/**
 jetbrains-audit/**
 tools/**
+audit/**
+syntax/**
+docs/**
