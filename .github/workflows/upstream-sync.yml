@@ -48,7 +48,8 @@ jobs:
 
       # The release this run cuts if the sync lands. Computed up front because
       # package.json has to carry it into the PR - release.yml refuses to
-      # publish a tag that disagrees with package.json.
+      # publish a tag that disagrees with package.json. A package.json version
+      # ahead of every tag is a bump that never got released; ship that one.
       - name: Compute next version
         id: version
         run: |
@@ -57,9 +58,15 @@ jobs:
             echo "no v* tag to bump from" >&2
             exit 1
           fi
-          next=$(echo "${latest#v}" | awk -F. '{printf "v%d.%d.%d", $1, $2, $3 + 1}')
+          pkg="v$(node -p "require('./package.json').version")"
+          top=$(printf '%s\n' "$latest" "$pkg" | sort -V | tail -1)
+          if [ "$pkg" = "$top" ] && [ "$pkg" != "$latest" ]; then
+            next=$pkg
+          else
+            next=$(echo "${latest#v}" | awk -F. '{printf "v%d.%d.%d", $1, $2, $3 + 1}')
+          fi
           echo "next=$next" >> "$GITHUB_OUTPUT"
-          echo "$latest -> $next"
+          echo "$latest (package.json $pkg) -> $next"
 
       # --- repo-specific ---
       - name: Refresh upstream
@@ -81,7 +88,7 @@ jobs:
           git --no-pager diff --stat -- upstream/ themes/ > /tmp/summary.txt
           # --ignore-scripts: this repo's `postversion` pushes to main, which
           # must not happen here. Only package.json / package-lock.json move.
-          npm version --no-git-tag-version --ignore-scripts "${NEXT#v}"
+          npm version --no-git-tag-version --ignore-scripts --allow-same-version "${NEXT#v}"
 
       - name: Compose PR body
         if: steps.refresh.outputs.changed == 'true'
