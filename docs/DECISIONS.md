@@ -20,11 +20,10 @@ and base16 files operators under base05, the foreground. The ecosystem
 survey later showed that cyan is one of three viable camps alongside plain
 and purple, shared with akamud and One Dark Pro.nvim. One Dark Pro had
 shipped a mix — logical operators cyan, ternary and optional purple through
-a word-operator group, the arrow purple, the rest plain — and that mix
-failed provenance review and was dropped in one sweep. An all-plain scheme
-shipped first. It was correct on paper and was reversed on sight the same
-day, because washed-out operators did not survive daily use, and we adopted
-Zed's all-cyan position instead.
+a word-operator group, the arrow purple, the rest plain — a mix that failed
+provenance review and was dropped. An all-plain scheme shipped first; while
+theoretically consistent, it was reversed immediately because uncolored operators
+degraded contrast in daily use, prompting the adoption of Zed's all-cyan scheme instead.
 
 `=>` is an operator, not a keyword (decided 2026-07-20). The purple arrow of
 TextMate-Atom and One Dark Pro lost to the modern sources: the official
@@ -110,11 +109,11 @@ causes are permanent `allow.json` entries.
 
 The key family is red across formats: JSON keys, YAML keys, CSS property
 names and TOML array keys. The CSS entry closed a hole in the family, with
-Zed as the source. TOML array keys had been type-yellow, a One Dark Pro
-leftover that surfaced the moment semantic rules became family-named,
-because "tomlArrayKey: type" reads as wrong in a way that "#e5c07b" never
-did. Vendor-prefixed CSS properties like `-webkit-*` stay cyan, since a
-vendor prefix is something the platform provides.
+Zed as the source. TOML array keys had been type-yellow, a One Dark Pro leftover
+that surfaced when semantic rules were converted to family names—the mismatch
+became immediately apparent as `tomlArrayKey: type`, whereas raw hex values like
+`#e5c07b` had obscured it. Vendor-prefixed CSS properties like `-webkit-*` stay
+cyan, since a vendor prefix is something the platform provides.
 
 Parameters are red italic. The ecosystem survey isolated this as a One Dark
 Pro signature (red is common there, the italic is not), and we keep it on
@@ -190,8 +189,9 @@ syntax cyan `#56B6C2`, so the 13-color accent family is recolored to
 
 ## 9. Mistakes we corrected
 
-These are conclusions the project got wrong and later fixed in public. They
-stay here because re-checking our own decisions is part of the method.
+This section documents earlier conclusions that were subsequently revised.
+Tracking these corrections preserves the rationale and ensures transparency
+behind the current ruleset.
 
 The consistency cleanup of 2026-07 came from auditing the theme against its
 own principles, and it found five places where the theme broke its own
@@ -245,7 +245,7 @@ modeled Zed's `"combined"` mode once §9's correction about LSP support
 landed.
 
 They were retired at v0.1.0. Several decisions above cite them, because
-putting both renderings side by side settled a number of "is our color or
-Zed's correct?" disputes, and living inside Zed's interpretation is what
-surfaced most of the operator, markup and type-family questions in the
+comparing both renderings directly resolved several debates over conflicting
+color choices, and actively testing Zed's interpretation in practice is what
+surfaced most of the operator, markup, and type-family questions in the
 first place.

@@ -2,12 +2,12 @@
 
 > 日本語版: [PHILOSOPHY.ja.md](PHILOSOPHY.ja.md)
 
-This document explains why the theme colors what it colors: what the theme
-is, what each color means, and the principles we argue color decisions
-from. The decisions themselves, with their evidence and history, live in
-[DECISIONS.md](DECISIONS.md), and a reference like "Decisions §3" points
-there. How the theme is built, verified and maintained is described in the
-[README](../README.md).
+This document outlines the rationale and design principles behind the color
+choices in this theme: its overall architecture, the semantic role of each
+color, and the guiding rules for palette decisions. The specific decisions,
+with their evidence and history, are recorded in [DECISIONS.md](DECISIONS.md)
+(referenced as "Decisions §3"). How the theme is built, verified and maintained
+is described in the [README](../README.md).
 
 One Dark Pro, TextMate, semantic tokens, base16 and flicker are defined in
 the glossary at the end.
@@ -27,18 +27,17 @@ differ only in the workbench generation underneath.
 Backgrounds always come from the workbench generation; the syntax layer
 never sets them.
 
-The theme blends three things: this repository's own One Dark syntax
+The theme combines three elements: this repository's own One Dark syntax
 colors, the Dark Modern UI with its `#181818`/`#1F1F1F` surfaces and
 `#0078D4` accent, and the 16-color ANSI terminal palette from Atom's
-one-dark-ui. That blend is the whole concept.
+one-dark-ui. This combination defines the theme's core concept.
 
 ### 2. The color vocabulary
 
-Each color stands for a family of meaning, and you should be able to tell
-what kind of symbol you are looking at from its color alone. That is the
-main thing the theme offers, so borrowing a color for a second family is not
-allowed by default. Every borrowed color makes the mapping a little less
-readable.
+Each color represents a distinct semantic family, allowing you to identify
+a symbol's role from its color alone. Because this is the core value of the
+theme, reusing a color across multiple families is avoided by default to
+keep the mapping consistent and unambiguous.
 
 The families below are the ones in `syntax/families.json`. Every rule in
 `syntax/tokens.json` and `syntax/semantic.json` names one of them, and the
@@ -118,13 +117,12 @@ that gap is the sanctioned exception described in Decisions §4.
 
 ## Part II — How we decide
 
-### 4. Provenance: where a color comes from decides how much weight it carries
+### 4. Provenance: where a color comes from determines its weight
 
-An inherited color is only as authoritative as its history, and "it was in
-One Dark Pro" stops being a reason once you know where One Dark Pro got it.
-One Dark exists in many implementations, and they disagree. When they do,
-we settle the disagreement with evidence rather than by asking which
-implementation this theme happens to descend from.
+An inherited color is only as valid as its history; "it was in One Dark Pro"
+ceases to be a justification once the upstream origin is identified. One
+Dark exists in many diverging implementations; when they conflict, we
+resolve the disagreement with verifiable evidence rather than lineage alone.
 
 #### The five sources
 
@@ -165,8 +163,8 @@ This is not vote-counting, but a few patterns have proven reliable.
   tree-sitter generation, and in such cases we follow the generation our
   own stack descends from.
 - A split that no source makes is weaker than any source's position.
-  Painting all symbol operators one color is a position; splitting logical
-  operators off from the rest is an invention.
+  Painting all symbol operators one color is a principled position; splitting
+  logical operators off from the rest is an arbitrary deviation.
 
 #### The wider ecosystem
 
@@ -219,24 +217,24 @@ principle wins.
 
 ### 7. Pragmatism about upstream
 
-We tried a faithful rebuild from `atom/one-dark-syntax` once and gave it up,
-because gray parameters, foreground operators and dark comments did not
-survive daily use. One Dark Pro's roughly 150 language-specific rules are a
-decade of tuning against real grammars, and that is worth a lot. But One
-Dark Pro is a dependency we review rather than an authority we follow, and
-each of its rules stood only until provenance review found one with a weak
-history. It started as the reference, became a dependency reviewed rule by
-rule, and is now one source among several. Anything worth importing from
-it arrives the way any other source's position does, through a decision.
+An exact rebuild from `atom/one-dark-syntax` was tested early on and set aside:
+gray parameters, uncolored operators, and dark comments proved impractical for
+daily use. One Dark Pro's ~150 language-specific rules represent a decade of
+tuning against real-world grammars, which is a valuable asset. However, One
+Dark Pro is a dependency to review rather than an absolute authority, and each
+rule remained only until provenance review identified a weak rationale. It
+began as the primary reference, became a dependency reviewed rule by rule, and
+now serves as one source among several. Desirable rules are incorporated
+through the standard decision process.
 
-For taste calls the yardstick is eyes calibrated by years of daily use of
-this family of themes. That has had two consequences, and we record both
-honestly. First, we keep two One Dark Pro signatures purely on taste:
-parameter italic, and constants-yellow, which we kept for a long time
-before the evidence retired it. Decisions §4 and §2 tell both stories. Second, we once
-rejected a scheme that was correct on paper — the all-plain operators of
-Decisions §1 — because it looked wrong in practice. History proposes a
-color; daily use has the final say.
+When subjective visual ergonomics are involved, decisions are guided by long-term
+daily use of this family of themes. This has led to two notable outcomes:
+First, two One Dark Pro traits were preserved for readability: italic parameters
+(Decisions §4) and yellow constants, which were kept until evidence favored
+unification (Decisions §2). Second, a scheme that was theoretically pure—the
+all-plain operators of Decisions §1—was rejected because it degraded contrast in
+practice. Historical precedent proposes candidate colors; real-world usability
+determines the outcome.
 
 ## Glossary
 

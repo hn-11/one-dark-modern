@@ -135,10 +135,10 @@ cd .. && node scripts/compare-jetbrains-dump.ts GO
 ```
 
 Known vocabulary limits found this way: IntelliJ has no const/readonly key
-for TS and no parameter key for Python beyond `DEFAULT_PARAMETER`. How much
-verification a platform gets follows how much intelligence sits between the
-theme and the pixels: IntelliJ most, then VS Code, then Vim; terminals are
-passive palettes, so generation correctness is all there is to check.
+for TS and no parameter key for Python beyond `DEFAULT_PARAMETER`. The level of
+verification for each platform reflects the complexity of its syntax engine:
+IntelliJ requires the most verification, followed by VS Code and Vim, while
+terminals are passive palettes where output correctness is sufficient.
 
 Coverage is tracked two ways: observed semantic `type.modifier` combos are
 snapshotted in `audit/coverage-semantic.json` (new combos fail the audit until
@@ -179,7 +179,7 @@ scheduled run opens a fresh one.
 
 ## Releasing
 
-Upstream syncs release themselves. To cut one by hand:
+Upstream syncs trigger releases automatically. To cut one by hand:
 
 ```sh
 npm version patch   # builds, stages themes/, commits, tags, and pushes
