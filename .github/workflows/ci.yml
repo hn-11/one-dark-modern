@@ -32,6 +32,7 @@ jobs:
       - run: npm run package
       - name: Validate JetBrains scheme (XML + attribute keys)
         run: |
+          sudo apt-get update -qq
           sudo apt-get install -y --no-install-recommends libxml2-utils >/dev/null
           xmllint --noout dist/jetbrains/OneDarkModern.icls
           node scripts/audit-jetbrains.ts
