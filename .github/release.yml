@@ -1,0 +1,8 @@
+# Shapes the notes release.yml generates from merged pull requests
+# (generate_release_notes). Dependabot labels its PRs "dependencies";
+# a bumped build tool changes nothing for someone using the theme, so
+# those stay out of the notes.
+changelog:
+  exclude:
+    labels:
+      - dependencies
